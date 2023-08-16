@@ -1,5 +1,6 @@
 import SurahAyahList from "@/components/SurahAyahList";
 import getSingleSurah from "@/lib/api/getSingleSurah";
+import Link from "next/link";
 
 async function Surah({ params }) {
   const { id } = params || {};
@@ -12,7 +13,7 @@ async function Surah({ params }) {
 
   return (
     <div className="px-5 pt-4 pb-28">
-      <div className="text-2xl font-bold">{englishName}</div>
+      <Link href="/" className="text-2xl font-bold inline-block mb-2">{englishName}</Link>
       <SurahAyahList
         arabicAyah={arabicAyah}
         englishTransAyah={englishTransAyah}

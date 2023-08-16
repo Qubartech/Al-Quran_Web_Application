@@ -5,18 +5,22 @@ import SurahAudioPlayer from "./SurahAudioPlayer";
 import SurahPlayBtn from "./SurahPlayBtn";
 
 const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio }) => {
+  const [ayahNum, setAyahNum] = useState(null);
   const [audioSrc, setAudioSrc] = useState("");
-  const [pause, setPause] = useState(false);
 
   function playControl(ayahNum) {
-    setAudioSrc("");
     setAudioSrc(ayahAudio[ayahNum].audio);
-    setPause(true);
+    setAyahNum(ayahNum);
+  }
+
+  function autoplayNext() {
+    if (ayahNum < arabicAyah.length - 1) playControl(ayahNum + 1);
+    else setAudioSrc("");
   }
 
   return (
     <>
-      <SurahAudioPlayer src={audioSrc} pause={pause} />
+      <SurahAudioPlayer src={audioSrc} autoplayNext={autoplayNext} />
 
       {arabicAyah.map((ayah, idx) => {
         return (
