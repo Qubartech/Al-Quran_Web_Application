@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import SurahAudioPlayer from "./surahAudioPlayer";
+import SurahAudioPlayer from "./SurahAudioPlayer";
 
 function SurahPlayBtn({ playNum, AudioArr }) {
   const [audioSrc, setAudioSrc] = useState("");

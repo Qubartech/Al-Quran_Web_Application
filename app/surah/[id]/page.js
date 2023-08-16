@@ -1,7 +1,6 @@
 
 
 import SurahPlayBtn from "@/components/SurahPlayBtn";
-import SurahAudioPlayer from "@/components/surahAudioPlayer";
 import getSingleSurah from "@/lib/api/getSingleSurah";
 
 
