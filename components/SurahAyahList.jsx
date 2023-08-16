@@ -26,7 +26,13 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio }) => {
         return (
           <div key={idx} className="py-2">
             <div className=" bg-white rounded-md p-3">
-              <div className="text-lg text-end">{ayah.text}</div>
+              <div
+                className={`text-md md:text-xl font-semibold text-end ${
+                  ayahNum === idx && audioSrc !== "" && "text-red-500"
+                }`}
+              >
+                {ayah.text}
+              </div>
               <div>{englishTransAyah[idx].text}</div>
               <SurahPlayBtn playControl={() => playControl(idx)} />
             </div>
