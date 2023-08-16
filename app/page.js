@@ -14,8 +14,8 @@ export default async function Home() {
         {data?.map((surah, idx) => {
           return (
             <Link href={`/surah/${surah.number}`} key={idx}>
-              <div className="w-full bg-white p-5 rounded-md shadow-sm flex items-center border boerder-transparent hover:border hover:border-red-500 group">
-                <div className="h-10 w-10 bg-gray-200 group-hover:text-white group-hover:bg-red-500 rotate-45 text-black flex items-center justify-center rounded-md">
+              <div className="w-full bg-white p-5 rounded-md shadow-sm flex items-center border border-transparent hover:border hover:border-red-500 group">
+                <div className="h-12 w-12 bg-gray-200 group-hover:text-white group-hover:bg-red-500 rotate-[45deg] text-black flex items-center justify-center rounded-sm">
                   <div className="rotate-[-45deg] font-semibold">{idx + 1}</div>
                 </div>
                 <div className="pl-4 flex justify-between w-full font-semibold">
