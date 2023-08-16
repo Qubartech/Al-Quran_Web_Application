@@ -4,7 +4,6 @@ import Link from "next/link";
 export default async function Home() {
   const surahList = await getSurahList();
   const { data } = surahList || {};
-  console.log(surahList);
 
   return (
     <main className="bg-gray-100 md:px-20 px-4">
