@@ -18,6 +18,7 @@ async function Surah({ params }) {
         arabicAyah={arabicAyah}
         englishTransAyah={englishTransAyah}
         ayahAudio={ayahAudio}
+        pageId={id}
       />
     </div>
   );
