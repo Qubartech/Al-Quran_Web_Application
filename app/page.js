@@ -7,9 +7,9 @@ export default async function Home() {
 
   return (
     <main className="bg-gray-100 md:px-20 px-4">
-      <h1 className="pt-5 pb-3 text-xl font-bold">Surah List</h1>
+      <h1 className="pt-5 pb-4 text-xl font-bold">Surah List</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 pb-10">
         {data?.map((surah, idx) => {
           return (
             <Link href={`/surah/${surah.number}`} key={idx}>

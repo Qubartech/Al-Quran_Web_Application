@@ -1,9 +1,9 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import SurahAudioPlayer from "./SurahAudioPlayer";
 import SurahPlayBtn from "./SurahPlayBtn";
-import { useRouter } from "next/navigation";
 // import { useRouter } from "next/router";
 
 const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
@@ -17,29 +17,40 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
     router.push(`/surah/${pageId}/#${ayahNum}`);
   }
 
-  function autoplayNext() {
-    if (ayahNum < arabicAyah.length - 1) playControl(ayahNum + 1);
-    else setAudioSrc("");
+  function playAdjacentAudio(playNext = true) {
+    let ayahToPlay = null;
+
+    if (playNext && ayahNum < arabicAyah.length - 1) ayahToPlay = ayahNum + 1;
+    else if (!playNext && ayahNum > 1) ayahToPlay = ayahNum - 1;
+    else {
+      ayahToPlay = null;
+      setAudioSrc("");
+    }
+
+    ayahToPlay && playControl(ayahToPlay);
   }
 
   return (
     <>
-      <SurahAudioPlayer src={audioSrc} autoplayNext={autoplayNext} />
+      <SurahAudioPlayer src={audioSrc} playAdjacentAudio={playAdjacentAudio} />
 
       {arabicAyah.map((ayah, idx) => {
+        const isPlaying = ayahNum === idx && audioSrc !== "";
         return (
           <div key={idx} className="py-2" id={idx}>
             <div className=" bg-white rounded-md p-3 shadow-sm">
               <div
                 className={`text-md md:text-xl font-semibold text-end ${
-                  ayahNum === idx && audioSrc !== "" && "text-red-500"
+                  isPlaying ? "text-red-500" : ""
                 }`}
-                
               >
                 {ayah.text}
               </div>
               <div>{englishTransAyah[idx].text}</div>
-              <SurahPlayBtn playControl={() => playControl(idx)} />
+              <SurahPlayBtn
+                isPlaying={isPlaying}
+                playControl={() => playControl(idx)}
+              />
             </div>
             {/* {englishTransAyah.((ayah, idx) => {
               return (

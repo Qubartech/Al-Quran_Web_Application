@@ -2,7 +2,7 @@
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 
-function SurahAudioPlayer({ src, autoplayNext }) {
+function SurahAudioPlayer({ src, playAdjacentAudio }) {
   return (
     <>
       {src && (
@@ -11,7 +11,9 @@ function SurahAudioPlayer({ src, autoplayNext }) {
             autoPlay
             className=""
             src={src}
-            onEnded={autoplayNext}
+            onEnded={playAdjacentAudio}
+            onClickNext={playAdjacentAudio}
+            onClickPrevious={() => playAdjacentAudio(false)}
             showSkipControls
             // other props here
           />
