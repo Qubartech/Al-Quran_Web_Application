@@ -13,7 +13,7 @@ async function Surah({ params }) {
 
   return (
     <div className="px-5 pt-4 pb-28">
-      <Link href="/" className="text-2xl font-bold inline-block mb-2">{englishName}</Link>
+      {/* <Link href="/" className="text-2xl font-bold inline-block mb-2">{englishName}</Link> */}
       <SurahAyahList
         arabicAyah={arabicAyah}
         englishTransAyah={englishTransAyah}

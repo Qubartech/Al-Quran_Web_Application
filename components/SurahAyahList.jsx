@@ -40,7 +40,7 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
           <div key={idx} className="py-2" id={idx}>
             <div className=" bg-white rounded-md p-3 shadow-sm">
               <div
-                className={`text-md md:text-xl font-semibold text-end ${
+                className={`text-xl md:text-4xl  text-end font-arabic pb-7 ${
                   isPlaying ? "text-red-500" : ""
                 }`}
               >
