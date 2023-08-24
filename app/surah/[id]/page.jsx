@@ -5,6 +5,7 @@ import Link from "next/link";
 async function Surah({ params }) {
   const { id } = params || {};
   const singleSurah = await getSingleSurah(id);
+  // console.log(singleSurah)
 
   const { data } = singleSurah || {};
   const { ayahs: arabicAyah, englishName } = data[0] || {};
