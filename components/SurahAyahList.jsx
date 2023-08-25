@@ -63,15 +63,6 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
                 <div>{englishTransAyah[idx].text}</div>
               </div>
             </div>
-            {/* {englishTransAyah.((ayah, idx) => {
-              return (
-                <div key={idx} className="py-2">
-                  <div className="text-end bg-white rounded-md p-3">
-                    {ayah.text}
-                  </div>
-                </div>
-              );
-            })} */}
           </div>
         );
       })}
