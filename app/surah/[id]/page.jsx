@@ -13,7 +13,7 @@ async function Surah({ params }) {
   const { ayahs: ayahAudio } = data[2] || {};
 
   return (
-    <div className="px-5 pt-4 pb-28">
+    <div className="px-5 py-4">
       {/* <Link href="/" className="text-2xl font-bold inline-block mb-2">{englishName}</Link> */}
       <SurahAyahList
         arabicAyah={arabicAyah}

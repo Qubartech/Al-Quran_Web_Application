@@ -1,4 +1,5 @@
 import "@/assets/css/globals.css";
+import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 // import "boxicons";
 import { Inter } from "next/font/google";
@@ -24,6 +25,7 @@ export default function RootLayout({ children }) {
         <div className="relative scroll-smooth max-w-screen-xl mx-auto min-h-screen pt-16">
           {children}
         </div>
+        <Footer />
       </body>
     </html>
   );
