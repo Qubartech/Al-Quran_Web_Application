@@ -1,6 +1,5 @@
 import SurahAyahList from "@/components/SurahAyahList";
 import getSingleSurah from "@/lib/api/getSingleSurah";
-import Link from "next/link";
 
 async function Surah({ params }) {
   const { id } = params || {};

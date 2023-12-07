@@ -1,6 +1,7 @@
 import LeftBar from "@/components/LeftBar";
 
-function LeftLayout({ children }) {
+async function LeftLayout({ children }) {
+
   return (
     <div className="flex justify-between w-full">
       <div className="w-96 hidden md:block">
