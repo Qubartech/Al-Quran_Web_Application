@@ -38,32 +38,34 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
         const isPlaying = ayahNum === idx && audioSrc !== "";
         const { text } = ayah || {};
         return (
-          <div key={idx} className="py-1" id={idx}>
-            <div className=" bg-white rounded-md p-5 shadow-sm flex justify-between w-full">
-              <div className="w-12 flex items-center">
-                <div className="text-xs font-semibold text-gray-600 flex flex-col items-center justify-center">
-                  {pageId}:{idx + 1}
-                  <div className="w-full">
-                    <SurahPlayBtn
-                      isPlaying={isPlaying}
-                      playControl={() => playControl(idx)}
-                    />
+          <>
+            <div key={idx} className="py-1" id={idx}>
+              <div className="p-5 border-b flex gap-6 justify-between w-full">
+                <div className="w-12 flex items-center">
+                  <div className="text-xs font-semibold text-gray-600 flex flex-col items-center justify-center">
+                    {pageId}:{idx + 1}
+                    <div className="w-full">
+                      <SurahPlayBtn
+                        isPlaying={isPlaying}
+                        playControl={() => playControl(idx)}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="w-full">
-                <div
-                  className={`text-xl md:text-4xl  text-end font-arabic pb-7 ${
-                    isPlaying ? "text-red-500" : ""
-                  }`}
-                >
-                  {text}
+                <div className="w-full">
+                  <div
+                    className={`text-xl md:text-3xl font-semibold  text-end font-arabic pb-7 ${
+                      isPlaying ? "text-red-500" : ""
+                    }`}
+                  >
+                    {text}
+                  </div>
+                  <div>{englishTransAyah[idx].text}</div>
                 </div>
-                <div>{englishTransAyah[idx].text}</div>
               </div>
             </div>
-          </div>
+          </>
         );
       })}
     </>
