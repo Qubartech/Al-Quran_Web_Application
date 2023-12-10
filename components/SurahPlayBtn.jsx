@@ -1,9 +1,11 @@
 "use client";
 
-function SurahPlayBtn({ playControl, isPlaying }) {
+function SurahPlayBtn({ playControl, isPlaying, setShowPlayer }) {
   return (
     <button
-      onClick={playControl}
+      onClick={() => {
+        playControl(); setShowPlayer(true);
+      }}
       className={`rounded-md mt-2 ${
         isPlaying ? "opacity-50 pointer-events-none" : ""
       }`}

@@ -9,14 +9,16 @@ async function Surah({ params }) {
   const { data } = singleSurah || {};
   const { ayahs: arabicAyah, englishName } = data[0] || {};
   const { ayahs: englishTransAyah } = data[1] || {};
-  const { ayahs: ayahAudio } = data[2] || {}
+  const { ayahs: ayahAudio } = data[2] || {};
 
-  console.log(data[0].number)
+  console.log(data[0].number);
 
   return (
     <div className="px-5">
       {/* <Link href="/" className="text-2xl font-bold inline-block mb-2">{englishName}</Link> */}
-      <div className="flex flex-col gap-4 justify-center items-center py-9 border-b bg-gray-100 mt-4 rounded-lg">
+      <div className="py-7 border-b bg-gray-100 mt-4 rounded-lg bg-[url('/bg.jpg')] bg-repeat relative overflow-hidden">
+        <div className="backdrop-blur-[2px] bg-white/30 absolute top-0 left-0 w-full h-full"></div>
+        <div className="relative z-10 flex flex-col gap-4 justify-center items-center ">
         <div className="text-4xl font-semibold">{englishName}</div>
         <div>
           <svg
@@ -37,7 +39,7 @@ async function Surah({ params }) {
               </g>
             </switch>
           </svg>
-        </div>
+        </div></div>
       </div>
       <SurahAyahList
         arabicAyah={arabicAyah}

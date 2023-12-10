@@ -10,6 +10,7 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
   const [ayahNum, setAyahNum] = useState(null);
   const [audioSrc, setAudioSrc] = useState("");
   const router = useRouter();
+  const [showPlayer, setShowPlayer] = useState(false);
 
   function playControl(ayahNum) {
     setAudioSrc(ayahAudio[ayahNum].audio);
@@ -30,9 +31,19 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
     ayahToPlay && playControl(ayahToPlay);
   }
 
+  const closePlayer = () => {
+    setShowPlayer(false);
+    // Additional logic to pause or stop audio playback if needed
+  };
+
   return (
     <>
-      <SurahAudioPlayer src={audioSrc} playAdjacentAudio={playAdjacentAudio} />
+      {showPlayer && <SurahAudioPlayer
+        src={audioSrc}
+        playAdjacentAudio={playAdjacentAudio}
+        onClose={closePlayer}
+      />
+      }
 
       {arabicAyah.map((ayah, idx) => {
         const isPlaying = ayahNum === idx && audioSrc !== "";
@@ -48,6 +59,7 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
                       <SurahPlayBtn
                         isPlaying={isPlaying}
                         playControl={() => playControl(idx)}
+                        setShowPlayer= {setShowPlayer}
                       />
                     </div>
                   </div>
