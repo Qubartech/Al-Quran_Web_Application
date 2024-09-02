@@ -1,8 +1,10 @@
 import "@/assets/css/globals.css";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import AppThemeProvider from "@/context/ThemeProvider";
 // import "boxicons";
 import { Inter } from "next/font/google";
+import { cookies } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -12,6 +14,8 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const theme = cookies().get("__theme__")?.value || "light";
+
   return (
     <html lang="en">
       <head>
@@ -21,11 +25,13 @@ export default function RootLayout({ children }) {
         ></script>
       </head>
       <body className={`${inter.className} bg-gray-100`}>
-        <Navbar />
-        <div className="relative scroll-smooth max-w-screen-xl mx-auto min-h-screen pt-16">
-          {children}
-        </div>
-        <Footer />
+        <AppThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <Navbar />
+          <div className="relative scroll-smooth max-w-screen-xl mx-auto min-h-screen pt-16">
+            {children}
+          </div>
+          <Footer />
+        </AppThemeProvider>
       </body>
     </html>
   );
