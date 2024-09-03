@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const defaultTheme = require("tailwindcss/defaultTheme");
+
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -15,7 +17,7 @@ module.exports = {
       },
 
       fontFamily: {
-        arabic: ["Arabic", "sans-serif"],
+        arabic: ["Arabic", , ...defaultTheme.fontFamily.sans],
       },
     },
   },
