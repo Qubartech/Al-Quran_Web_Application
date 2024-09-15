@@ -15,12 +15,11 @@ function Footer() {
               <span className="self-center text-3xl font-semibold whitespace-nowrap dark:text-white">
                 Quran
               </span>
-              </a>
-              <div className="max-w-[32rem] text-gray-700 mt-2">
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                Consectetur hic nisi explicabo minus voluptas aspernatur.
-              </div>
-            
+            </a>
+            <div className="max-w-[32rem] text-gray-700 mt-2">
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit.
+              Consectetur hic nisi explicabo minus voluptas aspernatur.
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
             <div>
