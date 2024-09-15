@@ -22,7 +22,7 @@ function Navbar() {
   // }, []);
 
   return (
-    <div className="px-5 bg-white dark:bg-black mb-4 shadow fixed left-0 right-0 w-full z-50">
+    <div className="px-5 bg-white dark:dark:bg-[#1a253c] mb-4 shadow fixed left-0 right-0 w-full z-50">
       <div className="max-w-screen-xl mx-auto py-4 flex justify-between items-center">
         <div className="text-3xl font-semibold">
           <Link href="/">Quran</Link>
