@@ -16,8 +16,10 @@ export default async function Home() {
           return (
             <Link href={`/surah/${surah.number}`} key={idx}>
               <div className="w-full p-5 rounded-md shadow-sm flex items-center border border-transparent hover:border hover:border-red-500 group">
-                <div className="h-[50px] w-[60px] bg-gray-200 dark:bg-black group-hover:text-white group-hover:bg-red-500 rotate-[45deg] text-black flex items-center justify-center rounded-md">
-                  <div className="rotate-[-45deg] text-xl font-semibold">{idx + 1}</div>
+                <div className="h-[50px] w-[60px] bg-gray-200 dark:bg-[#111827] group-hover:text-white group-hover:bg-red-500 rotate-[45deg] text-black flex items-center justify-center rounded-md">
+                  <div className="rotate-[-45deg] text-xl font-semibold">
+                    {idx + 1}
+                  </div>
                 </div>
                 <div className="pl-4 flex justify-between w-full font-semibold">
                   <div className="">
