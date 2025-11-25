@@ -38,12 +38,13 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
 
   return (
     <>
-      {showPlayer && <SurahAudioPlayer
-        src={audioSrc}
-        playAdjacentAudio={playAdjacentAudio}
-        onClose={closePlayer}
-      />
-      }
+      {showPlayer && (
+        <SurahAudioPlayer
+          src={audioSrc}
+          playAdjacentAudio={playAdjacentAudio}
+          onClose={closePlayer}
+        />
+      )}
 
       {arabicAyah.map((ayah, idx) => {
         const isPlaying = ayahNum === idx && audioSrc !== "";
@@ -51,15 +52,15 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
         return (
           <>
             <div key={idx} className="py-1" id={idx}>
-              <div className="p-5 border-b flex gap-6 justify-between w-full">
+              <div className="p-5 border-b border-gray-200 dark:border-gray-700 flex gap-6 justify-between w-full bg-white dark:bg-gray-900 transition-colors">
                 <div className="w-12 flex items-center">
-                  <div className="text-xs font-semibold text-gray-600 flex flex-col items-center justify-center">
+                  <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 flex flex-col items-center justify-center">
                     {pageId}:{idx + 1}
                     <div className="w-full">
                       <SurahPlayBtn
                         isPlaying={isPlaying}
                         playControl={() => playControl(idx)}
-                        setShowPlayer= {setShowPlayer}
+                        setShowPlayer={setShowPlayer}
                       />
                     </div>
                   </div>
@@ -67,13 +68,17 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
 
                 <div className="w-full">
                   <div
-                    className={`text-xl md:text-3xl font-semibold  text-end font-arabic pb-7 ${
-                      isPlaying ? "text-red-500" : ""
+                    className={`text-xl md:text-3xl font-semibold text-end font-arabic pb-7 ${
+                      isPlaying
+                        ? "text-red-500"
+                        : "text-gray-900 dark:text-gray-100"
                     }`}
                   >
                     {text}
                   </div>
-                  <div>{englishTransAyah[idx].text}</div>
+                  <div className="text-gray-700 dark:text-gray-300">
+                    {englishTransAyah[idx].text}
+                  </div>
                 </div>
               </div>
             </div>

@@ -17,8 +17,7 @@ function Footer() {
               </span>
             </a>
             <div className="max-w-[32rem] text-gray-700 mt-2">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-              Consectetur hic nisi explicabo minus voluptas aspernatur.
+              A lightweight Next.js Quran app with translations, search, and audio.
             </div>
           </div>
           <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
@@ -28,16 +27,16 @@ function Footer() {
               </h2>
               <ul className="text-gray-500 dark:text-gray-400 font-medium">
                 <li className="mb-4">
-                  <a href="https://flowbite.com/" className="hover:underline">
-                    Flowbite
+                  <a href="https://qubartech.com/" className="hover:underline">
+                    Qubartech
                   </a>
                 </li>
                 <li>
                   <a
-                    href="https://tailwindcss.com/"
+                    href="https://alquaran.com/"
                     className="hover:underline"
                   >
-                    Tailwind CSS
+                    Quran API
                   </a>
                 </li>
               </ul>
@@ -88,8 +87,8 @@ function Footer() {
         <div className="sm:flex sm:items-center sm:justify-between">
           <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
             © 2023{" "}
-            <a href="https://flowbite.com/" className="hover:underline">
-              Flowbite™
+            <a href="https://qubartech.com/" className="hover:underline">
+              Qubartech™
             </a>
             . All Rights Reserved.
           </span>

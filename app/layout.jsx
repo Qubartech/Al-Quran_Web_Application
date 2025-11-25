@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
         ></script>
       </head>
       <body className={`${inter.className} bg-gray-100 dark:bg-black`}>
-        <AppThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <AppThemeProvider attribute="class" defaultTheme={theme} enableSystem>
           <Navbar />
           <div className="relative scroll-smooth max-w-screen-xl mx-auto min-h-screen pt-16">
             {children}
