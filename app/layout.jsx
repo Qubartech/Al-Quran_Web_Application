@@ -24,10 +24,10 @@ export default function RootLayout({ children }) {
           async
         ></script>
       </head>
-      <body className={`${inter.className} bg-gray-100 dark:bg-black`}>
+      <body className={`${inter.className} bg-gray-100 dark:bg-[#111827]`}>
         <AppThemeProvider attribute="class" defaultTheme={theme} enableSystem>
           <Navbar />
-          <div className="relative scroll-smooth max-w-screen-xl mx-auto min-h-screen pt-16">
+          <div className="relative scroll-smooth max-w-screen-2xl mx-auto min-h-screen pt-16">
             {children}
           </div>
           <Footer />

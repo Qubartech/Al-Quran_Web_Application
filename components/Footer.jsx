@@ -2,8 +2,8 @@ import React from "react";
 
 function Footer() {
   return (
-    <footer className="bg-white dark:bg-gray-900">
-      <div className="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
+    <footer className="bg-white dark:bg-gray-800">
+      <div className="mx-auto w-full max-w-screen-2xl p-4 py-6 lg:py-8">
         <div className="md:flex md:justify-between">
           <div className="mb-6 md:mb-0">
             <a href="https://flowbite.com/" className="flex items-center">
@@ -16,7 +16,7 @@ function Footer() {
                 Quran
               </span>
             </a>
-            <div className="max-w-[32rem] text-gray-700 mt-2">
+            <div className="max-w-[32rem] text-gray-400 mt-2">
               A lightweight Next.js Quran app with translations, search, and audio.
             </div>
           </div>
@@ -33,7 +33,7 @@ function Footer() {
                 </li>
                 <li>
                   <a
-                    href="https://alquaran.com/"
+                    href="https://alquran.com/"
                     className="hover:underline"
                   >
                     Quran API
