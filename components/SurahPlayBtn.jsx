@@ -7,7 +7,7 @@ function SurahPlayBtn({ playControl, isPlaying, setShowPlayer }) {
         playControl();
         setShowPlayer(true);
       }}
-      className={`rounded-md mt-2 hover:bg-red-500 dark:hover:bg-red-600 text-black dark:text-gray-100 transition-colors ${
+      className={`rounded-md mt-2 hover:bg-primary dark:hover:bg-primary-dark text-black dark:text-gray-100 transition-colors ${
         isPlaying ? "opacity-50 pointer-events-none" : ""
       }`}
     >

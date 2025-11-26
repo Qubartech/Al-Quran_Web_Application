@@ -31,7 +31,7 @@ async function Surah({ params }) {
               viewBox="0 0 176 36"
               overflow="inherit"
               xmlSpace="preserve"
-              className="text-green-700 dark:text-green-400"
+              className="text-primary dark:text-primary-light"
             >
               <switch>
                 <g>

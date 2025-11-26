@@ -20,6 +20,19 @@ module.exports = {
       fontFamily: {
         arabic: ["Arabic", , ...defaultTheme.fontFamily.sans],
       },
+
+      colors: {
+        primary: {
+          DEFAULT: '#22c55e', // Tailwind green-500
+          light: '#4ade80',   // green-400
+          dark: '#16a34a',    // green-600
+        },
+      },
+      animation: {
+        ayahHighlight: 'ayahHighlight 7s',
+      },
+      keyframes: {
+      },
     },
   },
   plugins: [require("flowbite/plugin")],
