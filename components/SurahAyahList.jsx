@@ -22,11 +22,6 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
     setAyahNum(ayahIndex);
 
     if (typeof window !== "undefined") {
-      try {
-        const hash = `sura_${pageId}_ayah_${ayahIndex + 1}`;
-        history.replaceState(null, "", `#${hash}`);
-      } catch (e) {}
-
       requestAnimationFrame(() => {
         const elId = `sura_${pageId}_ayah_${ayahIndex + 1}`;
         const el = document.getElementById(elId);
@@ -61,14 +56,11 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
     const idx = audio.currentIndex;
     if (idx == null || idx < 0) return;
     const belongsHere = audio.playlistId === pageId;
-    if (!belongsHere) return; 
+    if (!belongsHere) return;
 
     setAyahNum(idx);
     if (typeof window !== "undefined") {
-      try {
-        const hash = `sura_${pageId}_ayah_${idx + 1}`;
-        history.replaceState(null, "", `#${hash}`);
-      } catch (e) {}
+      // Avoid modifying URL to prevent flashing
       requestAnimationFrame(() => {
         const elId = `sura_${pageId}_ayah_${idx + 1}`;
         const el = document.getElementById(elId);
@@ -76,6 +68,7 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
           el.tabIndex = -1;
           el.scrollIntoView({ behavior: "smooth", block: "center" });
           el.focus({ preventScroll: true });
+          // Keep URL unchanged
         }
       });
     }
