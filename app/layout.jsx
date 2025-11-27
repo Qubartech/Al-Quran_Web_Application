@@ -2,6 +2,7 @@ import "@/assets/css/globals.css";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import AppThemeProvider from "@/context/ThemeProvider";
+import AudioProvider from "@/context/AudioProvider";
 // import "boxicons";
 import { Inter } from "next/font/google";
 import { cookies } from "next/headers";
@@ -36,11 +37,13 @@ export default function RootLayout({ children }) {
       </head>
       <body className={`${inter.className} bg-gray-100 dark:bg-[#111827]`}>
         <AppThemeProvider attribute="class" defaultTheme={theme} enableSystem>
-          <Navbar />
-          <div className="relative scroll-smooth max-w-screen-2xl mx-auto min-h-screen pt-16">
-            {children}
-          </div>
-          <Footer />
+          <AudioProvider>
+            <Navbar />
+            <div className="relative scroll-smooth max-w-screen-2xl mx-auto min-h-screen pt-16">
+              {children}
+            </div>
+            <Footer />
+          </AudioProvider>
         </AppThemeProvider>
       </body>
     </html>

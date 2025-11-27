@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useAudio } from "@/context/AudioProvider";
 
 // Add custom animation style
 const ayahAnim = {
@@ -12,20 +13,23 @@ import SurahPlayBtn from "./SurahPlayBtn";
 
 const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
   const [ayahNum, setAyahNum] = useState(null);
-  const [audioSrc, setAudioSrc] = useState("");
-  const [showPlayer, setShowPlayer] = useState(false);
+  const audio = useAudio();
+
+  const list = useMemo(() => ayahAudio.map((a) => a.audio), [ayahAudio]);
 
   function playControl(ayahIndex) {
-    setAudioSrc(ayahAudio[ayahIndex].audio);
+    audio?.playList(list, ayahIndex, pageId);
     setAyahNum(ayahIndex);
 
     if (typeof window !== "undefined") {
       try {
-        history.replaceState(null, "", `#${ayahIndex}`);
+        const hash = `sura_${pageId}_ayah_${ayahIndex + 1}`;
+        history.replaceState(null, "", `#${hash}`);
       } catch (e) {}
 
       requestAnimationFrame(() => {
-        const el = document.getElementById(String(ayahIndex));
+        const elId = `sura_${pageId}_ayah_${ayahIndex + 1}`;
+        const el = document.getElementById(elId);
         if (el) {
           el.tabIndex = -1;
           el.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -42,33 +46,57 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
     else if (!playNext && ayahNum > 1) ayahToPlay = ayahNum - 1;
     else {
       ayahToPlay = null;
-      setAudioSrc("");
+      audio?.close();
     }
 
     ayahToPlay && playControl(ayahToPlay);
   }
 
   const closePlayer = () => {
-    setShowPlayer(false);
-    // Additional logic to pause or stop audio playback if needed
+    audio?.close();
   };
+
+  useEffect(() => {
+    if (!audio) return;
+    const idx = audio.currentIndex;
+    if (idx == null || idx < 0) return;
+    const belongsHere = audio.playlistId === pageId;
+    if (!belongsHere) return; 
+
+    setAyahNum(idx);
+    if (typeof window !== "undefined") {
+      try {
+        const hash = `sura_${pageId}_ayah_${idx + 1}`;
+        history.replaceState(null, "", `#${hash}`);
+      } catch (e) {}
+      requestAnimationFrame(() => {
+        const elId = `sura_${pageId}_ayah_${idx + 1}`;
+        const el = document.getElementById(elId);
+        if (el) {
+          el.tabIndex = -1;
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          el.focus({ preventScroll: true });
+        }
+      });
+    }
+  }, [audio, audio?.currentIndex, audio?.src, list, pageId]);
 
   return (
     <>
-      {showPlayer && (
-        <SurahAudioPlayer
-          src={audioSrc}
-          playAdjacentAudio={playAdjacentAudio}
-          onClose={closePlayer}
-        />
-      )}
+      {/* Audio player is rendered globally via AudioProvider */}
 
       {arabicAyah.map((ayah, idx) => {
-        const isPlaying = ayahNum === idx && audioSrc !== "";
+        const isPlaying =
+          audio?.playlistId === pageId && audio?.currentIndex === idx;
         const { text } = ayah || {};
         return (
           <>
-            <div key={idx} className="py-1" id={idx} tabIndex={-1}>
+            <div
+              key={idx}
+              className="py-1"
+              id={`sura_${pageId}_ayah_${idx + 1}`}
+              tabIndex={-1}
+            >
               <div className="p-5 border-b border-gray-200 dark:border-gray-700 flex gap-6 justify-between w-full transition-colors">
                 <div className="w-12 flex items-center">
                   <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 flex flex-col items-center justify-center">
@@ -77,7 +105,7 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
                       <SurahPlayBtn
                         isPlaying={isPlaying}
                         playControl={() => playControl(idx)}
-                        setShowPlayer={setShowPlayer}
+                        setShowPlayer={() => {}}
                       />
                     </div>
                   </div>
