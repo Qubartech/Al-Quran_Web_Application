@@ -19,7 +19,7 @@ const NamazTimeCard = ({ city }) => {
   });
 
   return (
-    <div className="h-auto w-full my-6 p-6 rounded-xl shadow-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 transition-colors">
+    <div className="glass h-auto w-full p-6 rounded-xl text-gray-900 dark:text-gray-100">
       <div className="mb-4 flex flex-col">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold">Namaz Timings</h2>
@@ -35,7 +35,7 @@ const NamazTimeCard = ({ city }) => {
         {Object.entries(demoTimes).map(([name, time]) => (
           <div
             key={name}
-            className="flex justify-between items-center py-3 px-3 rounded-lg bg-gray-100 dark:bg-gray-800"
+            className="flex justify-between items-center py-3 px-3 rounded-lg bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm"
           >
             <span className="font-semibold text-primary">{name}</span>
             <span className="text-sm">{time}</span>

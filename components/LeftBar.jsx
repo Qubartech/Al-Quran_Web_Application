@@ -7,7 +7,7 @@ async function LeftBar() {
   // console.log(data);
 
   return (
-    <div className="px-5 bg-white dark:bg-gray-800 rounded-md text-gray-900 dark:text-gray-100 transition-colors">
+    <div className="px-5 rounded-md text-gray-900 dark:text-gray-100 transition-colors glass">
       <div className="text-2xl font-semibold py-2 text-gray-800 dark:text-gray-100">
         Sura List
       </div>
