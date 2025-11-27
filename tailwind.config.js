@@ -23,7 +23,7 @@ module.exports = {
 
       colors: {
         primary: {
-          DEFAULT: '#22c55e', // Tailwind green-500
+          DEFAULT: '#06BA90', // Tailwind green-500
           light: '#4ade80',   // green-400
           dark: '#16a34a',    // green-600
         },

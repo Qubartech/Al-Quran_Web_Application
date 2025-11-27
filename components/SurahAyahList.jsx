@@ -69,7 +69,7 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
         return (
           <>
             <div key={idx} className="py-1" id={idx} tabIndex={-1}>
-              <div className="p-5 border-b border-gray-200 dark:border-gray-700 flex gap-6 justify-between w-full bg-white dark:bg-gray-900 transition-colors">
+              <div className="p-5 border-b border-gray-200 dark:border-gray-700 flex gap-6 justify-between w-full transition-colors">
                 <div className="w-12 flex items-center">
                   <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 flex flex-col items-center justify-center">
                     {pageId}:{idx + 1}

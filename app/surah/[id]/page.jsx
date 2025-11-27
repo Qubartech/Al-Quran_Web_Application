@@ -14,7 +14,7 @@ async function Surah({ params }) {
   console.log(data[0].number);
 
   return (
-    <div className="px-5 min-h-screen bg-white dark:bg-gray-900 dark:text-gray-100">
+    <div className="px-5 min-h-screen bg-white dark:bg-gray-800 dark:text-gray-100">
       {/* <Link href="/" className="text-2xl font-bold inline-block mb-2">{englishName}</Link> */}
       <div className="py-7 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 mt-4 rounded-lg bg-[url('/bg.jpg')] bg-repeat relative overflow-hidden">
         <div className="backdrop-blur-[2px] bg-white/30 dark:bg-black/40 absolute top-0 left-0 w-full h-full"></div>

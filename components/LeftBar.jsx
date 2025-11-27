@@ -7,7 +7,7 @@ async function LeftBar() {
   // console.log(data);
 
   return (
-    <div className="px-5 bg-white dark:bg-gray-900 rounded-md text-gray-900 dark:text-gray-100 transition-colors">
+    <div className="px-5 bg-white dark:bg-gray-800 rounded-md text-gray-900 dark:text-gray-100 transition-colors">
       <div className="text-2xl font-semibold py-2 text-gray-800 dark:text-gray-100">
         Sura List
       </div>
@@ -16,7 +16,7 @@ async function LeftBar() {
       {data?.map((surah, idx) => {
         return (
           <Link href={`/surah/${surah?.number}`} key={idx}>
-            <div className="w-full bg-white dark:bg-gray-800 p-5 rounded-md shadow-sm flex items-center border border-transparent dark:border-gray-700 hover:border hover:border-primary group max-h-full overflow-hidden transition-colors my-1">
+            <div className="w-full p-5 rounded-md shadow-sm flex items-center border border-transparent hover:border hover:border-primary group max-h-full overflow-hidden transition-colors my-1">
               <div className="h-12 w-16 bg-gray-200 dark:bg-gray-700 group-hover:text-white group-hover:bg-primary rotate-[496deg] text-black dark:text-gray-100 flex items-center justify-center rounded-md transition-colors">
                 <div className="rotate-[-496deg] font-semibold">{idx + 1}</div>
               </div>
