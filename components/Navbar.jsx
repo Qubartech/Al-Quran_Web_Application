@@ -2,12 +2,13 @@
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { DarkModeSwitch } from "react-toggle-dark-mode";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { setCookie } from "cookies-next";
 
 function Navbar() {
-  const { theme, setTheme } = useTheme();
-  const colorTheme = theme === "dark" ? "light" : "dark";
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const colorTheme = resolvedTheme === "dark" ? "light" : "dark";
 
   const toggleDarkMode = () => {
     setTheme(colorTheme);
@@ -18,9 +19,9 @@ function Navbar() {
     });
   };
 
-  // useEffect(() => {
-  //   setMounted(true);
-  // }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className="px-5 bg-white dark:bg-[#1a253c] mb-4 shadow fixed left-0 right-0 w-full z-50">
@@ -29,11 +30,15 @@ function Navbar() {
           <Link href="/">Quran</Link>
         </div>
         <div>
-          <DarkModeSwitch
-            checked={theme === "dark" ? true : false}
-            onChange={toggleDarkMode}
-            size={19}
-          />
+          {mounted && (
+            <DarkModeSwitch
+              checked={resolvedTheme === "dark"}
+              onChange={toggleDarkMode}
+              size={19}
+              sunColor="#000"
+              moonColor="#fff"
+            />
+          )}
         </div>
       </div>
     </div>
