@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import SurahAudioPlayer from "@/components/SurahAudioPlayer";
+import SurahAudioPlayer from "@/components/audio/SurahAudioPlayer";
 
 const AudioContext = createContext(null);
 

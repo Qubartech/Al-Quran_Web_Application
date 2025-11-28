@@ -1,5 +1,3 @@
-"use client";
-
 export default function NoFlashThemeScript() {
   return (
     <script
@@ -17,6 +15,8 @@ export default function NoFlashThemeScript() {
             } else {
             root.classList.remove('dark');
             }
+            // Keep color-scheme in sync to avoid UA style flashes
+            root.style.colorScheme = dark ? 'dark' : 'light';
         } catch (e) {}
         })();
         `.trim(),

@@ -1,4 +1,4 @@
-import SurahAyahList from "@/components/SurahAyahList";
+import SurahAyahList from "@/components/surah/SurahAyahList";
 import getSingleSurah from "@/lib/api/getSingleSurah";
 
 async function Surah({ params }) {

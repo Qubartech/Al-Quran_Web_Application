@@ -7,7 +7,7 @@ import { useAudio } from "@/context/AudioProvider";
 const ayahAnim = {
   animation: "ayahHighlight 7s",
 };
-import SurahAudioPlayer from "./SurahAudioPlayer";
+import SurahAudioPlayer from "@/components/audio/SurahAudioPlayer";
 import SurahPlayBtn from "./SurahPlayBtn";
 // import { useRouter } from "next/router";
 

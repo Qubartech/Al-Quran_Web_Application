@@ -5,7 +5,7 @@ import Drawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
-import ThemeToggle from "./ThemeToggle";
+import ThemeToggle from "@/components/settings/ThemeToggle";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -18,9 +18,6 @@ export default function SettingsDrawer({ open, onClose }) {
   const [themeChoice, setThemeChoice] = React.useState("system");
 
   React.useEffect(() => {
-    // Map next-themes values to our local selection
-    // resolvedTheme is the actual applied theme, but setTheme can be 'system'
-    // We read the cookie if present to know explicit choice; fallback to system
     try {
       const cookie = document.cookie
         .split(";")
@@ -43,7 +40,7 @@ export default function SettingsDrawer({ open, onClose }) {
   };
 
   const handleThemeChange = (_e, value) => {
-    if (!value) return; // ignore null when clicking selected
+    if (!value) return;
     updateTheme(value);
   };
 
@@ -92,7 +89,6 @@ export default function SettingsDrawer({ open, onClose }) {
               <ThemeToggle value={themeChoice} onChange={handleThemeChange} />
             </Box>
           </Box>
-          {/* Add more settings sections here as needed */}
         </Box>
       </Drawer>
     </ThemeProvider>

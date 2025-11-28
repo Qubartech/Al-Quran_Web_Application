@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import SettingsDrawer from "./SettingsDrawer";
+import SettingsDrawer from "@/components/settings/SettingsDrawer";
 import { IoSettings } from "react-icons/io5";
 
 function Navbar() {
