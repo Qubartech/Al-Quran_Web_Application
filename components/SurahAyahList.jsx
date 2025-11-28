@@ -44,7 +44,7 @@ const SurahAyahList = ({
     let ayahToPlay = null;
 
     if (playNext && ayahNum < arabicAyah.length - 1) ayahToPlay = ayahNum + 1;
-    else if (!playNext && ayahNum > 1) ayahToPlay = ayahNum - 1;
+    else if (!playNext && ayahNum > 0) ayahToPlay = ayahNum - 1;
     else {
       ayahToPlay = null;
       audio?.close();

@@ -97,6 +97,25 @@ export default function AudioProvider({ children }) {
     close();
   };
 
+  const playPrev = () => {
+    if (playlist.length > 0 && currentIndex > 0) {
+      const prevIdx = currentIndex - 1;
+      const prevSrc = playlist[prevIdx];
+      setCurrentIndex(prevIdx);
+      setSrc(prevSrc);
+      setOpen(true);
+      setPaused(false);
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("__audio_src__", prevSrc || "");
+        } catch (e) {}
+      }
+      return;
+    }
+    // If at the start, just keep current without closing
+    setOpen(true);
+  };
+
   const pause = () => {
     setPaused(true);
     setPauseTick((t) => t + 1);
@@ -115,7 +134,7 @@ export default function AudioProvider({ children }) {
     <AudioContext.Provider value={value}>
       {children}
       {open && src ? (
-        <SurahAudioPlayer src={src} playAdjacentAudio={onEnded} onClose={close} title={title} currentIndex={currentIndex} pauseTick={pauseTick} playTick={playTick} />
+        <SurahAudioPlayer src={src} playNext={onEnded} playPrev={playPrev} onClose={close} title={title} currentIndex={currentIndex} pauseTick={pauseTick} playTick={playTick} />
       ) : null}
     </AudioContext.Provider>
   );
