@@ -12,9 +12,13 @@ export function useAudio() {
 export default function AudioProvider({ children }) {
   const [src, setSrc] = useState("");
   const [open, setOpen] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [playlist, setPlaylist] = useState([]);
   const [playlistId, setPlaylistId] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(-1);
+  const [title, setTitle] = useState("");
+  const [pauseTick, setPauseTick] = useState(0);
+  const [playTick, setPlayTick] = useState(0);
 
   useEffect(() => {
     // Restore last audio on reload
@@ -29,8 +33,11 @@ export default function AudioProvider({ children }) {
   const play = (newSrc) => {
     setSrc(newSrc);
     setOpen(true);
+    setPaused(false);
     setPlaylist([]);
     setCurrentIndex(-1);
+    setTitle("");
+    setPlayTick((t) => t + 1);
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem("__audio_src__", newSrc || "");
@@ -38,7 +45,7 @@ export default function AudioProvider({ children }) {
     }
   };
 
-  const playList = (list, startIdx = 0, listId = null) => {
+  const playList = (list, startIdx = 0, listId = null, listTitle = "") => {
     if (!Array.isArray(list) || list.length === 0) return;
     setPlaylist(list);
     setPlaylistId(listId);
@@ -47,6 +54,9 @@ export default function AudioProvider({ children }) {
     const nextSrc = list[idx];
     setSrc(nextSrc);
     setOpen(true);
+    setPaused(false);
+    setTitle(listTitle || "");
+    setPlayTick((t) => t + 1);
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem("__audio_src__", nextSrc || "");
@@ -56,9 +66,11 @@ export default function AudioProvider({ children }) {
 
   const close = () => {
     setOpen(false);
+    setPaused(false);
     setSrc("");
     setPlaylist([]);
     setCurrentIndex(-1);
+    setTitle("");
     if (typeof window !== "undefined") {
       try {
         localStorage.removeItem("__audio_src__");
@@ -85,13 +97,25 @@ export default function AudioProvider({ children }) {
     close();
   };
 
-  const value = { src, open, play, playList, close, currentIndex, playlistId };
+  const pause = () => {
+    setPaused(true);
+    setPauseTick((t) => t + 1);
+  };
+
+  const resume = () => {
+    if (!src) return;
+    setPaused(false);
+    setOpen(true);
+    setPlayTick((t) => t + 1);
+  };
+
+  const value = { src, open, paused, play, playList, close, pause, resume, currentIndex, playlistId };
 
   return (
     <AudioContext.Provider value={value}>
       {children}
       {open && src ? (
-        <SurahAudioPlayer src={src} playAdjacentAudio={onEnded} onClose={close} />
+        <SurahAudioPlayer src={src} playAdjacentAudio={onEnded} onClose={close} title={title} currentIndex={currentIndex} pauseTick={pauseTick} playTick={playTick} />
       ) : null}
     </AudioContext.Provider>
   );

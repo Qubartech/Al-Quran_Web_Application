@@ -1,15 +1,19 @@
 "use client";
 
-function SurahPlayBtn({ playControl, isPlaying, setShowPlayer }) {
+function SurahPlayBtn({ playControl, pauseControl, isPlaying }) {
+  const handleClick = () => {
+    if (isPlaying) {
+      pauseControl?.();
+    } else {
+      playControl?.();
+    }
+  };
+
   return (
     <button
-      onClick={() => {
-        playControl();
-        setShowPlayer(true);
-      }}
-      className={`rounded-md mt-2 hover:bg-primary dark:hover:bg-primary-dark text-black dark:text-gray-100 transition-colors ${
-        isPlaying ? "opacity-50 pointer-events-none" : ""
-      }`}
+      onClick={handleClick}
+      className="rounded-md mt-2 hover:text-primary dark:hover:text-primary-dark text-black dark:text-gray-100 transition-colors"
+      aria-label={isPlaying ? "Pause ayah" : "Play ayah"}
     >
       {isPlaying ? (
         <box-icon name="pause-circle" color="currentColor"></box-icon>

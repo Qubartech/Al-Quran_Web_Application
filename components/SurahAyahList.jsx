@@ -11,14 +11,20 @@ import SurahAudioPlayer from "./SurahAudioPlayer";
 import SurahPlayBtn from "./SurahPlayBtn";
 // import { useRouter } from "next/router";
 
-const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
+const SurahAyahList = ({
+  arabicAyah,
+  englishTransAyah,
+  ayahAudio,
+  pageId,
+  surahName,
+}) => {
   const [ayahNum, setAyahNum] = useState(null);
   const audio = useAudio();
 
   const list = useMemo(() => ayahAudio.map((a) => a.audio), [ayahAudio]);
 
   function playControl(ayahIndex) {
-    audio?.playList(list, ayahIndex, pageId);
+    audio?.playList(list, ayahIndex, pageId, surahName);
     setAyahNum(ayahIndex);
 
     if (typeof window !== "undefined") {
@@ -96,9 +102,9 @@ const SurahAyahList = ({ arabicAyah, englishTransAyah, ayahAudio, pageId }) => {
                     {pageId}:{idx + 1}
                     <div className="w-full">
                       <SurahPlayBtn
-                        isPlaying={isPlaying}
+                        isPlaying={isPlaying && audio?.open && !audio?.paused}
                         playControl={() => playControl(idx)}
-                        setShowPlayer={() => {}}
+                        pauseControl={() => audio?.pause()}
                       />
                     </div>
                   </div>

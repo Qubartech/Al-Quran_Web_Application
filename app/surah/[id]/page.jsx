@@ -50,6 +50,7 @@ async function Surah({ params }) {
         englishTransAyah={englishTransAyah}
         ayahAudio={ayahAudio}
         pageId={id}
+        surahName={englishName}
       />
     </div>
   );

@@ -23,3 +23,20 @@
   background-color: rgba(26, 37, 60, 0.6); /* matches navbar dark */
   border-color: rgba(55, 65, 81, 0.8); /* gray-700 */
 }
+
+/* Dark mode overrides for react-h5-audio-player text visibility */
+.dark .rhap_main,
+.dark .rhap_header,
+.dark .rhap_controls,
+.dark .rhap_time,
+.dark .rhap_current-time,
+.dark .rhap_total-time {
+  color: #D1D5DB !important; /* gray-300 */
+}
+
+/* Ensure control icons inherit the text color */
+.dark .rhap_controls-icon,
+.dark .rhap_controls-icon svg {
+  color: #D1D5DB !important; /* gray-300 */
+  fill: currentColor !important;
+}
