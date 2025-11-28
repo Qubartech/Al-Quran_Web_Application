@@ -134,7 +134,24 @@ export default function AudioProvider({ children }) {
     <AudioContext.Provider value={value}>
       {children}
       {open && src ? (
-        <SurahAudioPlayer src={src} playNext={onEnded} playPrev={playPrev} onClose={close} title={title} currentIndex={currentIndex} pauseTick={pauseTick} playTick={playTick} />
+        <SurahAudioPlayer
+          src={src}
+          playNext={onEnded}
+          playPrev={playPrev}
+          onClose={close}
+          onPause={() => {
+            // Update provider state when player is paused via UI
+            pause();
+          }}
+          onPlay={() => {
+            // Update provider state when player is played via UI
+            resume();
+          }}
+          title={title}
+          currentIndex={currentIndex}
+          pauseTick={pauseTick}
+          playTick={playTick}
+        />
       ) : null}
     </AudioContext.Provider>
   );

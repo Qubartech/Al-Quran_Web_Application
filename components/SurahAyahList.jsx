@@ -19,6 +19,8 @@ const SurahAyahList = ({
   surahName,
 }) => {
   const [ayahNum, setAyahNum] = useState(null);
+  const [refreshTick, setRefreshTick] = useState(0);
+  const [isPaused, setIsPaused] = useState(true);
   const audio = useAudio();
 
   const list = useMemo(() => ayahAudio.map((a) => a.audio), [ayahAudio]);
@@ -80,6 +82,17 @@ const SurahAyahList = ({
     }
   }, [audio, audio?.currentIndex, audio?.src, list, pageId]);
 
+  // Force re-render when audio play/pause ticks change so isPlaying updates immediately
+  useEffect(() => {
+    if (!audio) return;
+    setRefreshTick((t) => t + 1);
+  }, [audio, audio?.playTick, audio?.pauseTick]);
+
+  // Track paused explicitly from provider
+  useEffect(() => {
+    setIsPaused(audio?.paused ?? true);
+  }, [audio, audio?.paused]);
+
   return (
     <>
       {/* Audio player is rendered globally via AudioProvider */}
@@ -102,7 +115,19 @@ const SurahAyahList = ({
                     {pageId}:{idx + 1}
                     <div className="w-full">
                       <SurahPlayBtn
-                        isPlaying={isPlaying && audio?.open && !audio?.paused}
+                        key={`spb_${idx}_pid_${audio?.playlistId ?? "-"}_ci_${
+                          audio?.currentIndex ?? -1
+                        }_open_${audio?.open ? 1 : 0}_paused_${
+                          audio?.paused ? 1 : 0
+                        }_play_${audio?.playTick ?? 0}_pause_${
+                          audio?.pauseTick ?? 0
+                        }_src_${audio?.src ?? "-"}`}
+                        isPlaying={
+                          audio?.open &&
+                          audio?.playlistId === pageId &&
+                          audio?.currentIndex === idx &&
+                          !isPaused
+                        }
                         playControl={() => playControl(idx)}
                         pauseControl={() => audio?.pause()}
                       />

@@ -8,6 +8,8 @@ function SurahAudioPlayer({
   playNext,
   playPrev,
   onClose,
+  onPause,
+  onPlay,
   title,
   currentIndex,
   pauseTick,
@@ -67,6 +69,8 @@ function SurahAudioPlayer({
         onEnded={playNext}
         onClickNext={playNext}
         onClickPrevious={playPrev}
+        onPause={onPause}
+        onPlay={onPlay}
         layout={isMdUp ? "horizontal" : "stacked"}
         showSkipControls
         header={
