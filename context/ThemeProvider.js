@@ -5,7 +5,14 @@ import { useEffect } from "react";
 
 function AppThemeProvider({ children, ...props }) {
   return (
-    <ThemeProvider enableColorScheme {...props}>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      enableColorScheme
+      disableTransitionOnChange
+      {...props}
+    >
       <AppThemeProviderHelper />
       {children}
     </ThemeProvider>

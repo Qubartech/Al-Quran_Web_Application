@@ -3,6 +3,7 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import AppThemeProvider from "@/context/ThemeProvider";
 import AudioProvider from "@/context/AudioProvider";
+import NoFlashThemeScript from "@/components/NoFlashThemeScript";
 // import "boxicons";
 import { Inter } from "next/font/google";
 import { cookies } from "next/headers";
@@ -25,18 +26,33 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  const theme = cookies().get("__theme__")?.value || "dark";
+  const themeCookie = cookies().get("__theme__")?.value;
+  const isDark =
+    themeCookie === "dark" ? true : themeCookie === "light" ? false : undefined;
 
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={isDark ? "dark" : undefined}
+    >
       <head>
+        <NoFlashThemeScript />
         <script
           src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"
           async
         ></script>
       </head>
-      <body className={`${inter.className} bg-gray-100 dark:bg-[#111827]`}>
-        <AppThemeProvider attribute="class" defaultTheme={theme} enableSystem>
+      <body
+        className={`${inter.className} bg-gray-100 dark:bg-[#111827]`}
+        suppressHydrationWarning
+      >
+        <AppThemeProvider
+          attribute="class"
+          defaultTheme={themeCookie ?? "system"}
+          enableSystem
+          disableTransitionOnChange
+        >
           <AudioProvider>
             <Navbar />
             <div className="relative scroll-smooth max-w-screen-2xl mx-auto min-h-screen pt-16">
