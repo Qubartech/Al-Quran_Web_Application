@@ -9,7 +9,7 @@ async function LeftBar() {
   return (
     <div className="px-5 rounded-md text-gray-900 dark:text-gray-100 transition-colors glass">
       <div className="text-2xl font-semibold py-2 text-gray-800 dark:text-gray-100">
-        Sura List
+        Surah List
       </div>
       {/* <h1 className="text-4xl">hi</h1> */}
 
