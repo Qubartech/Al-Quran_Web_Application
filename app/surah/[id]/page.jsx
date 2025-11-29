@@ -1,9 +1,17 @@
 import SurahAyahList from "@/components/surah/SurahAyahList";
 import getSingleSurah from "@/lib/api/getSingleSurah";
+import { cookies } from "next/headers";
 
 async function Surah({ params }) {
   const { id } = params || {};
-  const singleSurah = await getSingleSurah(id);
+  // Read language and translation identifier from cookies to persist across refreshes
+  const cookieStore = cookies();
+  const langCode = cookieStore.get("__language__")?.value || "bn";
+  const editionIdentifier = cookieStore.get(
+    "__translation_identifier__"
+  )?.value;
+
+  const singleSurah = await getSingleSurah(id, langCode, editionIdentifier);
   // console.log(singleSurah)
 
   const { data } = singleSurah || {};

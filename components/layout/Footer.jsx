@@ -33,7 +33,7 @@ function Footer() {
                   </a>
                 </li>
                 <li>
-                  <a href="https://alquran.com/" className="hover:underline">
+                  <a href="https://alquran.cloud/" className="hover:underline">
                     Quran API
                   </a>
                 </li>
