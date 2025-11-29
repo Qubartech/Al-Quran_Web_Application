@@ -6,6 +6,12 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import ThemeToggle from "@/components/settings/ThemeToggle";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import getLanguages from "@/lib/api/getLanguages";
+import getTranslationEditions from "@/lib/api/getTranslationEditions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -16,6 +22,12 @@ import { setCookie } from "cookies-next";
 export default function SettingsDrawer({ open, onClose }) {
   const { resolvedTheme, setTheme } = useTheme();
   const [themeChoice, setThemeChoice] = React.useState("system");
+  const [languages, setLanguages] = React.useState([]);
+  const [language, setLanguage] = React.useState("bn");
+  const [editions, setEditions] = React.useState([]);
+  const [filteredEditions, setFilteredEditions] = React.useState([]);
+  // Translation edition identifier user explicitly selected; blank means none chosen yet
+  const [identifier, setIdentifier] = React.useState("");
 
   React.useEffect(() => {
     try {
@@ -28,7 +40,50 @@ export default function SettingsDrawer({ open, onClose }) {
     } catch (e) {
       setThemeChoice("system");
     }
+    // Restore language from localStorage
+    try {
+      const savedLang = localStorage.getItem("app_language");
+      if (savedLang) setLanguage(savedLang);
+    } catch {}
+    // Fetch languages list
+    (async () => {
+      const langs = await getLanguages();
+      if (langs?.length) setLanguages(langs);
+    })();
+    // Fetch all translation editions once and initialize identifier (only if user previously selected one)
+    (async () => {
+      try {
+        const eds = await getTranslationEditions();
+        setEditions(eds);
+        const lang = localStorage.getItem("app_language") || "bn";
+        const initial = eds.filter(
+          (e) => e.language === lang && e.format === "text"
+        );
+        setFilteredEditions(initial);
+        const savedId = localStorage.getItem("app_translation_identifier");
+        if (savedId) setIdentifier(savedId);
+      } catch {}
+    })();
   }, []);
+
+  React.useEffect(() => {
+    // Update filtered editions when language changes; do NOT auto-select a fallback.
+    const next = editions.filter(
+      (e) => e.language === language && e.format === "text"
+    );
+    setFilteredEditions(next);
+    try {
+      const savedId = localStorage.getItem("app_translation_identifier");
+      if (savedId && savedId.startsWith(`${language}.`)) {
+        setIdentifier(savedId);
+      } else {
+        // Clear identifier so user chooses explicitly for this language.
+        setIdentifier("");
+      }
+    } catch {
+      setIdentifier("");
+    }
+  }, [language, editions]);
 
   const updateTheme = (next) => {
     // Update local state first so the toggle animates immediately
@@ -46,6 +101,30 @@ export default function SettingsDrawer({ open, onClose }) {
   const handleThemeChange = (_e, value) => {
     if (!value) return;
     updateTheme(value);
+  };
+
+  const handleLanguageChange = (e) => {
+    const val = e.target.value;
+    setLanguage(val);
+    try {
+      localStorage.setItem("app_language", val);
+      setCookie("__language__", val, {
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+        path: "/",
+      });
+    } catch {}
+  };
+
+  const handleIdentifierChange = (e) => {
+    const val = e.target.value;
+    setIdentifier(val);
+    try {
+      localStorage.setItem("app_translation_identifier", val);
+      setCookie("__translation_identifier__", val, {
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+        path: "/",
+      });
+    } catch {}
   };
 
   const muiTheme = React.useMemo(
@@ -89,9 +168,56 @@ export default function SettingsDrawer({ open, onClose }) {
             <Typography variant="subtitle1" sx={{ mb: 1 }}>
               Appearance
             </Typography>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
               <ThemeToggle value={themeChoice} onChange={handleThemeChange} />
             </Box>
+          </Box>
+          <Divider />
+          <Box sx={{ p: 2 }}>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+              Language
+            </Typography>
+            <FormControl fullWidth size="small">
+              <InputLabel id="settings-language-label">Language</InputLabel>
+              <Select
+                labelId="settings-language-label"
+                value={language}
+                label="Language"
+                onChange={handleLanguageChange}
+              >
+                {languages.length === 0 && (
+                  <MenuItem value={language}>{language}</MenuItem>
+                )}
+                {languages.map((lang) => (
+                  <MenuItem key={lang} value={lang}>
+                    {lang}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth size="small" sx={{ mt: 2 }}>
+              <InputLabel id="settings-translation-label">
+                Translation
+              </InputLabel>
+              <Select
+                labelId="settings-translation-label"
+                value={identifier}
+                label="Translation"
+                onChange={handleIdentifierChange}
+                displayEmpty
+                renderValue={(val) => (val ? val : "Select translation")}
+              >
+                <MenuItem value="">
+                  <em>Select translation</em>
+                </MenuItem>
+                {filteredEditions.map((e) => (
+                  <MenuItem key={e.identifier} value={e.identifier}>
+                    {e.englishName || e.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Box>
         </Box>
       </Drawer>

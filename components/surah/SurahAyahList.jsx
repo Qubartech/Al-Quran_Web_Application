@@ -21,6 +21,7 @@ const SurahAyahList = ({
   const [ayahNum, setAyahNum] = useState(null);
   const [refreshTick, setRefreshTick] = useState(0);
   const [isPaused, setIsPaused] = useState(true);
+  const [englishTrans, setEnglishTrans] = useState(englishTransAyah || []);
   const audio = useAudio();
 
   const list = useMemo(() => ayahAudio.map((a) => a.audio), [ayahAudio]);
@@ -93,6 +94,46 @@ const SurahAyahList = ({
     setIsPaused(audio?.paused ?? true);
   }, [audio, audio?.paused]);
 
+  // Keep local english translation in sync with prop when it changes
+  useEffect(() => {
+    setEnglishTrans(englishTransAyah || []);
+  }, [englishTransAyah]);
+
+  // React to language/identifier changes from Settings and refetch translation
+  useEffect(() => {
+    const fetchByIdentifier = async (identifier) => {
+      try {
+        const apiBase =
+          process.env.NEXT_PUBLIC_QURAN_API_URL ||
+          process.env.API_URL ||
+          "https://api.alquran.cloud/v1";
+        const url = `${apiBase}/surah/${pageId}/editions/quran-uthmani,${identifier},ar.alafasy`;
+        const res = await fetch(url);
+        if (!res.ok) return;
+        const json = await res.json();
+        const data = Array.isArray(json?.data) ? json.data : [];
+        const transEd = data.find((d) => d?.edition?.identifier === identifier);
+        const newTransAyahs = transEd?.ayahs || [];
+        if (newTransAyahs.length) setEnglishTrans(newTransAyahs);
+      } catch {}
+    };
+
+    if (!pageId || typeof window === "undefined") return;
+
+    // Initial load from storage
+    const identifier = localStorage.getItem("app_translation_identifier");
+    if (identifier) fetchByIdentifier(identifier);
+
+    // Listen to storage changes (e.g., settings change in another tab/component)
+    const onStorage = (e) => {
+      if (e.key === "app_translation_identifier" && e.newValue) {
+        fetchByIdentifier(e.newValue);
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [pageId]);
+
   return (
     <>
       {/* Audio player is rendered globally via AudioProvider */}
@@ -147,7 +188,7 @@ const SurahAyahList = ({
                     {text}
                   </div>
                   <div className="text-gray-700 dark:text-gray-300">
-                    {englishTransAyah[idx].text}
+                    {englishTrans[idx]?.text}
                   </div>
                 </div>
               </div>
