@@ -28,15 +28,19 @@ export default function SettingsDrawer({ open, onClose }) {
     } catch (e) {
       setThemeChoice("system");
     }
-  }, [resolvedTheme]);
+  }, []);
 
   const updateTheme = (next) => {
+    // Update local state first so the toggle animates immediately
     setThemeChoice(next);
-    setTheme(next);
-    setCookie("__theme__", next, {
-      expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
-      path: "/",
-    });
+    // Delay global theme switch until after the 350ms toggle animation completes
+    setTimeout(() => {
+      setTheme(next);
+      setCookie("__theme__", next, {
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+        path: "/",
+      });
+    }, 360);
   };
 
   const handleThemeChange = (_e, value) => {
