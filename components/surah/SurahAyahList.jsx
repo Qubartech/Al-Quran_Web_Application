@@ -139,7 +139,7 @@ const SurahAyahList = ({
                   <div
                     className={`text-xl md:text-3xl font-semibold text-end font-arabic pb-7 ${
                       isPlaying
-                        ? "text-primary"
+                        ? "text-primaryColor"
                         : "text-gray-900 dark:text-gray-100"
                     }`}
                     style={isPlaying ? ayahAnim : {}}

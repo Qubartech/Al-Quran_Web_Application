@@ -1,6 +1,5 @@
 import NamazTimeWrapper from "@/components/NamazTimeWrapper";
 import getSurahList from "@/lib/api/getSurahList";
-import Link from "next/link";
 import SurahList from "@/components/surah/SurahList";
 
 export default async function Home() {

@@ -16,8 +16,8 @@ async function LeftBar() {
       {data?.map((surah, idx) => {
         return (
           <Link href={`/surah/${surah?.number}`} key={idx}>
-            <div className="w-full p-5 rounded-md shadow-sm flex items-center border border-transparent hover:border hover:border-primary group max-h-full overflow-hidden transition-colors my-1">
-              <div className="h-12 w-16 bg-gray-200 dark:bg-gray-700 group-hover:text-white group-hover:bg-primary rotate-[496deg] text-black dark:text-gray-100 flex items-center justify-center rounded-md transition-colors">
+            <div className="w-full p-5 rounded-md shadow-sm flex items-center border border-transparent hover:border hover:border-primaryColor group max-h-full overflow-hidden transition-colors my-1">
+              <div className="h-12 w-16 bg-gray-200 dark:bg-gray-700 group-hover:text-white group-hover:bg-primaryColor rotate-[496deg] text-black dark:text-gray-100 flex items-center justify-center rounded-md transition-colors">
                 <div className="rotate-[-496deg] font-semibold">{idx + 1}</div>
               </div>
               <div className="pl-4 flex justify-between w-full font-semibold">
@@ -25,13 +25,13 @@ async function LeftBar() {
                   <div className="text-gray-800 dark:text-gray-100">
                     {surah?.englishName}
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold group-hover:text-primary">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold group-hover:text-primaryColor">
                     {surah?.englishNameTranslation}
                   </div>
                 </div>
                 {/* <div className="text-end">
                   <div>{surah?.name}</div>
-                  <div className="text-xs text-gray-500 font-semibold group-hover:text-primary">
+                  <div className="text-xs text-gray-500 font-semibold group-hover:text-primaryColor">
                     {surah?.numberOfAyahs} Ayahs
                   </div>
                 </div> */}

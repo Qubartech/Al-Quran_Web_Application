@@ -37,7 +37,7 @@ const NamazTimeCard = ({ city }) => {
             key={name}
             className="flex justify-between items-center py-3 px-3 rounded-lg bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm"
           >
-            <span className="font-semibold text-primary">{name}</span>
+            <span className="font-semibold text-primaryColor">{name}</span>
             <span className="text-sm">{time}</span>
           </div>
         ))}
