@@ -19,6 +19,8 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { useTheme } from "next-themes";
 import { setCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
+import LanguageSelect from "@/components/settings/LanguageSelect";
+import TranslationSelect from "@/components/settings/TranslationSelect";
 
 export default function SettingsDrawer({ open, onClose }) {
   const { resolvedTheme, setTheme } = useTheme();
@@ -178,7 +180,7 @@ export default function SettingsDrawer({ open, onClose }) {
           }),
         }}
       >
-        <Box sx={{ width: 350 }} role="presentation">
+        <Box sx={{ width: { xs: 280, sm: 350 } }} role="presentation">
           <Box
             sx={{
               display: "flex",
@@ -203,65 +205,17 @@ export default function SettingsDrawer({ open, onClose }) {
           </Box>
           <Divider />
           <Box sx={{ p: 2 }}>
-            <Typography variant="subtitle1" sx={{ mb: 1 }}>
-              Language
-            </Typography>
-            <FormControl fullWidth size="small">
-              <InputLabel id="settings-language-label">Language</InputLabel>
-              <Select
-                labelId="settings-language-label"
-                value={language}
-                label="Language"
-                onChange={handleLanguageChange}
-              >
-                {languages.length === 0 && (
-                  <MenuItem value={language}>{language}</MenuItem>
-                )}
-                {languages.map((lang) => (
-                  <MenuItem key={lang} value={lang}>
-                    {lang}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <LanguageSelect
+              languages={languages}
+              value={language}
+              onChange={handleLanguageChange}
+            />
 
-            <FormControl fullWidth size="small" sx={{ mt: 2 }}>
-              <InputLabel id="settings-translation-label">
-                Translation
-              </InputLabel>
-              <Select
-                labelId="settings-translation-label"
-                value={identifier}
-                label="Translation"
-                onChange={handleIdentifierChange}
-                displayEmpty
-                renderValue={(val) => {
-                  if (!val) return "";
-                  // Prefer englishName in display; fallback to native name; then identifier
-                  const edition =
-                    editions.find((e) => e.identifier === val) ||
-                    filteredEditions.find((e) => e.identifier === val);
-                  if (!edition) return val;
-                  return edition.englishName || edition.name || val;
-                }}
-              >
-                <MenuItem value="">
-                  <em></em>
-                </MenuItem>
-                {filteredEditions.map((e) => {
-                  const hasBoth =
-                    e.englishName && e.name && e.englishName !== e.name;
-                  const label = hasBoth
-                    ? `${e.englishName} — ${e.name}`
-                    : e.englishName || e.name || e.identifier;
-                  return (
-                    <MenuItem key={e.identifier} value={e.identifier}>
-                      {label}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
+            <TranslationSelect
+              editions={filteredEditions}
+              value={identifier}
+              onChange={handleIdentifierChange}
+            />
           </Box>
         </Box>
       </Drawer>
