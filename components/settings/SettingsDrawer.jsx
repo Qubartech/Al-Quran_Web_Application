@@ -18,9 +18,11 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { useTheme } from "next-themes";
 import { setCookie } from "cookies-next";
+import { useRouter } from "next/navigation";
 
 export default function SettingsDrawer({ open, onClose }) {
   const { resolvedTheme, setTheme } = useTheme();
+  const router = useRouter();
   const [themeChoice, setThemeChoice] = React.useState("system");
   const [languages, setLanguages] = React.useState([]);
   const [language, setLanguage] = React.useState("bn");
@@ -124,6 +126,14 @@ export default function SettingsDrawer({ open, onClose }) {
         path: "/",
       });
     } catch {}
+    // Allow identifier auto-select effect to run, then refresh to re-fetch server data
+    setTimeout(() => {
+      try {
+        router.refresh();
+      } catch {
+        if (typeof window !== "undefined") window.location.reload();
+      }
+    }, 150);
   };
 
   const handleIdentifierChange = (e) => {
@@ -136,6 +146,14 @@ export default function SettingsDrawer({ open, onClose }) {
         path: "/",
       });
     } catch {}
+    // Refresh page to pull new translation edition server-side
+    setTimeout(() => {
+      try {
+        router.refresh();
+      } catch {
+        if (typeof window !== "undefined") window.location.reload();
+      }
+    }, 120);
   };
 
   const muiTheme = React.useMemo(
