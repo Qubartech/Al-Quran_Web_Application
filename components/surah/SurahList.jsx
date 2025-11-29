@@ -31,14 +31,14 @@ export default function SurahList({ data }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search Surah by name or number..."
-          className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-primary max-w-sm"
+          className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-primaryColor max-w-sm"
         />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 pb-10">
         {filtered.map((surah, idx) => (
           <Link href={`/surah/${surah.number}`} key={`${surah.number}-${idx}`}>
-            <div className="w-full p-5 rounded-md flex items-center border border-transparent dark:border-gray-700 hover:border hover:border-primary dark:hover:border-primary group transition-colors glass">
-              <div className="h-[50px] w-[60px] bg-gray-200 dark:bg-gray-700 group-hover:text-white group-hover:bg-primary rotate-[45deg] text-black dark:text-gray-100 flex items-center justify-center rounded-md transition-colors">
+            <div className="w-full p-5 rounded-md flex items-center border border-transparent dark:border-gray-700 hover:border hover:border-primaryColor dark:hover:border-primaryColor group transition-colors glass">
+              <div className="h-[50px] w-[60px] bg-gray-200 dark:bg-gray-700 group-hover:text-white group-hover:bg-primaryColor rotate-[45deg] text-black dark:text-gray-100 flex items-center justify-center rounded-md transition-colors">
                 <div className="rotate-[-45deg] text-xl font-semibold">
                   {surah.number}
                 </div>
@@ -48,7 +48,7 @@ export default function SurahList({ data }) {
                   <div className="text-gray-800 dark:text-gray-100">
                     {surah.englishName}
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold group-hover:text-primary">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold group-hover:text-primaryColor">
                     {surah.englishNameTranslation}
                   </div>
                 </div>
@@ -56,7 +56,7 @@ export default function SurahList({ data }) {
                   <div className="text-gray-800 dark:text-gray-100">
                     {surah.name}
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold group-hover:text-primary">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold group-hover:text-primaryColor">
                     {surah.numberOfAyahs} Ayahs
                   </div>
                 </div>

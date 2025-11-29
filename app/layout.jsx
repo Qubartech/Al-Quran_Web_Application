@@ -1,9 +1,9 @@
 import "@/assets/css/globals.css";
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
+import Footer from "@/components/layout/Footer";
+import Navbar from "@/components/layout/Navbar";
 import AppThemeProvider from "@/context/ThemeProvider";
 import AudioProvider from "@/context/AudioProvider";
-import NoFlashThemeScript from "@/components/NoFlashThemeScript";
+import NoFlashThemeScript from "@/components/theme/NoFlashThemeScript";
 // import "boxicons";
 import { Inter } from "next/font/google";
 import { cookies } from "next/headers";

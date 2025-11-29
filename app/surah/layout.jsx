@@ -1,5 +1,5 @@
-import LeftBar from "@/components/LeftBar";
-import SurahPrevNextNav from "@/components/SurahPrevNextNav";
+import LeftBar from "@/components/layout/LeftBar";
+import SurahPrevNextNav from "@/components/surah/SurahPrevNextNav";
 
 async function LeftLayout({ children }) {
   return (

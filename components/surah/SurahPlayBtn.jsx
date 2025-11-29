@@ -12,7 +12,7 @@ function SurahPlayBtn({ playControl, pauseControl, isPlaying }) {
   return (
     <button
       onClick={handleClick}
-      className="rounded-md mt-2 hover:text-primary dark:hover:text-primary-dark text-black dark:text-gray-100 transition-colors"
+      className="rounded-md mt-2 hover:text-primaryColor dark:hover:text-primaryColor-dark text-black dark:text-gray-100 transition-colors"
       aria-label={isPlaying ? "Pause ayah" : "Play ayah"}
     >
       {isPlaying ? (

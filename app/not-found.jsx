@@ -23,7 +23,7 @@ function NotFound() {
             <Link href="/">
               <button
                 type="button"
-                className=" bg-gradient-to-r from-primary-light via-primary to-primary-dark hover:bg-gradient-to-bl font-medium rounded-3xl text-sm px-5 md:px-9 py-3.5 text-center mr-2 mb-2 text-white   "
+                className=" bg-gradient-to-r from-primaryColor-light via-primaryColor to-primaryColor-dark hover:bg-gradient-to-bl font-medium rounded-3xl text-sm px-5 md:px-9 py-3.5 text-center mr-2 mb-2 text-white   "
               >
                 Back to home
               </button>

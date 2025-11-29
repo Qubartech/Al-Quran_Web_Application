@@ -14,12 +14,16 @@
     "@heroicons/react": "^2.2.0",
     "@mui/icons-material": "^7.3.5",
     "@mui/material": "^7.3.5",
+    "@radix-ui/react-slot": "^1.2.4",
     "autoprefixer": "10.4.15",
     "boxicons": "^2.1.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "cookies-next": "^4.2.1",
     "eslint": "8.47.0",
     "eslint-config-next": "13.4.16",
     "flowbite": "^1.8.1",
+    "lucide-react": "^0.555.0",
     "next": "13.4.16",
     "next-themes": "^0.3.0",
     "postcss": "8.4.27",
@@ -28,6 +32,8 @@
     "react-h5-audio-player": "^3.8.6",
     "react-icons": "^5.5.0",
     "react-toggle-dark-mode": "^1.1.1",
-    "tailwindcss": "3.3.3"
+    "tailwind-merge": "^3.4.0",
+    "tailwindcss": "3.3.3",
+    "tailwindcss-animate": "^1.0.7"
   }
 }

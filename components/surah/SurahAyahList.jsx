@@ -7,7 +7,7 @@ import { useAudio } from "@/context/AudioProvider";
 const ayahAnim = {
   animation: "ayahHighlight 7s",
 };
-import SurahAudioPlayer from "./SurahAudioPlayer";
+import SurahAudioPlayer from "@/components/audio/SurahAudioPlayer";
 import SurahPlayBtn from "./SurahPlayBtn";
 // import { useRouter } from "next/router";
 
@@ -139,7 +139,7 @@ const SurahAyahList = ({
                   <div
                     className={`text-xl md:text-3xl font-semibold text-end font-arabic pb-7 ${
                       isPlaying
-                        ? "text-primary"
+                        ? "text-primaryColor"
                         : "text-gray-900 dark:text-gray-100"
                     }`}
                     style={isPlaying ? ayahAnim : {}}
