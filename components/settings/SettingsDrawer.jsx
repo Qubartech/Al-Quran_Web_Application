@@ -77,11 +77,22 @@ export default function SettingsDrawer({ open, onClose }) {
       if (savedId && savedId.startsWith(`${language}.`)) {
         setIdentifier(savedId);
       } else {
-        // Clear identifier so user chooses explicitly for this language.
-        setIdentifier("");
+        // Auto-select first identifier for this language if available
+        const first = next[0]?.identifier || "";
+        setIdentifier(first);
+        if (first) {
+          try {
+            localStorage.setItem("app_translation_identifier", first);
+            setCookie("__translation_identifier__", first, {
+              expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+              path: "/",
+            });
+          } catch {}
+        }
       }
     } catch {
-      setIdentifier("");
+      const first = next[0]?.identifier || "";
+      setIdentifier(first);
     }
   }, [language, editions]);
 
@@ -206,16 +217,31 @@ export default function SettingsDrawer({ open, onClose }) {
                 label="Translation"
                 onChange={handleIdentifierChange}
                 displayEmpty
-                renderValue={(val) => (val ? val : "Select translation")}
+                renderValue={(val) => {
+                  if (!val) return "";
+                  // Prefer englishName in display; fallback to native name; then identifier
+                  const edition =
+                    editions.find((e) => e.identifier === val) ||
+                    filteredEditions.find((e) => e.identifier === val);
+                  if (!edition) return val;
+                  return edition.englishName || edition.name || val;
+                }}
               >
                 <MenuItem value="">
-                  <em>Select translation</em>
+                  <em></em>
                 </MenuItem>
-                {filteredEditions.map((e) => (
-                  <MenuItem key={e.identifier} value={e.identifier}>
-                    {e.englishName || e.name}
-                  </MenuItem>
-                ))}
+                {filteredEditions.map((e) => {
+                  const hasBoth =
+                    e.englishName && e.name && e.englishName !== e.name;
+                  const label = hasBoth
+                    ? `${e.englishName} — ${e.name}`
+                    : e.englishName || e.name || e.identifier;
+                  return (
+                    <MenuItem key={e.identifier} value={e.identifier}>
+                      {label}
+                    </MenuItem>
+                  );
+                })}
               </Select>
             </FormControl>
           </Box>
