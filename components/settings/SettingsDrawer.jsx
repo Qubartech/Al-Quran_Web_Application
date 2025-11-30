@@ -35,12 +35,23 @@ export default function SettingsDrawer({ open, onClose }) {
 
   React.useEffect(() => {
     try {
-      const cookie = document.cookie
-        .split(";")
-        .map((c) => c.trim())
-        .find((c) => c.startsWith("__theme__="));
-      const value = cookie ? cookie.split("=")[1] : "system";
+      const cookies = document.cookie.split(";").map((c) => c.trim());
+      const sel = cookies.find((c) => c.startsWith("__theme_selected__="));
+      const cookie = cookies.find((c) => c.startsWith("__theme__="));
+      const value = sel
+        ? sel.split("=")[1]
+        : cookie
+        ? cookie.split("=")[1]
+        : "system";
       setThemeChoice(value || "system");
+      if (sel) {
+        try {
+          setCookie("__theme_selected__", "", {
+            expires: new Date(0),
+            path: "/",
+          });
+        } catch {}
+      }
     } catch (e) {
       setThemeChoice("system");
     }
