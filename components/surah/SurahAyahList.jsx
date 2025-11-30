@@ -150,11 +150,11 @@ const SurahAyahList = ({
               id={`sura_${pageId}_ayah_${idx + 1}`}
               tabIndex={-1}
             >
-              <div className="p-5 border-b border-gray-200 dark:border-gray-700 flex gap-6 justify-between w-full transition-colors">
-                <div className="w-12 flex items-center">
+              <div className="px-2 md:px-5 py-5 border-b border-gray-200 dark:border-gray-700 flex gap-3 justify-between w-full transition-colors">
+                <div className="md:w-12 flex items-center justify-center">
                   <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 flex flex-col items-center justify-center">
                     {pageId}:{idx + 1}
-                    <div className="w-full">
+                    <div className="w-full flex justify-center">
                       <SurahPlayBtn
                         key={`spb_${idx}_pid_${audio?.playlistId ?? "-"}_ci_${
                           audio?.currentIndex ?? -1
@@ -178,7 +178,7 @@ const SurahAyahList = ({
 
                 <div className="w-full">
                   <div
-                    className={`text-xl md:text-3xl font-semibold text-end font-arabic pb-7 ${
+                    className={`text-2xl md:text-3xl font-semibold text-end font-arabic pb-7 ${
                       isPlaying
                         ? "text-primaryColor"
                         : "text-gray-900 dark:text-gray-100"

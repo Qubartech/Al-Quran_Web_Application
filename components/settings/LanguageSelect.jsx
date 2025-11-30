@@ -17,10 +17,10 @@ export default function LanguageSelect({
   return (
     <React.Fragment>
       <Typography variant="subtitle1" sx={{ mb: 1 }}>
-        Language
+        Translation Language
       </Typography>
       <FormControl fullWidth size="small" sx={sx}>
-        <InputLabel id={labelId}>Language</InputLabel>
+        <InputLabel id={labelId}>Translation</InputLabel>
         <Select
           labelId={labelId}
           value={value}
