@@ -7,6 +7,7 @@ import NoFlashThemeScript from "@/components/theme/NoFlashThemeScript";
 // import "boxicons";
 import { Inter } from "next/font/google";
 import { cookies } from "next/headers";
+import { arabicFont } from './fonts'
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,7 +35,7 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={isDark ? "dark" : undefined}
+      className={`${isDark ? "dark" : ""} ${arabicFont.variable}`}
     >
       <head>
         <NoFlashThemeScript />
