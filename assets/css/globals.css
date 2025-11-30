@@ -4,7 +4,7 @@
 
 @font-face {
   font-family: "Arabic";
-  src: url("../font/uthmanic_regular.otf");
+  src: url("/font/uthmanic_regular.otf");
 }
 
 /* Glassy utility */
