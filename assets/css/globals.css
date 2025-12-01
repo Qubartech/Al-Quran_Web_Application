@@ -1,11 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+/* 
 @font-face {
   font-family: "Arabic";
-  src: url("/font/uthmanic_regular.otf");
-}
+  src: url("/font/UthmanicHafs1Ver18.woff2");
+} */
 
 /* Glassy utility */
 .glass {
@@ -103,5 +103,32 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Font size control for ayah text via CSS custom property */
+:root {
+  --ayah-font-size: 18px; 
+  --ayah-arabic-font-size: 24px;
+}
+
+.ayah-text {
+  font-size: var(--ayah-font-size);
+}
+
+.ayah-arabic-text {
+  font-size: var(--ayah-arabic-font-size);
+}
+
+@media (max-width: 640px) {
+  :root {
+    --ayah-font-size: 16px;
+    --ayah-arabic-font-size: 22px;
+  }
+}
+@media (min-width: 1024px) {
+  :root {
+    --ayah-font-size: 19px;
+    --ayah-arabic-font-size: 29px;
   }
 }

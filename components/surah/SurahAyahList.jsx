@@ -173,12 +173,12 @@ const SurahAyahList = ({
                         pauseControl={() => audio?.pause()}
                       />
                     </div>
-                  </div>
+                    </div>
                 </div>
 
                 <div className="w-full">
                   <div
-                    className={`text-2xl md:text-3xl font-semibold text-end font-arabic pb-7 ${
+                    className={`font-semibold text-end font-arabic font-amiri ayah-arabic-text pb-7 ${
                       isPlaying
                         ? "text-primaryColor"
                         : "text-gray-900 dark:text-gray-100"
@@ -187,7 +187,7 @@ const SurahAyahList = ({
                   >
                     {text}
                   </div>
-                  <div className="text-gray-700 dark:text-gray-300">
+                  <div className="text-gray-700 dark:text-gray-300 ayah-text">
                     {englishTrans[idx]?.text}
                   </div>
                 </div>
