@@ -7,7 +7,7 @@ export default async function Home() {
   const { data } = surahList || {};
 
   return (
-    <main className="text-gray-900 dark:text-gray-100 min-h-screen transition-colors my-10">
+    <main className="text-gray-900 dark:text-gray-100 min-h-screen transition-colors my-10 px-3 md:px-0">
       <div className="flex flex-col md:flex-row gap-6 px-4 md:px-0">
         <div className="w-full">
           <SurahList data={data} />
