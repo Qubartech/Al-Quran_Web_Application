@@ -1,40 +1,43 @@
 "use client";
 
 import * as React from "react";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import Typography from "@mui/material/Typography";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function LanguageSelect({
   languages = [],
   value = "bn",
-  onChange,
-  sx,
-  labelId = "settings-language-label",
+  onChange = () => {},
 }) {
   return (
-    <React.Fragment>
-      <Typography variant="subtitle1" sx={{ mb: 1 }}>
+    <div className="space-y-1">
+      <label className="text-sm font-medium text-foreground">
         Translation Language
-      </Typography>
-      <FormControl fullWidth size="small" sx={sx}>
-        <InputLabel id={labelId}>Translation</InputLabel>
-        <Select
-          labelId={labelId}
-          value={value}
-          label="Language"
-          onChange={onChange}
-        >
-          {languages.length === 0 && <MenuItem value={value}>{value}</MenuItem>}
-          {languages.map((lang) => (
-            <MenuItem key={lang} value={lang}>
-              {lang}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </React.Fragment>
+      </label>
+      <Select 
+        value={value} 
+        onValueChange={(val) => onChange({ target: { value: val } })}
+      >
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Select language" />
+        </SelectTrigger>
+        <SelectContent>
+          {languages.length === 0 ? (
+            <SelectItem value={value}>{value}</SelectItem>
+          ) : (
+            languages.map((lang) => (
+              <SelectItem key={lang} value={lang}>
+                {lang}
+              </SelectItem>
+            ))
+          )}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }

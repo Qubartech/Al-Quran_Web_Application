@@ -1,60 +1,46 @@
 "use client";
 
 import * as React from "react";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import Typography from "@mui/material/Typography";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function TranslationSelect({
   editions = [],
   value = "",
-  onChange,
-  sx,
-  labelId = "settings-translation-label",
+  onChange = () => {},
 }) {
-  const renderValue = React.useCallback(
-    (val) => {
-      if (!val) return "";
-      const edition = editions.find((e) => e.identifier === val);
-      if (!edition) return val;
-      return edition.englishName || edition.name || val;
-    },
-    [editions]
-  );
+  const renderLabel = React.useCallback((e) => {
+    const hasBoth = e.englishName && e.name && e.englishName !== e.name;
+    return hasBoth
+      ? `${e.englishName} — ${e.name}`
+      : e.englishName || e.name || e.identifier;
+  }, []);
 
   return (
-    <React.Fragment>
-      {/* <Typography variant="subtitle1" sx={{ mb: 1, mt:1 }}>
-        Translation
-      </Typography> */}
-      <FormControl fullWidth size="small" sx={{mt: 2}}>
-        <InputLabel id={labelId}>Translation</InputLabel>
-        <Select
-          labelId={labelId}
-          value={value}
-          label="Translation"
-          onChange={onChange}
-          displayEmpty
-          renderValue={renderValue}
-        >
-          <MenuItem value="">
-            <em></em>
-          </MenuItem>
-          {editions.map((e) => {
-            const hasBoth = e.englishName && e.name && e.englishName !== e.name;
-            const label = hasBoth
-              ? `${e.englishName} — ${e.name}`
-              : e.englishName || e.name || e.identifier;
-            return (
-              <MenuItem key={e.identifier} value={e.identifier}>
-                {label}
-              </MenuItem>
-            );
-          })}
-        </Select>
-      </FormControl>
-    </React.Fragment>
+    <div className="space-y-1">
+      <label className="text-sm font-medium text-foreground">
+        Translation Edition
+      </label>
+      <Select
+        value={value}
+        onValueChange={(val) => onChange({ target: { value: val } })}
+      >
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Select edition" />
+        </SelectTrigger>
+        <SelectContent>
+          {editions.map((e) => (
+            <SelectItem key={e.identifier} value={e.identifier}>
+              {renderLabel(e)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }
