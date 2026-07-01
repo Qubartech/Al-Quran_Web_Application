@@ -17,6 +17,7 @@ function SurahAudioPlayer({
 }) {
   const playerRef = useRef(null);
   const [isMdUp, setIsMdUp] = useState(false);
+  const [activeAyahIndex, setActiveAyahIndex] = useState(-1);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -37,7 +38,83 @@ function SurahAudioPlayer({
     };
   }, []);
 
+  useEffect(() => {
+    const handleAyahChange = (e) => {
+      if (typeof e.detail.ayahIndex === "number") {
+        setActiveAyahIndex(e.detail.ayahIndex);
+      }
+    };
+    window.addEventListener("quran-audio-ayah-change", handleAyahChange);
+    return () => {
+      window.removeEventListener("quran-audio-ayah-change", handleAyahChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Reset active ayah index when source changes
+    setActiveAyahIndex(-1);
+  }, [src]);
+
+  useEffect(() => {
+    const audioEl = playerRef.current?.audio?.current;
+    if (!audioEl) return;
+
+    const handleSeek = (e) => {
+      if (typeof e.detail.time === "number") {
+        // If metadata is not loaded yet, store it globally as pending
+        if (audioEl.readyState < 1) {
+          if (typeof window !== "undefined") {
+            window.pendingQuranAudioSeekTime = e.detail.time;
+          }
+        } else {
+          audioEl.currentTime = e.detail.time;
+        }
+      }
+    };
+
+    window.addEventListener("quran-audio-seek", handleSeek);
+    return () => {
+      window.removeEventListener("quran-audio-seek", handleSeek);
+    };
+  }, [src]);
+
+  useEffect(() => {
+    const audioEl = playerRef.current?.audio?.current;
+    if (!audioEl) return;
+
+    const handleLoadedMetadata = () => {
+      if (typeof window !== "undefined" && typeof window.pendingQuranAudioSeekTime === "number") {
+        audioEl.currentTime = window.pendingQuranAudioSeekTime;
+        window.pendingQuranAudioSeekTime = null;
+      }
+    };
+
+    audioEl.addEventListener("loadedmetadata", handleLoadedMetadata);
+    audioEl.addEventListener("canplay", handleLoadedMetadata);
+    return () => {
+      audioEl.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      audioEl.removeEventListener("canplay", handleLoadedMetadata);
+    };
+  }, [src]);
+
   if (!src) return null;
+
+  useEffect(() => {
+    const audioEl = playerRef.current?.audio?.current;
+    if (!audioEl) return;
+
+    const handleTimeUpdate = () => {
+      const event = new CustomEvent("quran-audio-timeupdate", {
+        detail: { currentTime: audioEl.currentTime },
+      });
+      window.dispatchEvent(event);
+    };
+
+    audioEl.addEventListener("timeupdate", handleTimeUpdate);
+    return () => {
+      audioEl.removeEventListener("timeupdate", handleTimeUpdate);
+    };
+  }, [src]);
 
   useEffect(() => {
     if (!pauseTick) return;
@@ -78,9 +155,7 @@ function SurahAudioPlayer({
             <div className="text-sm md:text-base font-semibold text-gray-900 dark:text-gray-300">
               {title
                 ? `${title} - Ayah ${
-                    typeof currentIndex === "number" && currentIndex >= 0
-                      ? currentIndex + 1
-                      : ""
+                    activeAyahIndex >= 0 ? activeAyahIndex + 1 : "1"
                   }`
                 : "Surah audio is playing"}
             </div>

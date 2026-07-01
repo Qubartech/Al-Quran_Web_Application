@@ -29,12 +29,14 @@ async function LeftBar() {
                     {surah?.englishNameTranslation}
                   </div>
                 </div>
-                {/* <div className="text-end">
-                  <div>{surah?.name}</div>
-                  <div className="text-xs text-gray-500 font-semibold group-hover:text-primaryColor">
+                <div className="text-end flex flex-col justify-between">
+                  <div className="font-arabic text-lg text-gray-900 dark:text-gray-100 group-hover:text-primaryColor transition-colors">
+                    {surah?.name}
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold group-hover:text-primaryColor">
                     {surah?.numberOfAyahs} Ayahs
                   </div>
-                </div> */}
+                </div>
               </div>
             </div>
           </Link>

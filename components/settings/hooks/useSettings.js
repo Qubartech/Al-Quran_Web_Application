@@ -94,7 +94,8 @@ export default function useSettings() {
     setFilteredEditions(next);
     try {
       const savedId = localStorage.getItem("app_translation_identifier");
-      if (savedId && savedId.startsWith(`${language}.`)) {
+      const exists = next.some((e) => e.identifier === savedId);
+      if (savedId && exists) {
         setIdentifier(savedId);
       } else {
         const first = next[0]?.identifier || "";

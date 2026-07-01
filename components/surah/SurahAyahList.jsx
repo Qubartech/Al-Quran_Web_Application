@@ -23,65 +23,105 @@ const SurahAyahList = ({
   const [isPaused, setIsPaused] = useState(true);
   const [englishTrans, setEnglishTrans] = useState(englishTransAyah || []);
   const audio = useAudio();
+  const [audioCurrentTime, setAudioCurrentTime] = useState(0);
 
-  const list = useMemo(() => ayahAudio.map((a) => a.audio), [ayahAudio]);
+  useEffect(() => {
+    const onTimeUpdate = (e) => {
+      setAudioCurrentTime(e.detail.currentTime);
+    };
+    window.addEventListener("quran-audio-timeupdate", onTimeUpdate);
+    return () => {
+      window.removeEventListener("quran-audio-timeupdate", onTimeUpdate);
+    };
+  }, []);
+
+  function getActiveWordIndex(ayah, currentTimeSeconds) {
+    if (!ayah?.segments || ayah.segments.length === 0) return -1;
+    const currentTimeMs = currentTimeSeconds * 1000;
+
+    const activeSegment = ayah.segments.find(
+      (seg) => currentTimeMs >= seg[1] && currentTimeMs <= seg[2]
+    );
+
+    if (activeSegment) {
+      return activeSegment[0] - 1; // Return 0-indexed position
+    }
+    return -1;
+  }
+
+  const fullAudioUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${pageId}.mp3`;
+
+  // Track the active ayah index based on audioCurrentTime
+  const activeAyahIndex = useMemo(() => {
+    const timeMs = audioCurrentTime * 1000;
+    return arabicAyah.findIndex(
+      (ayah) => timeMs >= ayah.timestamp_from && timeMs <= ayah.timestamp_to
+    );
+  }, [arabicAyah, audioCurrentTime]);
+
+  // Sync scroll on active ayah index change
+  useEffect(() => {
+    if (activeAyahIndex !== -1 && !isPaused) {
+      const elId = `sura_${pageId}_ayah_${activeAyahIndex + 1}`;
+      const el = document.getElementById(elId);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  }, [activeAyahIndex, isPaused, pageId]);
+
+  // Dispatch active ayah index to custom event listener in AudioPlayer
+  useEffect(() => {
+    if (activeAyahIndex !== -1) {
+      window.dispatchEvent(
+        new CustomEvent("quran-audio-ayah-change", {
+          detail: { ayahIndex: activeAyahIndex },
+        })
+      );
+    }
+  }, [activeAyahIndex]);
 
   function playControl(ayahIndex) {
-    audio?.playList(list, ayahIndex, pageId, surahName);
-    setAyahNum(ayahIndex);
+    const targetAyah = arabicAyah[ayahIndex];
+    if (!targetAyah) return;
+    const seekTime = targetAyah.timestamp_from / 1000;
 
-    if (typeof window !== "undefined") {
-      requestAnimationFrame(() => {
-        const elId = `sura_${pageId}_ayah_${ayahIndex + 1}`;
-        const el = document.getElementById(elId);
-        if (el) {
-          el.tabIndex = -1;
-          el.scrollIntoView({ behavior: "smooth", block: "center" });
-          el.focus({ preventScroll: true });
-        }
-      });
+    // Check if the full Surah audio is already playing
+    if (audio?.playlistId === pageId) {
+      window.dispatchEvent(
+        new CustomEvent("quran-audio-seek", { detail: { time: seekTime } })
+      );
+      if (isPaused) {
+        audio?.resume();
+      }
+    } else {
+      // Load and play the full Surah audio
+      audio?.playList([fullAudioUrl], 0, pageId, surahName);
+      // Wait for player state to populate, then seek
+      setTimeout(() => {
+        window.dispatchEvent(
+          new CustomEvent("quran-audio-seek", { detail: { time: seekTime } })
+        );
+      }, 300);
     }
   }
 
   function playAdjacentAudio(playNext = true) {
-    let ayahToPlay = null;
-
-    if (playNext && ayahNum < arabicAyah.length - 1) ayahToPlay = ayahNum + 1;
-    else if (!playNext && ayahNum > 0) ayahToPlay = ayahNum - 1;
-    else {
-      ayahToPlay = null;
+    let nextIdx = activeAyahIndex;
+    if (playNext && activeAyahIndex < arabicAyah.length - 1) {
+      nextIdx = activeAyahIndex + 1;
+    } else if (!playNext && activeAyahIndex > 0) {
+      nextIdx = activeAyahIndex - 1;
+    } else {
       audio?.close();
+      return;
     }
-
-    ayahToPlay && playControl(ayahToPlay);
+    playControl(nextIdx);
   }
 
   const closePlayer = () => {
     audio?.close();
   };
-
-  useEffect(() => {
-    if (!audio) return;
-    const idx = audio.currentIndex;
-    if (idx == null || idx < 0) return;
-    const belongsHere = audio.playlistId === pageId;
-    if (!belongsHere) return;
-
-    setAyahNum(idx);
-    if (typeof window !== "undefined") {
-      // Avoid modifying URL to prevent flashing
-      requestAnimationFrame(() => {
-        const elId = `sura_${pageId}_ayah_${idx + 1}`;
-        const el = document.getElementById(elId);
-        if (el) {
-          el.tabIndex = -1;
-          el.scrollIntoView({ behavior: "smooth", block: "center" });
-          el.focus({ preventScroll: true });
-          // Keep URL unchanged
-        }
-      });
-    }
-  }, [audio, audio?.currentIndex, audio?.src, list, pageId]);
 
   // Force re-render when audio play/pause ticks change so isPlaying updates immediately
   useEffect(() => {
@@ -103,17 +143,15 @@ const SurahAyahList = ({
   useEffect(() => {
     const fetchByIdentifier = async (identifier) => {
       try {
-        const apiBase =
-          process.env.NEXT_PUBLIC_QURAN_API_URL ||
-          process.env.API_URL ||
-          "https://api.alquran.cloud/v1";
-        const url = `${apiBase}/surah/${pageId}/editions/quran-uthmani,${identifier},ar.alafasy`;
+        const url = `https://api.quran.com/api/v4/verses/by_chapter/${pageId}?per_page=300&translations=${identifier}`;
         const res = await fetch(url);
         if (!res.ok) return;
         const json = await res.json();
-        const data = Array.isArray(json?.data) ? json.data : [];
-        const transEd = data.find((d) => d?.edition?.identifier === identifier);
-        const newTransAyahs = transEd?.ayahs || [];
+        const verses = Array.isArray(json?.verses) ? json.verses : [];
+        const newTransAyahs = verses.map((v) => ({
+          text: v.translations?.[0]?.text || "",
+          number: v.verse_number,
+        }));
         if (newTransAyahs.length) setEnglishTrans(newTransAyahs);
       } catch {}
     };
@@ -140,11 +178,10 @@ const SurahAyahList = ({
 
       {arabicAyah.map((ayah, idx) => {
         const isPlaying =
-          audio?.playlistId === pageId && audio?.currentIndex === idx;
+          audio?.playlistId === pageId && activeAyahIndex === idx;
         const { text } = ayah || {};
         return (
-          <>
-            <div
+          <div
               key={idx}
               className="py-1"
               id={`sura_${pageId}_ayah_${idx + 1}`}
@@ -162,11 +199,11 @@ const SurahAyahList = ({
                           audio?.paused ? 1 : 0
                         }_play_${audio?.playTick ?? 0}_pause_${
                           audio?.pauseTick ?? 0
-                        }_src_${audio?.src ?? "-"}`}
+                        }_active_${activeAyahIndex === idx ? 1 : 0}_src_${audio?.src ?? "-"}`}
                         isPlaying={
                           audio?.open &&
                           audio?.playlistId === pageId &&
-                          audio?.currentIndex === idx &&
+                          activeAyahIndex === idx &&
                           !isPaused
                         }
                         playControl={() => playControl(idx)}
@@ -177,23 +214,87 @@ const SurahAyahList = ({
                 </div>
 
                 <div className="w-full">
-                  <div
-                    className={`font-semibold text-end font-arabic font-amiri ayah-arabic-text pb-7 ${
-                      isPlaying
-                        ? "text-primaryColor"
-                        : "text-gray-900 dark:text-gray-100"
-                    }`}
-                    style={isPlaying ? ayahAnim : {}}
-                  >
-                    {text}
-                  </div>
-                  <div className="text-gray-700 dark:text-gray-300 ayah-text">
+                  {ayah.words && ayah.words.length > 0 ? (
+                    (() => {
+                      const activeWordIndex = getActiveWordIndex(ayah, audioCurrentTime);
+                      return (
+                        <div
+                          className="flex flex-wrap gap-x-3 gap-y-5 justify-end w-full pb-7"
+                          dir="rtl"
+                        >
+                          {ayah.words.map((word, wIdx) => {
+                            const isWord = word.char_type_name === "word";
+                            const wordText =
+                              word.text_qpc_hafs ||
+                              word.text_uthmani ||
+                              word.text;
+                            const wordTrans = word.translation?.text;
+                            const wordTranslit = word.transliteration?.text;
+
+                            const isActiveWord = isPlaying && activeWordIndex === wIdx;
+                            const isHighlightStyle = isActiveWord;
+                            const isDimmedStyle = isPlaying && activeWordIndex !== -1 && !isActiveWord;
+
+                            return (
+                              <div
+                                key={wIdx}
+                                className="relative flex flex-col items-center justify-center p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/30 transition-all duration-200 group cursor-pointer border border-transparent hover:border-gray-200/30 dark:hover:border-gray-700/30"
+                              >
+                                {/* Arabic word */}
+                                <span
+                                  className={`text-2xl md:text-3xl font-semibold select-none transition-all duration-150 font-arabic ${
+                                    isHighlightStyle
+                                      ? "text-primaryColor scale-110 font-bold"
+                                      : isDimmedStyle
+                                      ? "text-gray-900/30 dark:text-gray-100/30"
+                                      : "text-gray-900 dark:text-gray-100 group-hover:text-primaryColor"
+                                  }`}
+                                  dir="rtl"
+                                >
+                                  {wordText}
+                                </span>
+
+                                {/* Tooltip on Hover */}
+                                {isWord && (wordTrans || wordTranslit) && (
+                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center bg-gray-900 dark:bg-gray-800 text-white text-[11px] p-2 rounded shadow-lg z-30 pointer-events-none whitespace-nowrap min-w-[60px] border border-gray-700">
+                                    {wordTranslit && (
+                                      <span className="font-semibold text-gray-300 font-sans tracking-wide mb-0.5" dir="ltr">
+                                        {wordTranslit}
+                                      </span>
+                                    )}
+                                    {wordTrans && (
+                                      <span className="text-gray-400 font-sans text-center font-normal leading-normal" dir="ltr">
+                                        {wordTrans}
+                                      </span>
+                                    )}
+                                    {/* Tooltip triangle arrow */}
+                                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-gray-900 dark:border-t-gray-800"></div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    <div
+                      className={`font-semibold text-end font-arabic ayah-arabic-text pb-7 ${
+                        isPlaying
+                          ? "text-primaryColor"
+                          : "text-gray-900 dark:text-gray-100"
+                      }`}
+                      style={isPlaying ? ayahAnim : {}}
+                    >
+                      {text}
+                    </div>
+                  )}
+                  <div className="text-gray-700 dark:text-gray-300 ayah-text pt-2 border-t border-gray-100 dark:border-gray-800">
                     {englishTrans[idx]?.text}
                   </div>
                 </div>
               </div>
             </div>
-          </>
         );
       })}
     </>

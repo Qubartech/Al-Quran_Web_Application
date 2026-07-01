@@ -18,7 +18,7 @@ module.exports = {
       },
 
       fontFamily: {
-        arabic: ["Arabic", , ...defaultTheme.fontFamily.sans],
+        arabic: ["var(--font-arabic)", ...defaultTheme.fontFamily.sans],
       },
   		borderRadius: {
   			lg: 'var(--radius)',

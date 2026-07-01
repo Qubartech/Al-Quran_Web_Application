@@ -15,7 +15,7 @@ async function Surah({ params }) {
   // console.log(singleSurah)
 
   const { data } = singleSurah || {};
-  const { ayahs: arabicAyah, englishName } = data[0] || {};
+  const { ayahs: arabicAyah, englishName, arabicName } = data[0] || {};
   const { ayahs: englishTransAyah } = data[1] || {};
   const { ayahs: ayahAudio } = data[2] || {};
 
@@ -27,8 +27,13 @@ async function Surah({ params }) {
       <div className="py-7 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 mt-4 rounded-lg bg-[url('/bg.jpg')] bg-repeat relative overflow-hidden">
         <div className="backdrop-blur-[2px] bg-white/30 dark:bg-black/40 absolute top-0 left-0 w-full h-full"></div>
         <div className="relative z-10 flex flex-col gap-4 justify-center items-center text-gray-900 dark:text-gray-100">
-          <div className="text-4xl font-semibold tracking-wide">
-            {englishName}
+          <div className="text-4xl font-semibold tracking-wide flex items-center gap-4">
+            <span>{englishName}</span>
+            {arabicName && (
+              <span className="font-arabic text-3xl text-primaryColor font-normal dark:text-primaryColor-light ml-2">
+                {arabicName}
+              </span>
+            )}
           </div>
           <div>
             <svg
