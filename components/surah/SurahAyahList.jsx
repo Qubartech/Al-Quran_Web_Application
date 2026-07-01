@@ -187,7 +187,7 @@ const SurahAyahList = ({
               id={`sura_${pageId}_ayah_${idx + 1}`}
               tabIndex={-1}
             >
-              <div className="px-2 md:px-5 py-5 border-b border-gray-200 dark:border-gray-700 flex gap-3 justify-between w-full transition-colors">
+              <div className={`px-2 md:px-5 py-5 flex gap-3 justify-between w-full transition-colors ${idx < arabicAyah.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : ''}`}>
                 <div className="md:w-12 flex items-center justify-center">
                   <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 flex flex-col items-center justify-center">
                     {pageId}:{idx + 1}
