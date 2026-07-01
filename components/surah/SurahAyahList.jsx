@@ -219,7 +219,7 @@ const SurahAyahList = ({
                       const activeWordIndex = getActiveWordIndex(ayah, audioCurrentTime);
                       return (
                         <div
-                          className="flex flex-wrap gap-x-3 gap-y-5 justify-end w-full pb-7"
+                          className="flex flex-wrap gap-x-3 gap-y-5 justify-start w-full pb-7"
                           dir="rtl"
                         >
                           {ayah.words.map((word, wIdx) => {

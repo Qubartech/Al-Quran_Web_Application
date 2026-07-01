@@ -5,10 +5,10 @@ async function LeftLayout({ children }) {
   return (
     <>
       <div className="flex justify-between px-3 md:px-0 gap-4 w-full my-8 text-gray-900 dark:text-gray-100">
-        <div className="w-96 hidden md:block max-h-full overflow-hidden h-[calc(100vh-100px)] overflow-y-auto rounded-md glass">
+        <div className="w-96 hidden md:block max-h-full overflow-hidden h-[calc(100vh-100px)] overflow-y-auto rounded-md glass hover-scrollbar">
           <LeftBar />
         </div>
-        <div className="w-full rounded-md h-[calc(100vh-100px)] overflow-y-auto scroll-smooth duration-700 glass">
+        <div className="w-full rounded-md h-[calc(100vh-100px)] overflow-y-auto scroll-smooth duration-700 glass hover-scrollbar">
           {children}
         </div>
       </div>
