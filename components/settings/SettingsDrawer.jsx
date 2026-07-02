@@ -1,13 +1,18 @@
 "use client";
 
 import * as React from "react";
-import Drawer from "@mui/material/Drawer";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/rightDrawer";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 import ThemeToggle from "@/components/settings/ThemeToggle";
 import LanguageSelect from "@/components/settings/LanguageSelect";
 import TranslationSelect from "@/components/settings/TranslationSelect";
@@ -33,64 +38,51 @@ export default function SettingsDrawer({ open, onClose }) {
     resetAll,
   } = useSettings();
 
-  const muiTheme = React.useMemo(
-    () =>
-      createTheme({
-        palette: { mode: resolvedTheme === "dark" ? "dark" : "light" },
-      }),
-    [resolvedTheme]
-  );
-
   return (
-    <ThemeProvider theme={muiTheme}>
-      <Drawer anchor="right" open={open} onClose={onClose}>
-        <Box
-          sx={{
-            width: 340,
-            p: 2,
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography variant="h6">Settings</Typography>
-            <IconButton
-              aria-label="close settings"
-              onClick={onClose}
-              size="small"
-            >
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          <Divider />
+    <Drawer open={open} onOpenChange={onClose}>
+      <DrawerContent className="max-w-md ml-auto h-full">
+        <DrawerHeader className="text-left">
+          <div className="flex items-center justify-between">
+            <DrawerTitle>Settings</DrawerTitle>
+            <DrawerClose asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </Button>
+            </DrawerClose>
+          </div>
+          <DrawerDescription className="sr-only">
+            Configure your application settings
+          </DrawerDescription>
+        </DrawerHeader>
+
+        <div className="flex-1 overflow-y-auto px-4 space-y-6 py-3">
           <ThemeToggle value={themeChoice} onChange={handleThemeChange} />
+
           <LanguageSelect
             languages={languages}
             value={language}
             onChange={handleLanguageChange}
           />
+
           <TranslationSelect
             editions={filteredEditions}
             value={identifier}
             onChange={handleIdentifierChange}
           />
+
           <FontSizeControls
             fontSize={fontSize}
             arabicFontSize={arabicFontSize}
             onFontSizeChange={handleFontSizeChange}
             onArabicFontSizeChange={handleArabicFontSizeChange}
           />
-          <Divider />
+        </div>
+
+        <DrawerFooter className="pt-2">
           <SettingsResetButton onReset={resetAll} />
-        </Box>
-      </Drawer>
-    </ThemeProvider>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }
