@@ -9,19 +9,39 @@
 
 /* Glassy utility */
 .glass {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background-color: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(229, 231, 235, 0.8); /* gray-200 */
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -4px rgba(0, 0, 0, 0.1);
-  transition: background-color 300ms ease, border-color 300ms ease,
-    box-shadow 300ms ease;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background-color: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.04),
+              inset 0 1px 1px 0 rgba(255, 255, 255, 0.3);
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark .glass {
-  background-color: rgba(26, 37, 60, 0.6); /* matches navbar dark */
-  border-color: rgba(55, 65, 81, 0.8); /* gray-700 */
+  background-color: rgba(17, 24, 39, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15),
+              inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-hover {
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-hover:hover {
+  background-color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(6, 186, 144, 0.5);
+  box-shadow: 0 12px 40px 0 rgba(6, 186, 144, 0.08),
+              inset 0 1px 1px 0 rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.dark .glass-hover:hover {
+  background-color: rgba(17, 24, 39, 0.65);
+  border-color: rgba(74, 222, 128, 0.4);
+  box-shadow: 0 12px 40px 0 rgba(74, 222, 128, 0.06),
+              inset 0 1px 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 /* Dark mode overrides for react-h5-audio-player text visibility */

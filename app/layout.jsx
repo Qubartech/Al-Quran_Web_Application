@@ -56,6 +56,18 @@ export default function RootLayout({ children }) {
         >
           <AudioProvider>
             <Navbar />
+            {/* Ambient Background Blobs for Glassmorphic Depth */}
+            <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+              {/* Light Mode Blobs */}
+              <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-100/40 blur-[120px] dark:hidden"></div>
+              <div className="absolute bottom-[10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-teal-100/30 blur-[130px] dark:hidden"></div>
+              <div className="absolute top-[40%] left-[20%] w-[400px] h-[400px] rounded-full bg-amber-55/20 blur-[100px] dark:hidden"></div>
+              
+              {/* Dark Mode Blobs */}
+              <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-950/20 blur-[120px] hidden dark:block"></div>
+              <div className="absolute bottom-[10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-teal-950/15 blur-[130px] hidden dark:block"></div>
+              <div className="absolute top-[40%] left-[20%] w-[400px] h-[400px] rounded-full bg-emerald-900/10 blur-[100px] hidden dark:block"></div>
+            </div>
             <div className="relative scroll-smooth max-w-screen-2xl mx-auto min-h-screen pt-16">
               {children}
             </div>
