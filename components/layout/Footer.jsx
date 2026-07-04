@@ -16,7 +16,7 @@ function Footer() {
                 Quran
               </span>
             </a>
-            <div className="max-w-[32rem] text-gray-400 mt-2">
+            <div className="max-w-[32rem] text-gray-600 dark:text-gray-400 mt-2">
               A lightweight Next.js Quran app with translations, search, and
               audio.
             </div>
@@ -26,7 +26,7 @@ function Footer() {
               <h2 className="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">
                 Resources
               </h2>
-              <ul className="text-gray-500 dark:text-gray-400 font-medium">
+              <ul className="text-gray-600 dark:text-gray-400 font-medium">
                 <li className="mb-4">
                   <a href="https://qubartech.com/" className="hover:underline">
                     Qubartech
@@ -43,7 +43,7 @@ function Footer() {
               <h2 className="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">
                 Follow us
               </h2>
-              <ul className="text-gray-500 dark:text-gray-400 font-medium">
+              <ul className="text-gray-600 dark:text-gray-400 font-medium">
                 <li className="mb-4">
                   <a
                     href="https://github.com/themesberg/flowbite"
@@ -66,7 +66,7 @@ function Footer() {
               <h2 className="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">
                 Legal
               </h2>
-              <ul className="text-gray-500 dark:text-gray-400 font-medium">
+              <ul className="text-gray-600 dark:text-gray-400 font-medium">
                 <li className="mb-4">
                   <a href="#" className="hover:underline">
                     Privacy Policy
@@ -83,7 +83,7 @@ function Footer() {
         </div>
         <hr className="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
         <div className="sm:flex sm:items-center sm:justify-between">
-          <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
+          <span className="text-sm text-gray-600 sm:text-center dark:text-gray-400">
             © 2023{" "}
             <a href="https://qubartech.com/" className="hover:underline">
               Qubartech™

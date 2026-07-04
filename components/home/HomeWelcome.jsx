@@ -146,7 +146,7 @@ export default function HomeWelcome() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Daily Ayah Card */}
-        <div className="lg:col-span-2 p-6 rounded-2xl glass border border-white/20 dark:border-slate-850 shadow-sm relative overflow-hidden flex flex-col justify-between group transition-all duration-300">
+        <div className="lg:col-span-2 p-6 rounded-2xl glass border border-white/20 dark:border-slate-800/80 shadow-sm relative overflow-hidden flex flex-col justify-between group transition-all duration-300">
           <div className="absolute -right-16 -top-16 w-32 h-32 rounded-full bg-primaryColor/5 dark:bg-emerald-500/5 blur-2xl group-hover:scale-150 transition-transform duration-500 pointer-events-none"></div>
           
           <div className="flex justify-between items-center mb-4">
@@ -193,7 +193,7 @@ export default function HomeWelcome() {
         </div>
 
         {/* Popular Surahs Card */}
-        <div className="p-6 rounded-2xl glass border border-white/20 dark:border-slate-850 shadow-sm flex flex-col justify-between">
+        <div className="p-6 rounded-2xl glass border border-white/20 dark:border-slate-800/80 shadow-sm flex flex-col justify-between">
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-primaryColor dark:text-primaryColor-light mb-3 block">
               Quick Access
@@ -203,7 +203,7 @@ export default function HomeWelcome() {
                 <Link
                   href={`/surah/${s.id}`}
                   key={s.id}
-                  className="w-full flex items-center justify-between p-2.5 rounded-xl border border-gray-200/40 dark:border-slate-800/40 hover:border-primaryColor/30 dark:hover:border-emerald-500/30 bg-white/30 dark:bg-slate-900/30 hover:bg-white/60 dark:hover:bg-slate-855 transition-all duration-200 group"
+                  className="w-full flex items-center justify-between p-2.5 rounded-xl border border-gray-200/40 dark:border-slate-800/40 hover:border-primaryColor/30 dark:hover:border-emerald-500/30 bg-white/30 dark:bg-slate-900/30 hover:bg-white/60 dark:bg-slate-800/30 transition-all duration-200 group"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span className="text-base select-none shrink-0 group-hover:scale-110 transition-transform">{s.icon}</span>
@@ -211,7 +211,7 @@ export default function HomeWelcome() {
                       <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-primaryColor transition-colors">
                         Surah {s.name}
                       </h4>
-                      <p className="text-[10px] text-gray-450 dark:text-gray-400 truncate">
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">
                         {s.subtitle}
                       </p>
                     </div>

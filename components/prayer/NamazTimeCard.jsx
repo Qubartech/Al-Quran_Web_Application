@@ -418,7 +418,7 @@ const NamazTimeCard = ({ gpsLocation }) => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="e.g. London, UK"
-                  className="flex-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-850 dark:text-gray-150 focus:outline-none focus:ring-1 focus:ring-primaryColor"
+                  className="flex-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-800 dark:text-gray-150 focus:outline-none focus:ring-1 focus:ring-primaryColor"
                 />
                 <button 
                   type="submit"
@@ -468,7 +468,7 @@ const NamazTimeCard = ({ gpsLocation }) => {
                   className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold border transition-all ${
                     school === 0
                       ? "bg-primaryColor text-white border-primaryColor"
-                      : "bg-white dark:bg-gray-855 border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-655 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
                 >
                   Standard (Shafi, etc.)
@@ -479,7 +479,7 @@ const NamazTimeCard = ({ gpsLocation }) => {
                   className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold border transition-all ${
                     school === 1
                       ? "bg-primaryColor text-white border-primaryColor"
-                      : "bg-white dark:bg-gray-855 border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-655 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
                 >
                   Hanafi

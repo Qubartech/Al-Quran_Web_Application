@@ -49,11 +49,9 @@ const DrawerContent = React.forwardRef(
         className={cn(
           // Right side drawer with proper positioning
           "fixed right-0 top-0 z-50 h-full w-full sm:max-w-md flex flex-col",
-          "border-l border-border/40",
-          // Light mode: clean white/gray
-          "bg-white",
-          // Dark mode: soft dark gray instead of pure black
-          "dark:bg-gray-900 dark:border-gray-700",
+          "border-l border-white/20 dark:border-slate-800/80",
+          // Glass mode
+          "bg-white/75 dark:bg-slate-900/75 backdrop-blur-xl",
           // Smooth transitions
           "transition-transform duration-300 ease-in-out",
           "shadow-2xl",
@@ -72,8 +70,8 @@ const DrawerHeader = ({ className, ...props }) => (
   <div
     className={cn(
       "flex flex-col space-y-1.5 p-6 border-b",
-      "border-gray-200 dark:border-gray-700",
-      "bg-white dark:bg-gray-900",
+      "border-gray-200/30 dark:border-slate-800/30",
+      "bg-transparent",
       className
     )}
     {...props}
@@ -85,8 +83,8 @@ const DrawerFooter = ({ className, ...props }) => (
   <div
     className={cn(
       "mt-auto flex flex-col gap-2 p-6 border-t",
-      "border-gray-200 dark:border-gray-600",
-      "bg-white dark:bg-gray-900",
+      "border-gray-200/30 dark:border-slate-800/30",
+      "bg-transparent",
       className
     )}
     {...props}

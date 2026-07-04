@@ -187,7 +187,11 @@ const SurahAyahList = ({
               id={`sura_${pageId}_ayah_${idx + 1}`}
               tabIndex={-1}
             >
-              <div className={`px-2 md:px-5 py-5 flex gap-3 justify-between w-full transition-colors ${idx < arabicAyah.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : ''}`}>
+              <div className={`px-3 md:px-6 py-6 flex gap-4 justify-between w-full transition-all duration-300 rounded-xl ${
+                isPlaying
+                  ? "bg-primaryColor/5 border-l-4 border-primaryColor shadow-sm dark:bg-emerald-500/10"
+                  : "border-b border-gray-250/50 dark:border-slate-800/50 hover:bg-gray-50/50 dark:hover:bg-slate-800/20"
+              }`}>
                 <div className="md:w-12 flex items-center justify-center">
                   <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 flex flex-col items-center justify-center">
                     {pageId}:{idx + 1}

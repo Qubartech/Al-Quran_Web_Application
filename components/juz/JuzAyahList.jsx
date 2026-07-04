@@ -7,24 +7,43 @@ import SurahPlayBtn from "@/components/surah/SurahPlayBtn";
 export default function JuzAyahList({
   arabicAyah,
   englishTransAyah,
-  ayahAudio,
   juzId
 }) {
   const [refreshTick, setRefreshTick] = useState(0);
   const [isPaused, setIsPaused] = useState(true);
   const [englishTrans, setEnglishTrans] = useState(englishTransAyah || []);
+  const [segmentsMap, setSegmentsMap] = useState({});
+  const [loadingSurah, setLoadingSurah] = useState(null);
+  const [audioCurrentTime, setAudioCurrentTime] = useState(0);
   const audio = useAudio();
 
-  const playlist = useMemo(() => {
-    return (ayahAudio || []).map((a) => a.audio);
-  }, [ayahAudio]);
+  // Listen to time updates from global audio player
+  useEffect(() => {
+    const onTimeUpdate = (e) => {
+      setAudioCurrentTime(e.detail.currentTime);
+    };
+    window.addEventListener("quran-audio-timeupdate", onTimeUpdate);
+    return () => {
+      window.removeEventListener("quran-audio-timeupdate", onTimeUpdate);
+    };
+  }, []);
 
+  // Compute active ayah index in the Juz list based on current playback time of the active Surah
   const activeAyahIndex = useMemo(() => {
-    if (audio && audio.playlistId === `juz_${juzId}`) {
-      return audio.currentIndex;
-    }
-    return -1;
-  }, [audio, audio?.playlistId, audio?.currentIndex, juzId]);
+    if (!audio || !audio.playlistId || !audio.playlistId.startsWith("surah_")) return -1;
+    const playingSurahNum = parseInt(audio.playlistId.split("_")[1], 10);
+    const timeMs = audioCurrentTime * 1000;
+    const surahTimestamps = segmentsMap[playingSurahNum];
+
+    if (!surahTimestamps) return -1;
+
+    return arabicAyah.findIndex((ayah) => {
+      if (ayah.surahNumber !== playingSurahNum) return false;
+      const seg = surahTimestamps.find((s) => s.verse_key === ayah.verseKey);
+      if (!seg) return false;
+      return timeMs >= seg.timestamp_from && timeMs <= seg.timestamp_to;
+    });
+  }, [arabicAyah, audio, audioCurrentTime, segmentsMap]);
 
   // Sync scroll on active ayah index change
   useEffect(() => {
@@ -94,21 +113,84 @@ export default function JuzAyahList({
     return () => window.removeEventListener("storage", onStorage);
   }, [juzId]);
 
-  function playControl(idx) {
-    if (audio?.playlistId === `juz_${juzId}`) {
-      if (audio?.currentIndex === idx) {
-        if (audio?.paused) {
-          audio?.resume();
-        } else {
-          audio?.pause();
+  // Extract active word index in an ayah based on the play timestamp
+  function getActiveWordIndex(ayah, currentTimeSeconds) {
+    const surahTimestamps = segmentsMap[ayah.surahNumber];
+    if (!surahTimestamps) return -1;
+    const verseSeg = surahTimestamps.find((s) => s.verse_key === ayah.verseKey);
+    if (!verseSeg || !verseSeg.segments || verseSeg.segments.length === 0) return -1;
+    const currentTimeMs = currentTimeSeconds * 1000;
+
+    const activeSegment = verseSeg.segments.find(
+      (seg) => currentTimeMs >= seg[1] && currentTimeMs <= seg[2]
+    );
+
+    if (activeSegment) {
+      return activeSegment[0] - 1; // Return 0-indexed position
+    }
+    return -1;
+  }
+
+  async function playControl(idx) {
+    const target = arabicAyah[idx];
+    if (!target) return;
+    const { surahNumber, verseKey, surahName } = target;
+
+    let timestamps = segmentsMap[surahNumber];
+    if (!timestamps) {
+      setLoadingSurah(surahNumber);
+      try {
+        const res = await fetch(
+          `https://api.quran.com/api/v4/chapter_recitations/7/${surahNumber}?segments=true`
+        );
+        if (res.ok) {
+          const json = await res.json();
+          timestamps = json.audio_file?.timestamps || [];
+          setSegmentsMap((prev) => ({
+            ...prev,
+            [surahNumber]: timestamps,
+          }));
         }
-      } else {
-        audio?.playList(playlist, idx, `juz_${juzId}`, `Juz ${juzId}`);
+      } catch (err) {
+        console.error("Failed to load segments", err);
+      } finally {
+        setLoadingSurah(null);
+      }
+    }
+
+    if (!timestamps) return; // Fetch failed or was cancelled
+
+    const verseSeg = timestamps.find((t) => t.verse_key === verseKey);
+    const seekTime = (verseSeg?.timestamp_from || 0) / 1000;
+    const fullAudioUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${surahNumber}.mp3`;
+
+    if (audio?.playlistId === `surah_${surahNumber}`) {
+      window.dispatchEvent(
+        new CustomEvent("quran-audio-seek", { detail: { time: seekTime } })
+      );
+      if (isPaused) {
+        audio?.resume();
       }
     } else {
-      audio?.playList(playlist, idx, `juz_${juzId}`, `Juz ${juzId}`);
+      audio?.playList([fullAudioUrl], 0, `surah_${surahNumber}`, surahName);
+      setTimeout(() => {
+        window.dispatchEvent(
+          new CustomEvent("quran-audio-seek", { detail: { time: seekTime } })
+        );
+      }, 400);
     }
   }
+
+  // Auto-dispatch active ayah change to custom event listener in AudioPlayer
+  useEffect(() => {
+    if (activeAyahIndex !== -1 && activeAyahIndex !== undefined) {
+      window.dispatchEvent(
+        new CustomEvent("quran-audio-ayah-change", {
+          detail: { ayahIndex: activeAyahIndex },
+        })
+      );
+    }
+  }, [activeAyahIndex]);
 
   return (
     <div className="flex flex-col w-full pb-10">
@@ -120,6 +202,8 @@ export default function JuzAyahList({
         const isNewSurah =
           idx === 0 ||
           arabicAyah[idx].surahNumber !== arabicAyah[idx - 1].surahNumber;
+
+        const activeWordIndex = getActiveWordIndex(ayah, audioCurrentTime);
 
         return (
           <div key={idx} className="w-full flex flex-col">
@@ -148,7 +232,7 @@ export default function JuzAyahList({
               className={`px-3 md:px-6 py-6 flex gap-4 justify-between w-full transition-all duration-300 rounded-xl ${
                 isPlaying
                   ? "bg-primaryColor/5 border-l-4 border-primaryColor shadow-sm dark:bg-emerald-500/10"
-                  : "border-b border-gray-200/50 dark:border-slate-800/50 hover:bg-gray-50/50 dark:hover:bg-slate-800/20"
+                  : "border-b border-gray-250/50 dark:border-slate-800/50 hover:bg-gray-50/50 dark:hover:bg-slate-800/20"
               }`}
             >
               {/* Play Button and Verse identifier */}
@@ -157,16 +241,20 @@ export default function JuzAyahList({
                   {verseKey}
                 </span>
                 <div className="mt-1">
-                  <SurahPlayBtn
-                    isPlaying={
-                      audio?.open &&
-                      audio?.playlistId === `juz_${juzId}` &&
-                      activeAyahIndex === idx &&
-                      !isPaused
-                    }
-                    playControl={() => playControl(idx)}
-                    pauseControl={() => audio?.pause()}
-                  />
+                  {loadingSurah === surahNumber ? (
+                    <div className="w-6 h-6 border-2 border-primaryColor border-t-transparent rounded-full animate-spin mt-2" />
+                  ) : (
+                    <SurahPlayBtn
+                      isPlaying={
+                        audio?.open &&
+                        audio?.playlistId === `surah_${surahNumber}` &&
+                        activeAyahIndex === idx &&
+                        !isPaused
+                      }
+                      playControl={() => playControl(idx)}
+                      pauseControl={() => audio?.pause()}
+                    />
+                  )}
                 </div>
               </div>
 
@@ -187,6 +275,10 @@ export default function JuzAyahList({
                       const wordTrans = word.translation?.text;
                       const wordTranslit = word.transliteration?.text;
 
+                      const isActiveWord = isPlaying && activeWordIndex === wIdx;
+                      const isHighlightStyle = isActiveWord;
+                      const isDimmedStyle = isPlaying && activeWordIndex !== -1 && !isActiveWord;
+
                       return (
                         <div
                           key={wIdx}
@@ -194,8 +286,10 @@ export default function JuzAyahList({
                         >
                           <span
                             className={`text-2xl md:text-3xl font-semibold select-none transition-all duration-150 font-arabic ${
-                              isPlaying
-                                ? "text-primaryColor font-bold"
+                              isHighlightStyle
+                                ? "text-primaryColor scale-110 font-bold"
+                                : isDimmedStyle
+                                ? "text-gray-900/30 dark:text-gray-100/30"
                                 : "text-gray-900 dark:text-gray-100 group-hover:text-primaryColor"
                             }`}
                             dir="rtl"

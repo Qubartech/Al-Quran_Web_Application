@@ -35,7 +35,7 @@ export default function JuzPage() {
                   <h3 className="font-bold text-slate-800 dark:text-slate-200 group-hover:text-primaryColor transition-colors">
                     {juz.nameEnglish}
                   </h3>
-                  <p className="text-[11px] font-medium text-gray-500 dark:text-gray-450 mt-0.5 leading-none">
+                  <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mt-0.5 leading-none">
                     {juz.start} — {juz.end.split(" ")[0]}
                   </p>
                 </div>

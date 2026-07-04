@@ -20,9 +20,9 @@ async function Surah({ params }) {
   const { ayahs: ayahAudio } = data[2] || {};
 
   return (
-    <div className="px-5 min-h-screen bg-white dark:bg-gray-800 dark:text-gray-100">
-      <div className="py-8 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 mt-4 rounded-lg bg-[url('/bg.jpg')] bg-repeat relative overflow-hidden">
-        <div className="backdrop-blur-[2px] bg-white/30 dark:bg-black/40 absolute top-0 left-0 w-full h-full"></div>
+    <div className="px-5 py-4 min-h-screen bg-transparent text-gray-950 dark:text-gray-100">
+      <div className="py-8 border-b border-gray-200/50 dark:border-slate-800/80 bg-gray-50/40 dark:bg-slate-900/40 rounded-2xl relative overflow-hidden glass shadow-sm mb-6 animate-fadeIn">
+        <div className="absolute inset-0 bg-gradient-to-br from-primaryColor/5 to-emerald-500/5 dark:from-primaryColor/10 dark:to-emerald-500/5 z-0"></div>
         <div className="relative z-10 flex flex-col gap-3 justify-center items-center text-gray-900 dark:text-gray-100">
           {/* Surah Number Badge */}
           <div className="w-12 h-12 rounded-full bg-primaryColor/10 dark:bg-primaryColor-light/10 border-2 border-primaryColor dark:border-primaryColor-light flex items-center justify-center">
