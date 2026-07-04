@@ -43,7 +43,9 @@ export default function SettingsDrawer({ open, onClose }) {
       <DrawerContent className="max-w-md ml-auto h-full">
         <DrawerHeader className="text-left">
           <div className="flex items-center justify-between">
-            <DrawerTitle>Settings</DrawerTitle>
+            <DrawerTitle className="text-lg font-extrabold bg-gradient-to-r from-primaryColor to-emerald-600 dark:from-primaryColor-light dark:to-emerald-400 bg-clip-text text-transparent dark:text-transparent">
+              Settings
+            </DrawerTitle>
             <DrawerClose asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <X className="h-4 w-4" />
@@ -57,7 +59,7 @@ export default function SettingsDrawer({ open, onClose }) {
         </DrawerHeader>
 
         <div className="flex-1 overflow-y-auto px-4 space-y-6 py-3">
-          <ThemeToggle value={themeChoice} onChange={handleThemeChange} />
+          <ThemeToggle value={themeChoice} onChange={handleThemeChange} resolvedTheme={resolvedTheme} />
 
           <LanguageSelect
             languages={languages}

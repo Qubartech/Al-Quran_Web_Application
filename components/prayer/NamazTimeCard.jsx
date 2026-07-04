@@ -564,7 +564,7 @@ const NamazTimeCard = ({ gpsLocation }) => {
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`p-1.5 rounded-lg ${isActive ? 'bg-primaryColor text-white' : 'bg-gray-200/50 dark:bg-gray-800/65 text-gray-500'}`}>
+                    <div className={`p-1.5 rounded-lg transition-colors ${isActive ? 'bg-primaryColor text-white' : 'bg-gray-200/50 dark:bg-slate-800/80 text-gray-600 dark:text-gray-300'}`}>
                       <Icon size={16} />
                     </div>
                     <div className="flex flex-col">
