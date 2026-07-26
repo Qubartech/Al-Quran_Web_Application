@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import SettingsDrawer from "@/components/settings/SettingsDrawer";
 import { useUser } from "@/context/UserProvider";
@@ -24,6 +24,17 @@ function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    const handleOpenSettings = () => {
+      setMobileMenuOpen(false);
+      setSettingsOpen(true);
+    };
+    window.addEventListener("quran-open-settings", handleOpenSettings);
+    return () => {
+      window.removeEventListener("quran-open-settings", handleOpenSettings);
+    };
+  }, []);
 
   const openSettings = () => {
     setMobileMenuOpen(false);
