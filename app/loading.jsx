@@ -9,11 +9,10 @@ export default function Loading() {
         <div className="h-3 w-80 bg-gray-300 dark:bg-slate-700 rounded-full"></div>
       </div>
 
-      {/* Grid: Daily Ayah, Quick Access, Namaz Timings (3-Column balanced layout) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        
+      {/* Row 1: Daily Inspiration (Full Width) */}
+      <div className="w-full mb-6">
         {/* Daily Ayah Card Skeleton */}
-        <div className="p-6 rounded-2xl glass border border-gray-200/20 dark:border-slate-800/80 flex flex-col justify-between gap-4 h-[440px]">
+        <div className="p-6 rounded-2xl glass border border-gray-200/20 dark:border-slate-800/80 flex flex-col justify-between gap-4 min-h-[160px]">
           <div className="flex justify-between items-center">
             <div className="h-4 w-32 bg-gray-300 dark:bg-slate-700 rounded-full"></div>
             <div className="flex gap-2">
@@ -32,7 +31,11 @@ export default function Loading() {
             <div className="h-5 w-16 bg-gray-300 dark:bg-slate-700 rounded-full"></div>
           </div>
         </div>
+      </div>
 
+      {/* Row 2: Quick Access & Namaz Timings (2 Columns) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        
         {/* Quick Access Card Skeleton */}
         <div className="p-6 rounded-2xl glass border border-gray-200/20 dark:border-slate-800/80 shadow-md flex flex-col justify-between h-[440px] gap-4">
           <div className="flex flex-col gap-4">

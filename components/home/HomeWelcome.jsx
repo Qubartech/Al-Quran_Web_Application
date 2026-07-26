@@ -138,9 +138,8 @@ export default function HomeWelcome() {
         </div>
       </div>
 
-      {/* Daily Ayah & Popular Surahs Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+      {/* Row 1: Daily Inspiration (Full Width) */}
+      <div className="w-full">
         {/* Daily Ayah Card */}
         <div className="p-6 rounded-2xl glass border border-white/20 dark:border-slate-800/80 shadow-sm relative overflow-hidden flex flex-col justify-between group transition-all duration-300">
           <div className="absolute -right-16 -top-16 w-32 h-32 rounded-full bg-primaryColor/5 dark:bg-emerald-500/5 blur-2xl group-hover:scale-150 transition-transform duration-500 pointer-events-none"></div>
@@ -175,7 +174,7 @@ export default function HomeWelcome() {
               {ayah.arabic}
             </p>
             {/* Translation */}
-            <p className="text-sm italic text-gray-650 dark:text-gray-300 leading-relaxed font-sans">
+            <p className="text-sm italic text-gray-650 dark:text-gray-305 leading-relaxed font-sans">
               &quot;{ayah.translation}&quot;
             </p>
           </div>
@@ -187,14 +186,15 @@ export default function HomeWelcome() {
             </span>
           </div>
         </div>
+      </div>
+
+      {/* Row 2: Quick Access & Namaz Timings (2 Columns) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Quick Access Card */}
         <QuickAccessCard />
 
         {/* Namaz Timings Card */}
-        <div className="lg:col-span-1">
-          <NamazTimeWrapper />
-        </div>
-
+        <NamazTimeWrapper />
       </div>
     </div>
   );
