@@ -93,7 +93,7 @@ export default function MainContentTabs({ surahData }) {
                       </p>
                     </div>
                     <div className="text-end">
-                      <span className="font-arabic text-lg text-slate-700 dark:text-slate-350 group-hover:text-primaryColor transition-colors">
+                      <span className="font-arabic text-lg text-slate-700 dark:text-slate-300 group-hover:text-primaryColor transition-colors">
                         {juz.nameArabic}
                       </span>
                       <p className="text-[9px] font-bold text-primaryColor dark:text-primaryColor-light mt-0.5">

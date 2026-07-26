@@ -4,7 +4,18 @@ import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import SettingsDrawer from "@/components/settings/SettingsDrawer";
 import { useUser } from "@/context/UserProvider";
-import { IoSettings, IoMenu, IoClose } from "react-icons/io5";
+import { 
+  Settings, 
+  Menu, 
+  X, 
+  BookOpen, 
+  Layers, 
+  Play, 
+  User, 
+  LogOut, 
+  ChevronDown, 
+  LayoutDashboard 
+} from "lucide-react";
 
 function Navbar() {
   const { user, signOut } = useUser();
@@ -21,136 +32,146 @@ function Navbar() {
   const closeSettings = () => setSettingsOpen(false);
 
   const navLinks = [
-    { name: "Surahs", href: "/" },
-    { name: "Juz / Paras", href: "/juz" },
-    { name: "Dedicated Player", href: "/player" }
+    { name: "Surahs", href: "/", icon: BookOpen },
+    { name: "Juz / Paras", href: "/juz", icon: Layers },
+    { name: "Dedicated Player", href: "/player", icon: Play }
   ];
 
   return (
-    <div className="px-5 bg-white/60 dark:bg-slate-900/60 text-gray-900 dark:text-gray-150 backdrop-blur-md transition-all duration-300 fixed top-0 left-0 right-0 w-full z-50 border-b border-white/20 dark:border-slate-800/60 shadow-sm">
-      <div className="max-w-screen-2xl mx-auto py-3 flex justify-between items-center">
-        {/* Logo */}
-        <div className="text-2xl font-bold bg-gradient-to-r from-primaryColor to-emerald-600 dark:from-primaryColor-light dark:to-emerald-400 bg-clip-text text-transparent">
-          <Link href="/" className="hover:opacity-90 transition-opacity">
-            Al-Quran
+    <nav className="px-6 bg-background/70 text-foreground backdrop-blur-xl transition-all duration-300 fixed top-0 left-0 right-0 w-full z-50 border-b border-border/50 shadow-sm dark:shadow-slate-950/50">
+      <div className="max-w-screen-2xl mx-auto py-3.5 flex justify-between items-center">
+        {/* Logo container without parent gradient clip text bug */}
+        <div className="flex items-center">
+          <Link href="/" className="hover:opacity-95 transition-all flex items-center gap-2.5 whitespace-nowrap">
+            <span className="w-8 h-8 shrink-0 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white text-sm font-black shadow-md shadow-emerald-500/25">
+              Q
+            </span>
+            <span className="text-xl font-extrabold bg-gradient-to-r from-emerald-500 via-teal-550 to-cyan-500 dark:from-emerald-400 dark:via-teal-350 dark:to-cyan-400 bg-clip-text text-transparent tracking-tight">
+              Al-Quran
+            </span>
           </Link>
         </div>
 
-        {/* Right Section: Navigation Links & Buttons grouped together */}
-        <div className="flex items-center gap-6">
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-5 mr-1">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`text-sm font-bold transition-all duration-200 relative py-1 hover:text-primaryColor ${
-                    isActive 
-                      ? "text-primaryColor" 
-                      : "text-gray-600 dark:text-gray-400"
-                  }`}
-                >
-                  {link.name}
-                  {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primaryColor rounded-full animate-fadeIn" />
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Buttons */}
-          <div className="flex items-center gap-2">
-            {/* Settings Icon */}
-            <button
-              onClick={openSettings}
-              aria-label="Open settings"
-              className="group p-2 rounded-xl bg-gray-100/50 dark:bg-slate-800/40 text-gray-600 dark:text-gray-350 hover:text-primaryColor dark:hover:text-primaryColor hover:bg-primaryColor/10 dark:hover:bg-primaryColor/10 transition-all duration-300 border border-transparent hover:border-primaryColor/20"
-            >
-              <IoSettings size={20} className="transition-transform duration-500 group-hover:rotate-90" />
-            </button>
-
-            {/* Supabase User Profile Dropdown or Sign In */}
-            {user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="h-9 w-9 rounded-xl bg-primaryColor/10 dark:bg-emerald-500/10 border border-primaryColor/25 dark:border-emerald-500/25 text-primaryColor dark:text-emerald-400 flex items-center justify-center font-bold text-xs hover:bg-primaryColor hover:text-white transition-all select-none"
-                >
-                  {user.email[0].toUpperCase()}
-                </button>
-                
-                {profileDropdownOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setProfileDropdownOpen(false)}
-                    />
-                    <div className="absolute right-0 mt-2.5 z-50 w-48 rounded-xl border border-gray-200/50 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-lg py-1.5 animate-fadeIn">
-                      <div className="px-3.5 py-2 border-b border-gray-150 dark:border-slate-800/50 text-[10px] text-gray-500 dark:text-gray-400 font-semibold truncate">
-                        {user.email}
-                      </div>
-                      <Link
-                        href="/dashboard"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="block w-full text-left px-3.5 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800/40 hover:text-primaryColor dark:hover:text-primaryColor transition-colors"
-                      >
-                        Dashboard
-                      </Link>
-
-                      <button
-                        onClick={async () => {
-                          setProfileDropdownOpen(false);
-                          await signOut();
-                          router.push("/");
-                        }}
-                        className="block w-full text-left px-3.5 py-2 text-xs font-bold text-rose-500 hover:bg-rose-500/5 dark:hover:bg-rose-500/10 transition-colors"
-                      >
-                        Sign Out
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-            ) : (
+        {/* Desktop Menu */}
+        <div className="hidden md:flex items-center gap-1.5">
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href;
+            const Icon = link.icon;
+            return (
               <Link
-                href="/login"
-                className="px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 bg-primaryColor/10 dark:bg-emerald-500/10 border border-primaryColor/25 dark:border-emerald-500/25 text-primaryColor dark:text-emerald-400 hover:bg-primaryColor hover:text-white dark:hover:bg-primaryColor dark:hover:text-white shadow-sm"
+                key={link.href}
+                href={link.href}
+                className={`flex items-center gap-2 text-xs font-bold transition-all duration-300 px-4 py-2 rounded-xl border border-transparent ${
+                  isActive 
+                    ? "text-primaryColor bg-primaryColor/10 dark:text-primaryColor-light dark:bg-primaryColor-light/10 border-primaryColor/10 dark:border-primaryColor-light/10" 
+                    : "text-foreground/70 hover:text-foreground hover:bg-foreground/5"
+                }`}
               >
-                Sign In
+                <Icon size={14} className={isActive ? "text-primaryColor dark:text-primaryColor-light animate-pulse" : ""} />
+                {link.name}
               </Link>
-            )}
+            );
+          })}
+        </div>
 
-            {/* Mobile Menu Toggle */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle mobile menu"
-              className="md:hidden p-2 rounded-xl bg-gray-100/50 dark:bg-slate-800/40 text-gray-600 dark:text-gray-350 hover:text-primaryColor dark:hover:text-primaryColor transition-all duration-300 border border-transparent"
+        {/* Buttons & Profile */}
+        <div className="flex items-center gap-3">
+          {/* Settings Button */}
+          <button
+            onClick={openSettings}
+            aria-label="Open settings"
+            className="p-2.5 rounded-xl bg-foreground/5 text-foreground/70 hover:text-foreground hover:bg-foreground/10 transition-all duration-300 border border-transparent hover:border-foreground/5"
+          >
+            <Settings size={18} className="animate-[spin_8s_linear_infinite] hover:animate-[spin_2s_linear_infinite]" />
+          </button>
+
+          {/* Profile Dropdown */}
+          {user ? (
+            <div className="relative">
+              <button
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl bg-slate-100/60 dark:bg-slate-900/60 hover:bg-primaryColor/10 dark:hover:bg-emerald-500/10 border border-gray-200/20 dark:border-slate-800/40 transition-all text-xs font-bold text-slate-700 dark:text-slate-300"
+              >
+                <div className="h-6 w-6 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 text-white flex items-center justify-center font-black">
+                  {user.email[0].toUpperCase()}
+                </div>
+                <span className="hidden sm:inline-block max-w-[80px] truncate">{user.email.split("@")[0]}</span>
+                <ChevronDown size={12} className={`transition-transform duration-200 ${profileDropdownOpen ? "rotate-180" : ""}`} />
+              </button>
+              
+              {profileDropdownOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setProfileDropdownOpen(false)}
+                  />
+                  <div className="absolute right-0 mt-2 z-50 w-52 rounded-2xl border border-gray-200/40 dark:border-slate-800/60 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl shadow-xl py-2 animate-fadeIn">
+                    <div className="px-4 py-2 border-b border-gray-100 dark:border-slate-900/60 text-[10px] text-gray-500 dark:text-gray-400 font-bold truncate">
+                      {user.email}
+                    </div>
+                    
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setProfileDropdownOpen(false)}
+                      className="flex items-center gap-2 w-full text-left px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-primaryColor/5 hover:text-primaryColor dark:hover:text-emerald-400 transition-colors"
+                    >
+                      <LayoutDashboard size={14} />
+                      Dashboard
+                    </Link>
+
+                    <button
+                      onClick={async () => {
+                        setProfileDropdownOpen(false);
+                        await signOut();
+                        router.push("/");
+                      }}
+                      className="flex items-center gap-2 w-full text-left px-4 py-2 text-xs font-bold text-rose-500 hover:bg-rose-500/5 transition-colors border-t border-gray-100 dark:border-slate-900/60 mt-1"
+                    >
+                      <LogOut size={14} />
+                      Sign Out
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-md shadow-emerald-500/10 hover:scale-105 active:scale-95 transition-all duration-200"
             >
-              {mobileMenuOpen ? <IoClose size={20} /> : <IoMenu size={20} />}
-            </button>
-          </div>
+              Sign In
+            </Link>
+          )}
+
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle mobile menu"
+            className="md:hidden p-2 rounded-xl bg-foreground/5 text-foreground/70 hover:text-foreground transition-all duration-300"
+          >
+            {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
         </div>
       </div>
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-gray-100 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg py-4 px-5 flex flex-col gap-3 shadow-lg rounded-b-xl animate-fadeIn">
+        <div className="md:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl py-4 px-6 flex flex-col gap-2.5 shadow-xl rounded-b-2xl animate-fadeIn">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
+            const Icon = link.icon;
             return (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`text-sm font-bold py-2 px-3 rounded-lg transition-all ${
+                className={`flex items-center gap-3 text-sm font-bold py-2.5 px-4 rounded-xl transition-all ${
                   isActive
-                    ? "text-primaryColor bg-primaryColor/10"
-                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800/50"
+                    ? "text-primaryColor bg-primaryColor/10 dark:text-primaryColor-light dark:bg-primaryColor-light/10"
+                    : "text-foreground/70 hover:text-foreground hover:bg-foreground/5"
                 }`}
               >
+                <Icon size={16} />
                 {link.name}
               </Link>
             );
@@ -159,7 +180,7 @@ function Navbar() {
       )}
 
       <SettingsDrawer open={settingsOpen} onClose={closeSettings} />
-    </div>
+    </nav>
   );
 }
 
