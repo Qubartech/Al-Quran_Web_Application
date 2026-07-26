@@ -1,4 +1,5 @@
 import JuzAyahList from "@/components/juz/JuzAyahList";
+import JuzBookmarkBtn from "@/components/juz/JuzBookmarkBtn";
 import getSingleJuz from "@/lib/api/getSingleJuz";
 import { juzList } from "@/lib/juzData";
 import { cookies } from "next/headers";
@@ -62,9 +63,17 @@ async function Juz({ params }) {
             )}
           </div>
           {juzMeta && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold bg-white/40 dark:bg-slate-800/40 px-3 py-1 rounded-full border border-gray-250/20 dark:border-slate-800/20">
-              Range: {juzMeta.start} to {juzMeta.end}
-            </p>
+            <>
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold bg-white/40 dark:bg-slate-800/40 px-3 py-1 rounded-full border border-gray-250/20 dark:border-slate-800/20">
+                Range: {juzMeta.start} to {juzMeta.end}
+              </p>
+              <JuzBookmarkBtn
+                juzId={juzId}
+                juzName={juzMeta.nameEnglish}
+                startSurah={juzMeta.start}
+                endSurah={juzMeta.end}
+              />
+            </>
           )}
         </div>
       </div>

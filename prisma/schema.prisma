@@ -1,0 +1,59 @@
+datasource db {
+  provider  = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String         @id
+  email         String?        @unique
+  createdAt     DateTime       @default(now())
+  favoriteAyahs FavoriteAyah[]
+  favoriteJuzs  FavoriteJuz[]
+  recentSurahs  RecentSurah[]
+}
+
+model FavoriteAyah {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  surahNumber Int
+  ayahNumber  Int
+  surahName   String
+  arabicText  String
+  translation String
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, surahNumber, ayahNumber])
+  @@index([userId])
+}
+
+model FavoriteJuz {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  juzId       Int
+  juzName     String
+  startSurah  String
+  endSurah    String
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, juzId])
+  @@index([userId])
+}
+
+model RecentSurah {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  surahNumber Int
+  surahName   String
+  englishName String
+  playedAt    DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, surahNumber])
+  @@index([userId])
+}

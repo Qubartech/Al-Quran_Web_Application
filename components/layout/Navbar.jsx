@@ -1,13 +1,17 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import SettingsDrawer from "@/components/settings/SettingsDrawer";
+import { useUser } from "@/context/UserProvider";
 import { IoSettings, IoMenu, IoClose } from "react-icons/io5";
 
 function Navbar() {
+  const { user, signOut } = useUser();
+  const router = useRouter();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const pathname = usePathname();
 
   const openSettings = () => {
@@ -58,6 +62,7 @@ function Navbar() {
 
           {/* Buttons */}
           <div className="flex items-center gap-2">
+            {/* Settings Icon */}
             <button
               onClick={openSettings}
               aria-label="Open settings"
@@ -65,6 +70,63 @@ function Navbar() {
             >
               <IoSettings size={20} className="transition-transform duration-500 group-hover:rotate-90" />
             </button>
+
+            {/* Supabase User Profile Dropdown or Sign In */}
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                  className="h-9 w-9 rounded-xl bg-primaryColor/10 dark:bg-emerald-500/10 border border-primaryColor/25 dark:border-emerald-500/25 text-primaryColor dark:text-emerald-400 flex items-center justify-center font-bold text-xs hover:bg-primaryColor hover:text-white transition-all select-none"
+                >
+                  {user.email[0].toUpperCase()}
+                </button>
+                
+                {profileDropdownOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setProfileDropdownOpen(false)}
+                    />
+                    <div className="absolute right-0 mt-2.5 z-50 w-48 rounded-xl border border-gray-200/50 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-lg py-1.5 animate-fadeIn">
+                      <div className="px-3.5 py-2 border-b border-gray-150 dark:border-slate-800/50 text-[10px] text-gray-500 dark:text-gray-400 font-semibold truncate">
+                        {user.email}
+                      </div>
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="block w-full text-left px-3.5 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800/40 hover:text-primaryColor dark:hover:text-primaryColor transition-colors"
+                      >
+                        Dashboard
+                      </Link>
+                      <Link
+                        href="/player"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="block w-full text-left px-3.5 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800/40 hover:text-primaryColor dark:hover:text-primaryColor transition-colors"
+                      >
+                        Dedicated Player
+                      </Link>
+                      <button
+                        onClick={async () => {
+                          setProfileDropdownOpen(false);
+                          await signOut();
+                          router.push("/");
+                        }}
+                        className="block w-full text-left px-3.5 py-2 text-xs font-bold text-rose-500 hover:bg-rose-500/5 dark:hover:bg-rose-500/10 transition-colors"
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 bg-primaryColor/10 dark:bg-emerald-500/10 border border-primaryColor/25 dark:border-emerald-500/25 text-primaryColor dark:text-emerald-400 hover:bg-primaryColor hover:text-white dark:hover:bg-primaryColor dark:hover:text-white shadow-sm"
+              >
+                Sign In
+              </Link>
+            )}
 
             {/* Mobile Menu Toggle */}
             <button

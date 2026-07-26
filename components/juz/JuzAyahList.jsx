@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useAudio } from "@/context/AudioProvider";
+import { useUser } from "@/context/UserProvider";
+import { Bookmark } from "lucide-react";
 import SurahPlayBtn from "@/components/surah/SurahPlayBtn";
 
 export default function JuzAyahList({
@@ -10,6 +12,8 @@ export default function JuzAyahList({
   juzId
 }) {
   const [refreshTick, setRefreshTick] = useState(0);
+  const { user, session } = useUser();
+  const [bookmarks, setBookmarks] = useState({});
   const [isPaused, setIsPaused] = useState(true);
   const [englishTrans, setEnglishTrans] = useState(englishTransAyah || []);
   const [segmentsMap, setSegmentsMap] = useState({});
@@ -71,6 +75,81 @@ export default function JuzAyahList({
   useEffect(() => {
     setEnglishTrans(englishTransAyah || []);
   }, [englishTransAyah]);
+
+  // Fetch bookmarks
+  useEffect(() => {
+    if (!user || !session?.access_token) {
+      setBookmarks({});
+      return;
+    }
+    fetch("/api/favorites/ayah", {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const map = {};
+          data.forEach((item) => {
+            map[`${item.surahNumber}_${item.ayahNumber}`] = true;
+          });
+          setBookmarks(map);
+        }
+      })
+      .catch((e) => console.error("Error fetching bookmarks:", e));
+  }, [user, session?.access_token]);
+
+  const toggleBookmark = async (ayahIdx) => {
+    if (!user || !session?.access_token) {
+      alert("Please Sign In to bookmark/whitelist Ayahs!");
+      return;
+    }
+    const target = arabicAyah[ayahIdx];
+    if (!target) return;
+    const { surahNumber, verseKey, surahName } = target;
+    const ayahNumber = parseInt(verseKey.split(":")[1], 10);
+    const key = `${surahNumber}_${ayahNumber}`;
+    const isBookmarked = !!bookmarks[key];
+
+    try {
+      if (isBookmarked) {
+        await fetch(`/api/favorites/ayah?surahNumber=${surahNumber}&ayahNumber=${ayahNumber}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+        setBookmarks((prev) => {
+          const next = { ...prev };
+          delete next[key];
+          return next;
+        });
+      } else {
+        const translationText = englishTrans[ayahIdx]?.text || "";
+        await fetch("/api/favorites/ayah", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            surahNumber,
+            ayahNumber,
+            surahName: surahName || "",
+            arabicText: target.text || "",
+            translation: translationText,
+          }),
+        });
+        setBookmarks((prev) => ({
+          ...prev,
+          [key]: true,
+        }));
+      }
+    } catch (e) {
+      console.error("Error toggling bookmark:", e);
+    }
+  };
 
   // Handle settings changes and update translation dynamically
   useEffect(() => {
@@ -173,6 +252,23 @@ export default function JuzAyahList({
       }
     } else {
       audio?.playList([fullAudioUrl], 0, `surah_${surahNumber}`, surahName);
+      
+      // Log to Recently Played
+      if (user && session?.access_token) {
+        fetch("/api/recent", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            surahNumber,
+            surahName: surahName || "",
+            englishName: surahName || "",
+          }),
+        }).catch((err) => console.error("Error logging recent play:", err));
+      }
+
       setTimeout(() => {
         window.dispatchEvent(
           new CustomEvent("quran-audio-seek", { detail: { time: seekTime } })
@@ -255,6 +351,20 @@ export default function JuzAyahList({
                       pauseControl={() => audio?.pause()}
                     />
                   )}
+                </div>
+                {/* BOOKMARK BUTTON */}
+                <div className="w-full flex justify-center mt-2">
+                  <button
+                    onClick={() => toggleBookmark(idx)}
+                    className={`p-1.5 rounded-lg hover:bg-gray-155 dark:hover:bg-slate-800 transition-colors ${
+                      bookmarks[`${surahNumber}_${parseInt(verseKey.split(":")[1], 10)}`]
+                        ? "text-emerald-500"
+                        : "text-gray-400 hover:text-emerald-500"
+                    }`}
+                    title="Bookmark Ayah"
+                  >
+                    <Bookmark size={15} fill={bookmarks[`${surahNumber}_${parseInt(verseKey.split(":")[1], 10)}`] ? "currentColor" : "none"} />
+                  </button>
                 </div>
               </div>
 
