@@ -22,7 +22,8 @@ function Navbar() {
 
   const navLinks = [
     { name: "Surahs", href: "/" },
-    { name: "Juz / Paras", href: "/juz" }
+    { name: "Juz / Paras", href: "/juz" },
+    { name: "Dedicated Player", href: "/player" }
   ];
 
   return (
@@ -98,13 +99,7 @@ function Navbar() {
                       >
                         Dashboard
                       </Link>
-                      <Link
-                        href="/player"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="block w-full text-left px-3.5 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800/40 hover:text-primaryColor dark:hover:text-primaryColor transition-colors"
-                      >
-                        Dedicated Player
-                      </Link>
+
                       <button
                         onClick={async () => {
                           setProfileDropdownOpen(false);
