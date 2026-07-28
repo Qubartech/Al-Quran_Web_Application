@@ -59,12 +59,12 @@ export default async function SurahPage() {
         <div className="w-full xl:w-[340px] shrink-0">
           <div className="xl:sticky xl:top-6 space-y-6">
             {/* Verse of the Day */}
-            <VerseOfTheDay />
+            {/* <VerseOfTheDay /> */}
 
             {/* Prayer Times */}
-            <div className="rounded-2xl overflow-hidden glass border border-white/20 dark:border-slate-800/80 shadow-sm">
+            {/* <div className="rounded-2xl overflow-hidden glass border border-white/20 dark:border-slate-800/80 shadow-sm">
               <NamazTimeWrapper />
-            </div>
+            </div> */}
 
             {/* Reminders, Stats, Quick Access, Activity */}
             <SurahPageWidgets />

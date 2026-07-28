@@ -127,13 +127,14 @@ export default function SurahList({ data }) {
           </div>
 
           {/* Quick Controls: View mode + Sort */}
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
             {/* Sort selection */}
-            <div className="flex items-center gap-1.5 bg-white/40 dark:bg-slate-900/40 p-1 rounded-xl border border-gray-200/40 dark:border-slate-800/60">
+            <div className="flex items-center gap-1 bg-white/50 dark:bg-slate-800/50 p-1.5 rounded-xl border border-gray-200/50 dark:border-slate-700/50">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-transparent text-slate-700 dark:text-slate-300 text-xs font-bold focus:outline-none px-2 py-1 cursor-pointer"
+                className="bg-transparent text-slate-700 dark:text-slate-200 text-xs font-bold focus:outline-none focus:ring-0 px-2 py-1 cursor-pointer appearance-none pr-6 [&>option]:bg-white [&>option]:dark:bg-slate-800 [&>option]:text-slate-800 [&>option]:dark:text-slate-200"
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 4px center' }}
               >
                 <option value="number">Sort by Number</option>
                 <option value="ayahs">Sort by Ayahs</option>
@@ -141,20 +142,24 @@ export default function SurahList({ data }) {
               </select>
               <button
                 onClick={toggleSortOrder}
-                className="p-1.5 hover:bg-gray-200/50 dark:hover:bg-slate-800/60 rounded-lg text-gray-500 dark:text-gray-400 transition-colors"
+                className={`p-1.5 rounded-lg transition-all ${
+                  sortOrder === "desc"
+                    ? "bg-primaryColor/15 text-primaryColor dark:text-primaryColor-light"
+                    : "text-gray-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-gray-200/40 dark:hover:bg-slate-700/40"
+                }`}
                 title={`Sort ${sortOrder === "asc" ? "Ascending" : "Descending"}`}
               >
-                <ArrowUpDown size={14} />
+                <ArrowUpDown size={14} className={sortOrder === "desc" ? "rotate-180 transition-transform" : "transition-transform"} />
               </button>
             </div>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center p-1 bg-white/40 dark:bg-slate-900/40 rounded-xl border border-gray-200/40 dark:border-slate-800/60">
+            <div className="flex items-center p-1 bg-white/50 dark:bg-slate-800/50 rounded-xl border border-gray-200/50 dark:border-slate-700/50">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-1.5 rounded-lg transition-all ${viewMode === "grid"
-                    ? "bg-primaryColor text-white shadow-sm"
-                    : "text-gray-400 hover:text-slate-700 dark:hover:text-slate-200"
+                className={`p-2 rounded-lg transition-all ${viewMode === "grid"
+                    ? "bg-primaryColor text-white shadow-sm shadow-emerald-500/20"
+                    : "text-gray-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-gray-200/40 dark:hover:bg-slate-700/40"
                   }`}
                 title="Grid View"
               >
@@ -162,9 +167,9 @@ export default function SurahList({ data }) {
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-1.5 rounded-lg transition-all ${viewMode === "list"
-                    ? "bg-primaryColor text-white shadow-sm"
-                    : "text-gray-400 hover:text-slate-700 dark:hover:text-slate-200"
+                className={`p-2 rounded-lg transition-all ${viewMode === "list"
+                    ? "bg-primaryColor text-white shadow-sm shadow-emerald-500/20"
+                    : "text-gray-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-gray-200/40 dark:hover:bg-slate-700/40"
                   }`}
                 title="List View"
               >
