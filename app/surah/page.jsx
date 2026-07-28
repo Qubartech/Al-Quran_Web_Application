@@ -15,7 +15,7 @@ export default async function SurahPage() {
   const { data } = surahList || {};
 
   return (
-    <main className="text-gray-900 dark:text-gray-100 min-h-full transition-colors p-5 md:p-6">
+    <main className="text-gray-900 dark:text-gray-100 min-h-screen transition-colors py-8 px-4 md:px-6 max-w-screen-2xl mx-auto">
       {/* Header Banner */}
       <div className="relative overflow-hidden p-6 md:p-8 rounded-3xl glass border border-primaryColor/10 dark:border-emerald-500/10 shadow-sm mb-6 animate-fadeIn">
         <div className="absolute inset-0 bg-gradient-to-r from-primaryColor/5 via-teal-500/5 to-cyan-500/5 dark:from-primaryColor/10 dark:via-teal-500/10 dark:to-cyan-500/10 z-0"></div>
