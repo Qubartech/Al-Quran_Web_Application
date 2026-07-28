@@ -43,7 +43,8 @@ function Navbar() {
   const closeSettings = () => setSettingsOpen(false);
 
   const navLinks = [
-    { name: "Surahs", href: "/", icon: BookOpen },
+    { name: "Home", href: "/", icon: LayoutDashboard },
+    { name: "Surahs", href: "/surah", icon: BookOpen },
     { name: "Juz / Paras", href: "/juz", icon: Layers },
     { name: "Dedicated Player", href: "/player", icon: Play }
   ];
@@ -66,7 +67,7 @@ function Navbar() {
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-1.5">
           {navLinks.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
             const Icon = link.icon;
             return (
               <Link
@@ -169,7 +170,7 @@ function Navbar() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl py-4 px-6 flex flex-col gap-2.5 shadow-xl rounded-b-2xl animate-fadeIn">
           {navLinks.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
             const Icon = link.icon;
             return (
               <Link
