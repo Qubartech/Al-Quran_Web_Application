@@ -4,7 +4,7 @@ import useCity from "@/lib/getLocation";
 import NamazTimeCard from "./prayer/NamazTimeCard";
 
 export default function NamazTimeWrapper() {
-  const city = useCity();
+  const location = useCity();
 
-  return <NamazTimeCard city={city} />;
+  return <NamazTimeCard gpsLocation={location} />;
 }

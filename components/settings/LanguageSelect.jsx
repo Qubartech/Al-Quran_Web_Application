@@ -16,7 +16,7 @@ export default function LanguageSelect({
 }) {
   return (
     <div className="space-y-1">
-      <label className="text-sm font-medium text-foreground">
+      <label className="text-sm font-semibold text-slate-800 dark:text-slate-200">
         Translation Language
       </label>
       <Select 

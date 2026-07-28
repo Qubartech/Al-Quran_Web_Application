@@ -20,7 +20,7 @@ export default function SurahPrevNextNav() {
         {numericId > 1 ? (
           <Link
             href={`/surah/${prevId}`}
-            className="px-3 py-1 rounded-md text-sm font-medium bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600 transition-colors"
+            className="px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 glass glass-hover hover:border-primaryColor/50 hover:text-primaryColor shadow-sm border border-white/20 dark:border-slate-800/80"
             aria-label="Previous Surah"
           >
             ← Previous
@@ -28,7 +28,7 @@ export default function SurahPrevNextNav() {
         ) : (
           <button
             disabled
-            className="px-3 py-1 rounded-md text-sm font-medium bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500 cursor-not-allowed"
+            className="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-gray-100/50 text-gray-400 dark:bg-slate-800/50 dark:text-gray-600 cursor-not-allowed border border-gray-200/20 dark:border-slate-800/30"
             aria-disabled="true"
           >
             ← Previous
@@ -37,7 +37,7 @@ export default function SurahPrevNextNav() {
         {numericId < 114 ? (
           <Link
             href={`/surah/${nextId}`}
-            className="px-3 py-1 rounded-md text-sm font-medium bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600 transition-colors"
+            className="px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 glass glass-hover hover:border-primaryColor/50 hover:text-primaryColor shadow-sm border border-white/20 dark:border-slate-800/80"
             aria-label="Next Surah"
           >
             Next →
@@ -45,7 +45,7 @@ export default function SurahPrevNextNav() {
         ) : (
           <button
             disabled
-            className="px-3 py-1 rounded-md text-sm font-medium bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500 cursor-not-allowed"
+            className="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-gray-100/50 text-gray-400 dark:bg-slate-800/50 dark:text-gray-600 cursor-not-allowed border border-gray-200/20 dark:border-slate-800/30"
             aria-disabled="true"
           >
             Next →

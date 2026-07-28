@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useAudio } from "@/context/AudioProvider";
+import { useUser } from "@/context/UserProvider";
+import { Bookmark } from "lucide-react";
 
 // Add custom animation style
 const ayahAnim = {
@@ -23,7 +25,81 @@ const SurahAyahList = ({
   const [isPaused, setIsPaused] = useState(true);
   const [englishTrans, setEnglishTrans] = useState(englishTransAyah || []);
   const audio = useAudio();
+  const { user, session } = useUser();
   const [audioCurrentTime, setAudioCurrentTime] = useState(0);
+  const [bookmarks, setBookmarks] = useState({});
+
+  useEffect(() => {
+    if (!user || !session?.access_token) {
+      setBookmarks({});
+      return;
+    }
+    fetch("/api/favorites/ayah", {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const map = {};
+          data.forEach((item) => {
+            map[`${item.surahNumber}_${item.ayahNumber}`] = true;
+          });
+          setBookmarks(map);
+        }
+      })
+      .catch((e) => console.error("Error fetching bookmarks:", e));
+  }, [user, session?.access_token]);
+
+  const toggleBookmark = async (ayahIdx) => {
+    if (!user || !session?.access_token) {
+      alert("Please Sign In to bookmark/whitelist Ayahs!");
+      return;
+    }
+    const ayahNumber = ayahIdx + 1;
+    const key = `${pageId}_${ayahNumber}`;
+    const isBookmarked = !!bookmarks[key];
+
+    try {
+      if (isBookmarked) {
+        await fetch(`/api/favorites/ayah?surahNumber=${pageId}&ayahNumber=${ayahNumber}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+        setBookmarks((prev) => {
+          const next = { ...prev };
+          delete next[key];
+          return next;
+        });
+      } else {
+        const ayahObj = arabicAyah[ayahIdx];
+        const translationText = englishTrans[ayahIdx]?.text || "";
+        await fetch("/api/favorites/ayah", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            surahNumber: pageId,
+            ayahNumber,
+            surahName: surahName || "",
+            arabicText: ayahObj?.text || "",
+            translation: translationText,
+          }),
+        });
+        setBookmarks((prev) => ({
+          ...prev,
+          [key]: true,
+        }));
+      }
+    } catch (e) {
+      console.error("Error toggling bookmark:", e);
+    }
+  };
 
   useEffect(() => {
     const onTimeUpdate = (e) => {
@@ -97,6 +173,23 @@ const SurahAyahList = ({
     } else {
       // Load and play the full Surah audio
       audio?.playList([fullAudioUrl], 0, pageId, surahName);
+      
+      // Log to Recently Played
+      if (user && session?.access_token) {
+        fetch("/api/recent", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            surahNumber: pageId,
+            surahName: surahName || "",
+            englishName: surahName || "",
+          }),
+        }).catch((err) => console.error("Error logging recent play:", err));
+      }
+
       // Wait for player state to populate, then seek
       setTimeout(() => {
         window.dispatchEvent(
@@ -187,7 +280,11 @@ const SurahAyahList = ({
               id={`sura_${pageId}_ayah_${idx + 1}`}
               tabIndex={-1}
             >
-              <div className={`px-2 md:px-5 py-5 flex gap-3 justify-between w-full transition-colors ${idx < arabicAyah.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : ''}`}>
+              <div className={`px-3 md:px-6 py-6 flex gap-4 justify-between w-full transition-all duration-300 rounded-xl ${
+                isPlaying
+                  ? "bg-primaryColor/5 border-l-4 border-primaryColor shadow-sm dark:bg-emerald-500/10"
+                  : "border-b border-gray-250/50 dark:border-slate-800/50 hover:bg-gray-50/50 dark:hover:bg-slate-800/20"
+              }`}>
                 <div className="md:w-12 flex items-center justify-center">
                   <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 flex flex-col items-center justify-center">
                     {pageId}:{idx + 1}
@@ -210,7 +307,21 @@ const SurahAyahList = ({
                         pauseControl={() => audio?.pause()}
                       />
                     </div>
+                    {/* BOOKMARK BUTTON */}
+                    <div className="w-full flex justify-center mt-2">
+                      <button
+                        onClick={() => toggleBookmark(idx)}
+                        className={`p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors ${
+                          bookmarks[`${pageId}_${idx + 1}`]
+                            ? "text-emerald-500"
+                            : "text-gray-400 hover:text-emerald-500"
+                        }`}
+                        title="Bookmark Ayah"
+                      >
+                        <Bookmark size={15} fill={bookmarks[`${pageId}_${idx + 1}`] ? "currentColor" : "none"} />
+                      </button>
                     </div>
+                  </div>
                 </div>
 
                 <div className="w-full">
