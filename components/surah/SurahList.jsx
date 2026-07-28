@@ -2,13 +2,13 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { 
-  Search, 
-  LayoutGrid, 
-  List, 
-  Play, 
-  Pause, 
-  ArrowUpDown, 
+import {
+  Search,
+  LayoutGrid,
+  List,
+  Play,
+  Pause,
+  ArrowUpDown,
   Sparkles,
   X,
   Compass
@@ -103,7 +103,7 @@ export default function SurahList({ data }) {
     <div className="w-full space-y-6">
       {/* Control Bar: Search + Filters + Views */}
       <div className="flex flex-col gap-4 p-4 md:p-5 rounded-2xl glass border border-white/20 dark:border-slate-800/80 shadow-sm">
-        
+
         {/* Row 1: Search Bar & View Toggle */}
         <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
           {/* Search Input */}
@@ -152,22 +152,20 @@ export default function SurahList({ data }) {
             <div className="flex items-center p-1 bg-white/40 dark:bg-slate-900/40 rounded-xl border border-gray-200/40 dark:border-slate-800/60">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-1.5 rounded-lg transition-all ${
-                  viewMode === "grid"
+                className={`p-1.5 rounded-lg transition-all ${viewMode === "grid"
                     ? "bg-primaryColor text-white shadow-sm"
                     : "text-gray-400 hover:text-slate-700 dark:hover:text-slate-200"
-                }`}
+                  }`}
                 title="Grid View"
               >
                 <LayoutGrid size={14} />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-1.5 rounded-lg transition-all ${
-                  viewMode === "list"
+                className={`p-1.5 rounded-lg transition-all ${viewMode === "list"
                     ? "bg-primaryColor text-white shadow-sm"
                     : "text-gray-400 hover:text-slate-700 dark:hover:text-slate-200"
-                }`}
+                  }`}
                 title="List View"
               >
                 <List size={14} />
@@ -180,31 +178,28 @@ export default function SurahList({ data }) {
         <div className="flex items-center gap-2 pt-1 border-t border-gray-200/40 dark:border-slate-800/50 overflow-x-auto no-scrollbar">
           <button
             onClick={() => setFilterType("all")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-              filterType === "all"
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filterType === "all"
                 ? "bg-primaryColor text-white shadow-sm shadow-emerald-500/20"
                 : "bg-white/30 dark:bg-slate-900/30 text-gray-600 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-slate-800/50"
-            }`}
+              }`}
           >
             All Surahs ({counts.all})
           </button>
           <button
             onClick={() => setFilterType("makkah")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-              filterType === "makkah"
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filterType === "makkah"
                 ? "bg-primaryColor text-white shadow-sm shadow-emerald-500/20"
                 : "bg-white/30 dark:bg-slate-900/30 text-gray-600 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-slate-800/50"
-            }`}
+              }`}
           >
             Meccan / Makki ({counts.makki})
           </button>
           <button
             onClick={() => setFilterType("madinah")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-              filterType === "madinah"
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filterType === "madinah"
                 ? "bg-primaryColor text-white shadow-sm shadow-emerald-500/20"
                 : "bg-white/30 dark:bg-slate-900/30 text-gray-600 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-slate-800/50"
-            }`}
+              }`}
           >
             Medinan / Madani ({counts.madani})
           </button>
@@ -240,16 +235,15 @@ export default function SurahList({ data }) {
 
             return (
               <Link href={`/surah/${surah.number}`} key={surah.number} className="group">
-                <div className="w-full p-4.5 rounded-2xl flex items-center justify-between border border-transparent dark:border-slate-800/80 hover:border-primaryColor/40 dark:hover:border-emerald-500/40 group-hover:shadow-md transition-all duration-300 glass glass-hover relative overflow-hidden">
-                  
+                <div className="w-full p-4 rounded-2xl flex items-center justify-between border border-transparent dark:border-slate-800/80 hover:border-primaryColor/40 dark:hover:border-emerald-500/40 group-hover:shadow-md transition-all duration-300 glass glass-hover relative overflow-hidden">
+
                   <div className="flex items-center gap-3.5 min-w-0 pr-2">
                     {/* Surah Number Badge / Play Button */}
                     <div className="relative shrink-0">
-                      <div className={`h-11 w-11 rounded-xl flex items-center justify-center font-bold text-sm transition-all duration-300 ${
-                        isPlaying
+                      <div className={`h-11 w-11 rounded-xl flex items-center justify-center font-bold text-sm transition-all duration-300 ${isPlaying
                           ? "bg-primaryColor text-white shadow-md shadow-emerald-500/30 scale-105"
                           : "bg-primaryColor/10 dark:bg-emerald-500/10 text-primaryColor dark:text-primaryColor-light border-2 border-primaryColor/20 group-hover:border-transparent group-hover:bg-primaryColor group-hover:text-white"
-                      }`}>
+                        }`}>
                         {isPlaying ? (
                           <span className="animate-pulse">▶</span>
                         ) : (
@@ -273,11 +267,10 @@ export default function SurahList({ data }) {
                         <h3 className="text-sm font-extrabold text-slate-800 dark:text-slate-100 group-hover:text-primaryColor transition-colors truncate">
                           {surah.englishName}
                         </h3>
-                        <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full border ${
-                          isMeccan 
-                            ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20" 
+                        <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full border ${isMeccan
+                            ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
                             : "bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20"
-                        }`}>
+                          }`}>
                           {isMeccan ? "Makki" : "Madani"}
                         </span>
                       </div>
@@ -313,7 +306,7 @@ export default function SurahList({ data }) {
             return (
               <Link href={`/surah/${surah.number}`} key={surah.number} className="group">
                 <div className="w-full px-5 py-3 rounded-xl flex items-center justify-between border border-transparent dark:border-slate-800/80 hover:border-primaryColor/40 dark:hover:border-emerald-500/40 transition-all duration-200 glass glass-hover">
-                  
+
                   <div className="flex items-center gap-4 min-w-0">
                     <div className="text-xs font-black text-gray-400 group-hover:text-primaryColor w-8">
                       #{surah.number}
@@ -321,11 +314,10 @@ export default function SurahList({ data }) {
 
                     <button
                       onClick={(e) => handlePlaySurah(e, surah)}
-                      className={`p-2 rounded-lg transition-all ${
-                        isPlaying
+                      className={`p-2 rounded-lg transition-all ${isPlaying
                           ? "bg-primaryColor text-white shadow-sm"
                           : "bg-primaryColor/10 dark:bg-emerald-500/10 text-primaryColor hover:bg-primaryColor hover:text-white"
-                      }`}
+                        }`}
                       title="Play Audio"
                     >
                       {isPlaying ? <Pause size={14} fill="white" /> : <Play size={14} fill="currentColor" className="ml-0.5" />}
@@ -345,11 +337,10 @@ export default function SurahList({ data }) {
                   </div>
 
                   <div className="flex items-center gap-6 shrink-0">
-                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${
-                      isMeccan 
-                        ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20" 
+                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${isMeccan
+                        ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
                         : "bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20"
-                    }`}>
+                      }`}>
                       {isMeccan ? "Meccan" : "Medinan"}
                     </span>
                     <span className="text-xs font-bold text-primaryColor dark:text-primaryColor-light w-16 text-right">

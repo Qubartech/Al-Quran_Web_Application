@@ -1,6 +1,9 @@
 import getSurahList from "@/lib/api/getSurahList";
 import SurahList from "@/components/surah/SurahList";
-import { BookOpen, Sparkles } from "lucide-react";
+import { BookOpen } from "lucide-react";
+import VerseOfTheDay from "@/components/surah/VerseOfTheDay";
+import SurahPageWidgets from "@/components/surah/SurahPageWidgets";
+import NamazTimeWrapper from "@/components/NamazTimeWrapper";
 
 export const metadata = {
   title: "Surah Directory - Al-Quran Application",
@@ -12,9 +15,9 @@ export default async function SurahPage() {
   const { data } = surahList || {};
 
   return (
-    <main className="text-gray-900 dark:text-gray-100 min-h-screen transition-colors py-8 px-4 md:px-6 max-w-screen-2xl mx-auto">
+    <main className="text-gray-900 dark:text-gray-100 min-h-full transition-colors p-5 md:p-6">
       {/* Header Banner */}
-      <div className="relative overflow-hidden p-6 md:p-8 rounded-3xl glass border border-primaryColor/10 dark:border-emerald-500/10 shadow-sm mb-8 animate-fadeIn">
+      <div className="relative overflow-hidden p-6 md:p-8 rounded-3xl glass border border-primaryColor/10 dark:border-emerald-500/10 shadow-sm mb-6 animate-fadeIn">
         <div className="absolute inset-0 bg-gradient-to-r from-primaryColor/5 via-teal-500/5 to-cyan-500/5 dark:from-primaryColor/10 dark:via-teal-500/10 dark:to-cyan-500/10 z-0"></div>
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex flex-col gap-2">
@@ -45,8 +48,29 @@ export default async function SurahPage() {
         </div>
       </div>
 
-      {/* Main Surah Directory List & Filters */}
-      <SurahList data={data} />
+      {/* Two-Column Layout: SurahList (main) + Islamic Widgets (sidebar) */}
+      <div className="flex flex-col xl:flex-row gap-6">
+        {/* LEFT — Main Focus: Surah Directory */}
+        <div className="w-full xl:flex-1 min-w-0">
+          <SurahList data={data} />
+        </div>
+
+        {/* RIGHT — Islamic Content Sidebar */}
+        <div className="w-full xl:w-[340px] shrink-0">
+          <div className="xl:sticky xl:top-6 space-y-6">
+            {/* Verse of the Day */}
+            <VerseOfTheDay />
+
+            {/* Prayer Times */}
+            <div className="rounded-2xl overflow-hidden glass border border-white/20 dark:border-slate-800/80 shadow-sm">
+              <NamazTimeWrapper />
+            </div>
+
+            {/* Reminders, Stats, Quick Access, Activity */}
+            <SurahPageWidgets />
+          </div>
+        </div>
+      </div>
     </main>
   );
 }

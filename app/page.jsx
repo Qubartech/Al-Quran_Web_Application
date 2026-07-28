@@ -29,13 +29,13 @@ export default async function Home() {
 
       {/* Main Content Layout (Featured Surahs + Sidebar) */}
       <div className="flex flex-col lg:flex-row gap-8 mt-6">
-        
+
         {/* Left Column: Featured Surahs & Quick Sections */}
         <div className="w-full space-y-8">
-          
+
           {/* Section 1: Featured & Popular Surahs */}
           <div className="p-6 rounded-2xl glass border border-white/20 dark:border-slate-800/80 shadow-sm flex flex-col gap-5">
-            
+
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div>
                 <span className="text-xs font-extrabold uppercase tracking-widest text-primaryColor dark:text-primaryColor-light flex items-center gap-1.5">
