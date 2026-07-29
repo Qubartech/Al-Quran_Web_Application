@@ -86,8 +86,8 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-lg rounded-3xl bg-white dark:bg-slate-900 border border-gray-200/50 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-[100] overflow-y-auto bg-slate-950/75 backdrop-blur-md p-4 sm:p-6 flex items-center justify-center min-h-screen">
+      <div className="relative w-full max-w-lg rounded-3xl bg-white dark:bg-slate-900 border border-gray-200/50 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col my-auto animate-fadeIn">
         {/* Header Tabs */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/50">
           <div className="flex items-center gap-2 p-1 bg-gray-200/50 dark:bg-slate-800/60 rounded-xl">
