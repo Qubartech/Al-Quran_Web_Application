@@ -13,9 +13,11 @@ export default function ProfileEditModal({ isOpen, onClose }) {
 
   const [name, setName] = useState("");
   const [birthdate, setBirthdate] = useState("");
-  const [preferredReciter, setPreferredReciter] = useState("mishari_al_afasy");
+  const [preferredReciter, setPreferredReciter] = useState("7");
   const [preferredTranslation, setPreferredTranslation] = useState("sahih_international");
   const [dailyGoal, setDailyGoal] = useState("15");
+  const [reciters, setReciters] = useState([]);
+  const [loadingReciters, setLoadingReciters] = useState(false);
 
   // Fetch current user profile
   useEffect(() => {
@@ -29,7 +31,7 @@ export default function ProfileEditModal({ isOpen, onClose }) {
           if (data) {
             setName(data.name || "");
             setBirthdate(data.birthdate ? data.birthdate.split("T")[0] : "");
-            setPreferredReciter(data.preferredReciter || "mishari_al_afasy");
+            setPreferredReciter(data.preferredReciter === "mishari_al_afasy" ? "7" : (data.preferredReciter || "7"));
             setPreferredTranslation(data.preferredTranslation || "sahih_international");
             setDailyGoal(String(data.dailyGoal || 15));
           }
@@ -38,6 +40,25 @@ export default function ProfileEditModal({ isOpen, onClose }) {
         .finally(() => setLoading(false));
     }
   }, [isOpen, session?.access_token]);
+
+  // Fetch reciters list from API on mount
+  useEffect(() => {
+    setLoadingReciters(true);
+    fetch("https://api.quran.com/api/v4/resources/recitations?language=en")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.recitations) {
+          const sorted = [...data.recitations].sort((a, b) => {
+            const nameA = a.translated_name?.name || a.reciter_name || "";
+            const nameB = b.translated_name?.name || b.reciter_name || "";
+            return nameA.localeCompare(nameB);
+          });
+          setReciters(sorted);
+        }
+      })
+      .catch((err) => console.error("Error loading reciters:", err))
+      .finally(() => setLoadingReciters(false));
+  }, []);
 
   if (!isOpen) return null;
 
@@ -67,10 +88,20 @@ export default function ProfileEditModal({ isOpen, onClose }) {
         throw new Error("Failed to save profile changes.");
       }
 
+      // Sync settings local state & cookies
+      try {
+        localStorage.setItem("app_reciter_id", preferredReciter);
+        document.cookie = `__reciter_id__=${preferredReciter}; path=/; max-age=${60 * 60 * 24 * 365}`;
+      } catch (err) {}
+
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
         onClose();
+        // Refresh page so player is updated
+        if (typeof window !== "undefined") {
+          window.location.reload();
+        }
       }, 1200);
     } catch (err) {
       setError(err.message || "Failed updating profile.");
@@ -162,10 +193,21 @@ export default function ProfileEditModal({ isOpen, onClose }) {
                   onChange={(e) => setPreferredReciter(e.target.value)}
                   className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200/60 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primaryColor/30 cursor-pointer"
                 >
-                  <option value="mishari_al_afasy">Mishary Rashid Alafasy</option>
-                  <option value="abdul_baset">AbdulBaset AbdulSamad</option>
-                  <option value="maher_al_muaiqly">Maher Al-Muaiqly</option>
-                  <option value="saad_al_ghamdi">Saad Al-Ghamdi</option>
+                  {loadingReciters ? (
+                    <option value={preferredReciter}>Loading reciters...</option>
+                  ) : reciters.length === 0 ? (
+                    <option value="7">Mishary Rashid Alafasy</option>
+                  ) : (
+                    reciters.map((r) => {
+                      const name = r.translated_name?.name || r.reciter_name;
+                      const style = r.style ? ` (${r.style})` : "";
+                      return (
+                        <option key={r.id} value={String(r.id)}>
+                          {name}{style}
+                        </option>
+                      );
+                    })
+                  )}
                 </select>
                 <Headphones className="absolute left-3 top-3 text-gray-400" size={14} />
               </div>

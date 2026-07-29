@@ -16,6 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import ThemeToggle from "@/components/settings/ThemeToggle";
 import LanguageSelect from "@/components/settings/LanguageSelect";
 import TranslationSelect from "@/components/settings/TranslationSelect";
+import ReciterSelect from "@/components/settings/ReciterSelect";
 import FontSizeControls from "@/components/settings/FontSizeControls";
 import SettingsResetButton from "@/components/settings/SettingsResetButton";
 import useSettings from "@/components/settings/hooks/useSettings";
@@ -30,11 +31,13 @@ export default function SettingsDrawer({ open, onClose }) {
     identifier,
     fontSize,
     arabicFontSize,
+    reciterId,
     handleThemeChange,
     handleLanguageChange,
     handleIdentifierChange,
     handleFontSizeChange,
     handleArabicFontSizeChange,
+    handleReciterIdChange,
     resetAll,
   } = useSettings();
 
@@ -71,6 +74,11 @@ export default function SettingsDrawer({ open, onClose }) {
             editions={filteredEditions}
             value={identifier}
             onChange={handleIdentifierChange}
+          />
+
+          <ReciterSelect
+            value={reciterId}
+            onChange={handleReciterIdChange}
           />
 
           <FontSizeControls

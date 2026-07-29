@@ -108,15 +108,20 @@ export default function AudioPlayerPage() {
     
     // Read translation edition from localStorage or default
     let translationId = "161"; // Default English Sahih International numeric identifier
+    let reciterId = "7";
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("app_translation_identifier");
       if (saved && !isNaN(Number(saved))) {
         translationId = saved;
       }
+      const savedReciter = localStorage.getItem("app_reciter_id");
+      if (savedReciter) {
+        reciterId = savedReciter;
+      }
     }
 
     const textUrl = `https://api.quran.com/api/v4/verses/by_chapter/${activeSurahNum}?per_page=300&translations=${translationId}&words=true&word_fields=text_qpc_hafs,text_indopak,text_uthmani,code_v1,code_v2`;
-    const segmentsUrl = `https://api.quran.com/api/v4/chapter_recitations/7/${activeSurahNum}?segments=true`;
+    const segmentsUrl = `https://api.quran.com/api/v4/chapter_recitations/${reciterId}/${activeSurahNum}?segments=true`;
     const chapterUrl = `https://api.quran.com/api/v4/chapters/${activeSurahNum}?language=en`;
 
     Promise.all([
@@ -208,10 +213,8 @@ export default function AudioPlayerPage() {
 
   const selectSurah = (num) => {
     setActiveSurahNum(num);
-    // Play Surah directly using context
-    const fullAudioUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${num}.mp3`;
     const selected = surahs.find((s) => s.number === num);
-    audio?.playList([fullAudioUrl], 0, `surah_${num}`, selected?.englishName || "Surah");
+    audio?.playSurah(num, selected?.englishName || "Surah");
 
     // Log to recents
     if (user && session?.access_token) {

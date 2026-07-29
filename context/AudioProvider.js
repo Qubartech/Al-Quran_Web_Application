@@ -20,15 +20,41 @@ export default function AudioProvider({ children }) {
   const [pauseTick, setPauseTick] = useState(0);
   const [playTick, setPlayTick] = useState(0);
 
+  // Dynamic reciter states
+  const [reciters, setReciters] = useState([]);
+  const [reciterName, setReciterName] = useState("Mishary Rashid Alafasy");
+
   useEffect(() => {
     // Restore last audio on reload
     const last = typeof window !== "undefined" ? localStorage.getItem("__audio_src__") : null;
-    // Keep player hidden until user explicitly plays audio
     if (last) {
       setSrc(last);
       setOpen(false);
     }
+
+    // Fetch reciters list to get the name of the selected reciter
+    fetch("https://api.quran.com/api/v4/resources/recitations?language=en")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.recitations) {
+          setReciters(data.recitations);
+        }
+      })
+      .catch((e) => console.error("Error fetching reciters for names:", e));
   }, []);
+
+  // Update resolved reciter name based on active reciter ID
+  useEffect(() => {
+    const savedId = typeof window !== "undefined" ? localStorage.getItem("app_reciter_id") || "7" : "7";
+    const match = reciters.find((r) => String(r.id) === String(savedId));
+    if (match) {
+      const name = match.translated_name?.name || match.reciter_name;
+      const style = match.style ? ` (${match.style})` : "";
+      setReciterName(`${name}${style}`);
+    } else {
+      setReciterName(savedId === "7" ? "Mishary Rashid Alafasy" : `Reciter ${savedId}`);
+    }
+  }, [reciters, src]);
 
   const play = (newSrc) => {
     setSrc(newSrc);
@@ -64,6 +90,35 @@ export default function AudioProvider({ children }) {
     }
   };
 
+  // Play a Surah by fetching its recitation URL dynamically from the API based on current reciter
+  const playSurah = async (surahNumber, surahName = "") => {
+    const num = parseInt(surahNumber, 10);
+    if (isNaN(num)) return;
+
+    let reciterId = "7";
+    if (typeof window !== "undefined") {
+      reciterId = localStorage.getItem("app_reciter_id") || "7";
+    }
+
+    try {
+      const res = await fetch(`https://api.quran.com/api/v4/chapter_recitations/${reciterId}/${num}`);
+      if (res.ok) {
+        const data = await res.json();
+        const audioUrl = data.audio_file?.audio_url;
+        if (audioUrl) {
+          playList([audioUrl], 0, `surah_${num}`, surahName);
+          return;
+        }
+      }
+    } catch (e) {
+      console.error("Failed to fetch recitation from API:", e);
+    }
+
+    // Fallback to Mishary
+    const fallbackUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${num}.mp3`;
+    playList([fallbackUrl], 0, `surah_${num}`, surahName);
+  };
+
   const close = () => {
     setOpen(false);
     setPaused(false);
@@ -93,7 +148,6 @@ export default function AudioProvider({ children }) {
         return;
       }
     }
-    // Otherwise, stop
     close();
   };
 
@@ -112,7 +166,6 @@ export default function AudioProvider({ children }) {
       }
       return;
     }
-    // If at the start, just keep current without closing
     setOpen(true);
   };
 
@@ -128,7 +181,21 @@ export default function AudioProvider({ children }) {
     setPlayTick((t) => t + 1);
   };
 
-  const value = { src, open, paused, play, playList, close, pause, resume, currentIndex, playlistId };
+  const value = {
+    src,
+    open,
+    paused,
+    play,
+    playList,
+    playSurah,
+    close,
+    pause,
+    resume,
+    currentIndex,
+    playlistId,
+    reciterName,
+    title
+  };
 
   return (
     <AudioContext.Provider value={value}>
@@ -139,18 +206,13 @@ export default function AudioProvider({ children }) {
           playNext={onEnded}
           playPrev={playPrev}
           onClose={close}
-          onPause={() => {
-            // Update provider state when player is paused via UI
-            pause();
-          }}
-          onPlay={() => {
-            // Update provider state when player is played via UI
-            resume();
-          }}
+          onPause={pause}
+          onPlay={resume}
           title={title}
           currentIndex={currentIndex}
           pauseTick={pauseTick}
           playTick={playTick}
+          reciterName={reciterName}
         />
       ) : null}
     </AudioContext.Provider>

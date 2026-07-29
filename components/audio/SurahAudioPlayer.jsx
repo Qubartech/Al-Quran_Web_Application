@@ -24,6 +24,7 @@ function SurahAudioPlayer({
   currentIndex,
   pauseTick,
   playTick,
+  reciterName,
 }) {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -328,7 +329,7 @@ function SurahAudioPlayer({
                   : "Surah Recitation"}
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                Mishari bin Rashid Alafasy
+                {reciterName || "Mishary Rashid Alafasy"}
               </p>
             </div>
           </div>
