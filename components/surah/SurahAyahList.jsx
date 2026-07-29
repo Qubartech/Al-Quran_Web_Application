@@ -161,7 +161,7 @@ const SurahAyahList = ({
     const seekTime = targetAyah.timestamp_from / 1000;
 
     // Check if the full Surah audio is already playing
-    if (audio?.playlistId === pageId) {
+    if (audio?.playlistId === pageId || audio?.playlistId === `surah_${pageId}`) {
       window.dispatchEvent(
         new CustomEvent("quran-audio-seek", { detail: { time: seekTime } })
       );
@@ -269,7 +269,7 @@ const SurahAyahList = ({
 
       {arabicAyah.map((ayah, idx) => {
         const isPlaying =
-          audio?.playlistId === pageId && activeAyahIndex === idx;
+          (audio?.playlistId === pageId || audio?.playlistId === `surah_${pageId}`) && activeAyahIndex === idx;
         const { text } = ayah || {};
         return (
           <div
@@ -297,7 +297,7 @@ const SurahAyahList = ({
                         }_active_${activeAyahIndex === idx ? 1 : 0}_src_${audio?.src ?? "-"}`}
                         isPlaying={
                           audio?.open &&
-                          audio?.playlistId === pageId &&
+                          (audio?.playlistId === pageId || audio?.playlistId === `surah_${pageId}`) &&
                           activeAyahIndex === idx &&
                           !isPaused
                         }

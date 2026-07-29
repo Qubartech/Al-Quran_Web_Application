@@ -8,10 +8,13 @@ A modern, feature-rich, interactive web application built with **Next.js (App Ro
 
 - 📖 **Surah Directory**: Browse all 114 Surahs with Meccan/Medinan tags, English translations, verse counts, audio playback, and instant search/sorting.
 - 📚 **Juz Directory**: Explore the 30 partitions (Paras) of the Holy Quran with starting/ending verse details, quick audio play, and list/grid views.
-- 🎧 **Audio Player & Recitations**: Continuous audio playback support for Surahs and verses with reciter controls.
+- 🎨 **Premium Sidebar UI**: Sleek glassmorphic sidebar featuring active route highlighting, smooth transition states, search query clearing, and automatic scroll-to-view of active items.
+- 🎧 **Centralized Dynamic Audio Streaming**: Dynamic chapter and segment streaming fetched on-the-fly from the Quran.com API, eliminating hardcoded local audio files.
+- 🎙️ **Dynamic Reciter Controls**: Settings drawer and Profile modal allow changing reciters in real-time. Choices are fetched dynamically from the Quran.com resources API.
+- 🔄 **Profile & Settings Sync**: Settings (Theme, Translation Language, Edition, Font Size, and Reciter Preference) are stored in cookies (preventing layout shift) and synced directly to the user's database profile when authenticated.
+- 🔍 **Dynamic Text Scaling**: Responsive sliding controls for both Translation and Arabic font sizes that dynamically update both normal reading and word-by-word layouts in real-time.
 - 🕌 **Prayer Times (Namaz)**: Live calculation of Islamic daily prayer schedules.
 - 🔍 **Global Search**: Quick search modal for finding Surahs, Juz, and Ayahs instantly.
-- 🎨 **Modern Design**: Built with smooth glassmorphism, responsive grid layouts, custom Arabic typography, and automatic Dark Mode support.
 - 📌 **Bookmarks & Favorites**: Track recent activity, save favorite Ayahs, and manage bookmarks (backed by Prisma/Supabase).
 
 ---
