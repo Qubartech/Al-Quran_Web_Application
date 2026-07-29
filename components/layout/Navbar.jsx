@@ -3,6 +3,8 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import SettingsDrawer from "@/components/settings/SettingsDrawer";
+import AuthModal from "@/components/auth/AuthModal";
+import ProfileEditModal from "@/components/auth/ProfileEditModal";
 import { useUser } from "@/context/UserProvider";
 import { 
   Settings, 
@@ -14,7 +16,9 @@ import {
   User, 
   LogOut, 
   ChevronDown, 
-  LayoutDashboard 
+  LayoutDashboard,
+  GraduationCap,
+  UserCheck
 } from "lucide-react";
 
 function Navbar() {
@@ -23,6 +27,8 @@ function Navbar() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -30,9 +36,16 @@ function Navbar() {
       setMobileMenuOpen(false);
       setSettingsOpen(true);
     };
+    const handleOpenAuth = () => {
+      setMobileMenuOpen(false);
+      setAuthModalOpen(true);
+    };
+
     window.addEventListener("quran-open-settings", handleOpenSettings);
+    window.addEventListener("quran-open-auth", handleOpenAuth);
     return () => {
       window.removeEventListener("quran-open-settings", handleOpenSettings);
+      window.removeEventListener("quran-open-auth", handleOpenAuth);
     };
   }, []);
 
@@ -46,13 +59,14 @@ function Navbar() {
     { name: "Home", href: "/", icon: LayoutDashboard },
     { name: "Surahs", href: "/surah", icon: BookOpen },
     { name: "Juz / Paras", href: "/juz", icon: Layers },
+    { name: "Learn Quran", href: "/learn", icon: GraduationCap },
     { name: "Dedicated Player", href: "/player", icon: Play }
   ];
 
   return (
     <nav className="px-6 bg-background/70 text-foreground backdrop-blur-xl transition-all duration-300 fixed top-0 left-0 right-0 w-full z-50 border-b border-border/50 shadow-sm dark:shadow-slate-950/50">
       <div className="max-w-screen-2xl mx-auto py-3.5 flex justify-between items-center">
-        {/* Logo container without parent gradient clip text bug */}
+        {/* Logo container */}
         <div className="flex items-center">
           <Link href="/" className="hover:opacity-95 transition-all flex items-center gap-2.5 whitespace-nowrap">
             <span className="w-8 h-8 shrink-0 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white text-sm font-black shadow-md shadow-emerald-500/25">
@@ -132,6 +146,17 @@ function Navbar() {
                     </Link>
 
                     <button
+                      onClick={() => {
+                        setProfileDropdownOpen(false);
+                        setProfileModalOpen(true);
+                      }}
+                      className="flex items-center gap-2 w-full text-left px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-primaryColor/5 hover:text-primaryColor dark:hover:text-emerald-400 transition-colors"
+                    >
+                      <UserCheck size={14} />
+                      Edit Profile
+                    </button>
+
+                    <button
                       onClick={async () => {
                         setProfileDropdownOpen(false);
                         await signOut();
@@ -147,12 +172,12 @@ function Navbar() {
               )}
             </div>
           ) : (
-            <Link
-              href="/login"
+            <button
+              onClick={() => setAuthModalOpen(true)}
               className="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-md shadow-emerald-500/10 hover:scale-105 active:scale-95 transition-all duration-200"
             >
               Sign In
-            </Link>
+            </button>
           )}
 
           {/* Mobile Menu Toggle */}
@@ -191,7 +216,14 @@ function Navbar() {
         </div>
       )}
 
+      {/* Settings Drawer */}
       <SettingsDrawer open={settingsOpen} onClose={closeSettings} />
+
+      {/* Auth Modal */}
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
+
+      {/* Profile Edit Modal */}
+      <ProfileEditModal isOpen={profileModalOpen} onClose={() => setProfileModalOpen(false)} />
     </nav>
   );
 }
