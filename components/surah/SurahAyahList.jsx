@@ -125,8 +125,6 @@ const SurahAyahList = ({
     return -1;
   }
 
-  const fullAudioUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${pageId}.mp3`;
-
   // Track the active ayah index based on audioCurrentTime
   const activeAyahIndex = useMemo(() => {
     const timeMs = audioCurrentTime * 1000;
@@ -172,7 +170,7 @@ const SurahAyahList = ({
       }
     } else {
       // Load and play the full Surah audio
-      audio?.playList([fullAudioUrl], 0, pageId, surahName);
+      audio?.playSurah(pageId, surahName);
       
       // Log to Recently Played
       if (user && session?.access_token) {
@@ -353,7 +351,7 @@ const SurahAyahList = ({
                               >
                                 {/* Arabic word */}
                                 <span
-                                  className={`text-2xl md:text-3xl font-semibold select-none transition-all duration-150 font-arabic ${
+                                  className={`font-semibold select-none transition-all duration-150 font-arabic ayah-arabic-text ${
                                     isHighlightStyle
                                       ? "text-primaryColor scale-110 font-bold"
                                       : isDimmedStyle

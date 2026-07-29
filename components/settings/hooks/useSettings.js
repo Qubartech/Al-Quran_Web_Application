@@ -6,10 +6,14 @@ import { useTheme } from "next-themes";
 import getLanguages from "@/lib/api/getLanguages";
 import getTranslationEditions from "@/lib/api/getTranslationEditions";
 import { useRouter } from "next/navigation";
+import { useAudio } from "@/context/AudioProvider";
+import { useUser } from "@/context/UserProvider";
 
 export default function useSettings() {
   const router = useRouter();
   const { resolvedTheme, setTheme } = useTheme();
+  const { session } = useUser() || {};
+  const audio = useAudio();
 
   const [themeChoice, setThemeChoice] = React.useState("system");
   const [languages, setLanguages] = React.useState([]);
@@ -19,6 +23,7 @@ export default function useSettings() {
   const [identifier, setIdentifier] = React.useState("");
   const [fontSize, setFontSize] = React.useState(18);
   const [arabicFontSize, setArabicFontSize] = React.useState(24);
+  const [reciterId, setReciterId] = React.useState("7");
 
   // Initial load
   React.useEffect(() => {
@@ -68,6 +73,24 @@ export default function useSettings() {
       document.documentElement.style.setProperty("--ayah-arabic-font-size", `${fallbackArabic}px`);
     }
 
+    // Reciter ID
+    try {
+      const savedReciter = localStorage.getItem("app_reciter_id");
+      if (savedReciter) {
+        setReciterId(savedReciter);
+        setCookie("__reciter_id__", savedReciter, {
+          expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+          path: "/",
+        });
+      } else {
+        setReciterId("7");
+        setCookie("__reciter_id__", "7", {
+          expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+          path: "/",
+        });
+      }
+    } catch {}
+
     // Fetch languages
     (async () => {
       const langs = await getLanguages();
@@ -87,6 +110,28 @@ export default function useSettings() {
       } catch {}
     })();
   }, []);
+
+  // Sync reciter from user profile if logged in
+  React.useEffect(() => {
+    if (session?.access_token) {
+      fetch("/api/user/profile", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.preferredReciter) {
+            const val = data.preferredReciter === "mishari_al_afasy" ? "7" : String(data.preferredReciter);
+            setReciterId(val);
+            localStorage.setItem("app_reciter_id", val);
+            setCookie("__reciter_id__", val, {
+              expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+              path: "/",
+            });
+          }
+        })
+        .catch((err) => console.error("Error loading profile settings:", err));
+    }
+  }, [session?.access_token]);
 
   // Refilter on language change
   React.useEffect(() => {
@@ -195,12 +240,58 @@ export default function useSettings() {
     document.documentElement.style.setProperty("--ayah-arabic-font-size", `${clamped}px`);
   };
 
+  const handleReciterIdChange = (val) => {
+    const stringVal = String(val);
+    setReciterId(stringVal);
+    try {
+      localStorage.setItem("app_reciter_id", stringVal);
+      setCookie("__reciter_id__", stringVal, {
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+        path: "/",
+      });
+    } catch {}
+
+    // Sync to user profile if logged in
+    if (session?.access_token) {
+      fetch("/api/user/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ preferredReciter: stringVal }),
+      }).catch((err) => console.error("Error syncing reciter change:", err));
+    }
+
+    // Hot-swap playing audio if any Surah is currently playing
+    if (audio?.playlistId) {
+      let num = null;
+      if (typeof audio.playlistId === "string" && audio.playlistId.startsWith("surah_")) {
+        num = parseInt(audio.playlistId.replace("surah_", ""), 10);
+      } else if (!isNaN(Number(audio.playlistId))) {
+        num = parseInt(audio.playlistId, 10);
+      }
+      if (num) {
+        audio.playSurah(num, audio.title || "");
+      }
+    }
+
+    setTimeout(() => {
+      try {
+        router.refresh();
+      } catch {
+        if (typeof window !== "undefined") window.location.reload();
+      }
+    }, 150);
+  };
+
   const resetAll = () => {
     try {
       localStorage.removeItem("app_language");
       localStorage.removeItem("app_translation_identifier");
       localStorage.removeItem("app_font_size");
       localStorage.removeItem("app_arabic_font_size");
+      localStorage.removeItem("app_reciter_id");
       setThemeChoice("system");
       document.documentElement.style.setProperty("--ayah-font-size", "18px");
       const defaultArabic = typeof window !== "undefined" && window.innerWidth >= 768 ? 32 : 24;
@@ -209,6 +300,7 @@ export default function useSettings() {
       setCookie("__translation_identifier__", "", { expires: new Date(0), path: "/" });
       setCookie("__font_size__", "", { expires: new Date(0), path: "/" });
       setCookie("__arabic_font_size__", "", { expires: new Date(0), path: "/" });
+      setCookie("__reciter_id__", "", { expires: new Date(0), path: "/" });
       setCookie("__theme__", "system", {
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
         path: "/",
@@ -219,6 +311,7 @@ export default function useSettings() {
     setFontSize(18);
     const defaultArabic = typeof window !== "undefined" && window.innerWidth >= 768 ? 32 : 24;
     setArabicFontSize(defaultArabic);
+    setReciterId("7");
     setTimeout(() => {
       try {
         router.refresh();
@@ -238,12 +331,14 @@ export default function useSettings() {
     identifier,
     fontSize,
     arabicFontSize,
+    reciterId,
     // handlers
     handleThemeChange,
     handleLanguageChange,
     handleIdentifierChange,
     handleFontSizeChange,
     handleArabicFontSizeChange,
+    handleReciterIdChange,
     resetAll,
   };
 }

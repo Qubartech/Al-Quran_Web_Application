@@ -10,12 +10,13 @@ async function Surah({ params }) {
   const editionIdentifier = cookieStore.get(
     "__translation_identifier__"
   )?.value;
+  const reciterId = cookieStore.get("__reciter_id__")?.value || "7";
 
-  const singleSurah = await getSingleSurah(id, langCode, editionIdentifier);
+  const singleSurah = await getSingleSurah(id, langCode, editionIdentifier, reciterId);
   // console.log(singleSurah)
 
   const { data } = singleSurah || {};
-  const { ayahs: arabicAyah, englishName, arabicName, number: surahNumber, versesCount, revelationPlace, translatedName } = data[0] || {};
+  const { ayahs: arabicAyah, englishName, arabicName, number: surahNumber, versesCount, revelationPlace, translatedName, audioUrl } = data[0] || {};
   const { ayahs: englishTransAyah } = data[1] || {};
   const { ayahs: ayahAudio } = data[2] || {};
 
@@ -66,6 +67,7 @@ async function Surah({ params }) {
         ayahAudio={ayahAudio}
         pageId={id}
         surahName={englishName}
+        fullAudioUrl={audioUrl}
       />
     </div>
   );

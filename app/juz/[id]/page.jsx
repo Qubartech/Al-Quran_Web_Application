@@ -23,8 +23,9 @@ async function Juz({ params }) {
   const editionIdentifier = cookieStore.get(
     "__translation_identifier__"
   )?.value;
+  const reciterId = cookieStore.get("__reciter_id__")?.value || "7";
 
-  const singleJuz = await getSingleJuz(juzId, langCode, editionIdentifier);
+  const singleJuz = await getSingleJuz(juzId, langCode, editionIdentifier, reciterId);
   const { data } = singleJuz || {};
   const { ayahs: arabicAyah } = data[0] || {};
   const { ayahs: englishTransAyah } = data[1] || {};

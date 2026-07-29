@@ -215,12 +215,17 @@ export default function JuzAyahList({
     if (!target) return;
     const { surahNumber, verseKey, surahName } = target;
 
+    let reciterId = "7";
+    try {
+      reciterId = localStorage.getItem("app_reciter_id") || "7";
+    } catch {}
+
     let timestamps = segmentsMap[surahNumber];
     if (!timestamps) {
       setLoadingSurah(surahNumber);
       try {
         const res = await fetch(
-          `https://api.quran.com/api/v4/chapter_recitations/7/${surahNumber}?segments=true`
+          `https://api.quran.com/api/v4/chapter_recitations/${reciterId}/${surahNumber}?segments=true`
         );
         if (res.ok) {
           const json = await res.json();
@@ -238,12 +243,12 @@ export default function JuzAyahList({
     }
 
     if (!timestamps) return; // Fetch failed or was cancelled
-
     const verseSeg = timestamps.find((t) => t.verse_key === verseKey);
     const seekTime = (verseSeg?.timestamp_from || 0) / 1000;
-    const fullAudioUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${surahNumber}.mp3`;
 
-    if (audio?.playlistId === `surah_${surahNumber}`) {
+    const isCurrentSurahPlaying = audio?.playlistId === surahNumber || audio?.playlistId === `surah_${surahNumber}`;
+
+    if (isCurrentSurahPlaying) {
       window.dispatchEvent(
         new CustomEvent("quran-audio-seek", { detail: { time: seekTime } })
       );
@@ -251,7 +256,7 @@ export default function JuzAyahList({
         audio?.resume();
       }
     } else {
-      audio?.playList([fullAudioUrl], 0, `surah_${surahNumber}`, surahName);
+      audio?.playSurah(surahNumber, surahName);
       
       // Log to Recently Played
       if (user && session?.access_token) {
@@ -269,11 +274,10 @@ export default function JuzAyahList({
         }).catch((err) => console.error("Error logging recent play:", err));
       }
 
-      setTimeout(() => {
-        window.dispatchEvent(
-          new CustomEvent("quran-audio-seek", { detail: { time: seekTime } })
-        );
-      }, 400);
+      // Store the seek time so SurahAudioPlayer will seek to it when metadata/audio loads
+      if (typeof window !== "undefined") {
+        window.pendingQuranAudioSeekTime = seekTime;
+      }
     }
   }
 
@@ -395,7 +399,7 @@ export default function JuzAyahList({
                           className="relative flex flex-col items-center justify-center p-1 rounded-md hover:bg-gray-150 dark:hover:bg-slate-800/40 transition-all duration-200 group cursor-pointer border border-transparent hover:border-gray-200/30 dark:hover:border-slate-700/30"
                         >
                           <span
-                            className={`text-2xl md:text-3xl font-semibold select-none transition-all duration-150 font-arabic ${
+                            className={`font-semibold select-none transition-all duration-150 font-arabic ayah-arabic-text ${
                               isHighlightStyle
                                 ? "text-primaryColor scale-110 font-bold"
                                 : isDimmedStyle
@@ -429,7 +433,7 @@ export default function JuzAyahList({
                   </div>
                 ) : (
                   <div
-                    className={`font-semibold text-end font-arabic text-3xl pb-3 ${
+                    className={`font-semibold text-end font-arabic ayah-arabic-text pb-3 ${
                       isPlaying
                         ? "text-primaryColor"
                         : "text-gray-900 dark:text-gray-100"
@@ -440,7 +444,7 @@ export default function JuzAyahList({
                 )}
 
                 {/* English / Bengali translation */}
-                <div className="text-gray-700 dark:text-gray-300 text-sm md:text-base leading-relaxed pt-2 border-t border-gray-100 dark:border-slate-800/80">
+                <div className="text-gray-700 dark:text-gray-300 ayah-text leading-relaxed pt-2 border-t border-gray-100 dark:border-slate-800/80">
                   {englishTrans[idx]?.text}
                 </div>
               </div>

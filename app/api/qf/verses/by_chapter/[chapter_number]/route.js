@@ -1,5 +1,7 @@
 import { qfContentFetch } from '@/lib/qf/content';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   const chapter = params?.chapter_number;
   if (!chapter || isNaN(Number(chapter))) {

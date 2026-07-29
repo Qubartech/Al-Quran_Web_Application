@@ -7,12 +7,19 @@ generator client {
 }
 
 model User {
-  id            String         @id
-  email         String?        @unique
-  createdAt     DateTime       @default(now())
-  favoriteAyahs FavoriteAyah[]
-  favoriteJuzs  FavoriteJuz[]
-  recentSurahs  RecentSurah[]
+  id                   String          @id
+  email                String?         @unique
+  name                 String?
+  birthdate            DateTime?
+  preferredReciter     String?         @default("mishari_al_afasy")
+  preferredTranslation String?         @default("sahih_international")
+  dailyGoal            Int?            @default(15)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+  favoriteAyahs        FavoriteAyah[]
+  favoriteJuzs         FavoriteJuz[]
+  recentSurahs         RecentSurah[]
+  learnProgress        LearnProgress[]
 }
 
 model FavoriteAyah {
@@ -55,5 +62,20 @@ model RecentSurah {
   createdAt   DateTime @default(now())
 
   @@unique([userId, surahNumber])
+  @@index([userId])
+}
+
+model LearnProgress {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moduleId  String
+  completed Boolean  @default(true)
+  quizScore Int?
+  maxScore  Int?
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@unique([userId, moduleId])
   @@index([userId])
 }
