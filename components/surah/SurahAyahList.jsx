@@ -267,68 +267,88 @@ const SurahAyahList = ({
     <>
       {/* Audio player is rendered globally via AudioProvider */}
 
-      {arabicAyah.map((ayah, idx) => {
-        const isPlaying =
-          (audio?.playlistId === pageId || audio?.playlistId === `surah_${pageId}`) && activeAyahIndex === idx;
-        const { text } = ayah || {};
-        return (
-          <div
+      <div className="flex flex-col gap-3 md:gap-4 mt-2">
+        {arabicAyah.map((ayah, idx) => {
+          const isPlaying =
+            (audio?.playlistId === pageId || audio?.playlistId === `surah_${pageId}`) && activeAyahIndex === idx;
+          const { text } = ayah || {};
+          
+          // Stagger animation delay for first 10 visible verses
+          const animDelay = idx < 10 ? `${idx * 0.04}s` : '0s';
+          
+          return (
+            <div
               key={idx}
-              className="py-1"
+              className="animate-slideUp"
               id={`sura_${pageId}_ayah_${idx + 1}`}
               tabIndex={-1}
+              style={{ animationDelay: animDelay }}
             >
-              <div className={`px-3 md:px-6 py-6 flex gap-4 justify-between w-full transition-all duration-300 rounded-xl ${
+              <div className={`px-3 md:px-6 py-3 md:py-6 flex flex-col md:flex-row gap-2 md:gap-5 w-full transition-all duration-300 rounded-xl verse-card ${
                 isPlaying
-                  ? "bg-primaryColor/5 border-l-4 border-primaryColor shadow-sm dark:bg-emerald-500/10"
-                  : "border-b border-gray-250/50 dark:border-slate-800/50 hover:bg-gray-50/50 dark:hover:bg-slate-800/20"
+                  ? "bg-primaryColor/[0.06] dark:bg-emerald-500/[0.08] border border-primaryColor/20 dark:border-emerald-500/20 verse-active-glow shadow-sm"
+                  : "bg-white/20 dark:bg-slate-900/10 border border-gray-200/20 dark:border-slate-800/20 hover:border-gray-300/30 dark:hover:border-slate-700/30"
               }`}>
-                <div className="md:w-12 flex items-center justify-center">
-                  <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 flex flex-col items-center justify-center">
-                    {pageId}:{idx + 1}
-                    <div className="w-full flex justify-center">
-                      <SurahPlayBtn
-                        key={`spb_${idx}_pid_${audio?.playlistId ?? "-"}_ci_${
-                          audio?.currentIndex ?? -1
-                        }_open_${audio?.open ? 1 : 0}_paused_${
-                          audio?.paused ? 1 : 0
-                        }_play_${audio?.playTick ?? 0}_pause_${
-                          audio?.pauseTick ?? 0
-                        }_active_${activeAyahIndex === idx ? 1 : 0}_src_${audio?.src ?? "-"}`}
-                        isPlaying={
-                          audio?.open &&
-                          (audio?.playlistId === pageId || audio?.playlistId === `surah_${pageId}`) &&
-                          activeAyahIndex === idx &&
-                          !isPaused
-                        }
-                        playControl={() => playControl(idx)}
-                        pauseControl={() => audio?.pause()}
-                      />
-                    </div>
-                    {/* BOOKMARK BUTTON */}
-                    <div className="w-full flex justify-center mt-2">
-                      <button
-                        onClick={() => toggleBookmark(idx)}
-                        className={`p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors ${
-                          bookmarks[`${pageId}_${idx + 1}`]
-                            ? "text-emerald-500"
-                            : "text-gray-400 hover:text-emerald-500"
-                        }`}
-                        title="Bookmark Ayah"
-                      >
-                        <Bookmark size={15} fill={bookmarks[`${pageId}_${idx + 1}`] ? "currentColor" : "none"} />
-                      </button>
-                    </div>
+                
+                {/* Action Controls — Horizontal row on mobile, vertical column on desktop */}
+                <div className="flex flex-row md:flex-col items-center gap-2 md:gap-2 shrink-0 md:pt-0.5">
+                  
+                  {/* Islamic Star Ayah Badge */}
+                  <div className={`ayah-badge w-7 h-7 md:w-10 md:h-10 shrink-0 ${
+                    isPlaying
+                      ? "bg-primaryColor dark:bg-emerald-500"
+                      : "bg-primaryColor/10 dark:bg-emerald-500/10"
+                  }`}>
+                    <span className={`text-[8px] md:text-[10px] font-bold ${
+                      isPlaying
+                        ? "text-white"
+                        : "text-primaryColor dark:text-primaryColor-light"
+                    }`}>
+                      {idx + 1}
+                    </span>
                   </div>
+                  
+                  {/* Play Button */}
+                  <SurahPlayBtn
+                    key={`spb_${idx}_pid_${audio?.playlistId ?? "-"}_ci_${
+                      audio?.currentIndex ?? -1
+                    }_open_${audio?.open ? 1 : 0}_paused_${
+                      audio?.paused ? 1 : 0
+                    }_play_${audio?.playTick ?? 0}_pause_${
+                      audio?.pauseTick ?? 0
+                    }_active_${activeAyahIndex === idx ? 1 : 0}_src_${audio?.src ?? "-"}`}
+                    isPlaying={
+                      audio?.open &&
+                      (audio?.playlistId === pageId || audio?.playlistId === `surah_${pageId}`) &&
+                      activeAyahIndex === idx &&
+                      !isPaused
+                    }
+                    playControl={() => playControl(idx)}
+                    pauseControl={() => audio?.pause()}
+                  />
+                  
+                  {/* Bookmark Button */}
+                  <button
+                    onClick={() => toggleBookmark(idx)}
+                    className={`p-1 md:p-1.5 rounded-lg transition-all duration-200 ${
+                      bookmarks[`${pageId}_${idx + 1}`]
+                        ? "text-emerald-500 bg-emerald-500/10"
+                        : "text-gray-400 hover:text-emerald-500 hover:bg-emerald-500/5"
+                    }`}
+                    title="Bookmark Ayah"
+                  >
+                    <Bookmark size={12} className="md:w-3.5 md:h-3.5" fill={bookmarks[`${pageId}_${idx + 1}`] ? "currentColor" : "none"} />
+                  </button>
                 </div>
 
-                <div className="w-full">
+                {/* Content Column — Arabic + Translation */}
+                <div className="w-full min-w-0">
                   {ayah.words && ayah.words.length > 0 ? (
                     (() => {
                       const activeWordIndex = getActiveWordIndex(ayah, audioCurrentTime);
                       return (
                         <div
-                          className="flex flex-wrap gap-x-3 gap-y-5 justify-start w-full pb-7"
+                          className="flex flex-wrap gap-x-3 gap-y-5 justify-start w-full pb-5"
                           dir="rtl"
                         >
                           {ayah.words.map((word, wIdx) => {
@@ -365,14 +385,14 @@ const SurahAyahList = ({
 
                                 {/* Tooltip on Hover */}
                                 {isWord && (wordTrans || wordTranslit) && (
-                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center bg-gray-900 dark:bg-gray-800 text-white text-[11px] p-2 rounded shadow-lg z-30 pointer-events-none whitespace-nowrap min-w-[60px] border border-gray-700">
+                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center bg-gray-900/95 dark:bg-gray-800/95 backdrop-blur-sm text-white text-[11px] p-2.5 rounded-lg shadow-xl z-30 pointer-events-none whitespace-nowrap min-w-[60px] border border-gray-700/50 transition-all duration-200">
                                     {wordTranslit && (
-                                      <span className="font-semibold text-gray-300 font-sans tracking-wide mb-0.5" dir="ltr">
+                                      <span className="font-semibold text-emerald-300 font-sans tracking-wide mb-0.5" dir="ltr">
                                         {wordTranslit}
                                       </span>
                                     )}
                                     {wordTrans && (
-                                      <span className="text-gray-400 font-sans text-center font-normal leading-normal" dir="ltr">
+                                      <span className="text-gray-300 font-sans text-center font-normal leading-normal" dir="ltr">
                                         {wordTrans}
                                       </span>
                                     )}
@@ -388,7 +408,7 @@ const SurahAyahList = ({
                     })()
                   ) : (
                     <div
-                      className={`font-semibold text-end font-arabic ayah-arabic-text pb-7 ${
+                      className={`font-semibold text-end font-arabic ayah-arabic-text pb-5 ${
                         isPlaying
                           ? "text-primaryColor"
                           : "text-gray-900 dark:text-gray-100"
@@ -398,14 +418,20 @@ const SurahAyahList = ({
                       {text}
                     </div>
                   )}
-                  <div className="text-gray-700 dark:text-gray-300 ayah-text pt-2 border-t border-gray-100 dark:border-gray-800">
+                  
+                  {/* Gradient fade divider */}
+                  <div className="verse-divider my-2"></div>
+                  
+                  {/* Translation */}
+                  <div className="text-gray-700 dark:text-gray-300 ayah-text pt-2 leading-relaxed">
                     {englishTrans[idx]?.text}
                   </div>
                 </div>
               </div>
             </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </>
   );
 };
