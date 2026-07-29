@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Headphones, Loader2 } from "lucide-react";
 
 export default function ReciterSelect({
   value = "7",
@@ -23,7 +23,6 @@ export default function ReciterSelect({
       .then((res) => res.json())
       .then((data) => {
         if (data?.recitations) {
-          // Sort reciters alphabetically
           const sorted = [...data.recitations].sort((a, b) => {
             const nameA = a.translated_name?.name || a.reciter_name || "";
             const nameB = b.translated_name?.name || b.reciter_name || "";
@@ -39,23 +38,26 @@ export default function ReciterSelect({
   const currentValue = String(value);
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-          Audio Reciter
-        </label>
-        {loading && <Loader2 size={12} className="animate-spin text-primaryColor" />}
+        <div className="flex items-center gap-1.5">
+          <Headphones className="w-3.5 h-3.5 text-emerald-500" />
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Audio Reciter
+          </label>
+        </div>
+        {loading && <Loader2 size={12} className="animate-spin text-emerald-500" />}
       </div>
       <Select
         value={currentValue}
         onValueChange={(val) => onChange(val)}
       >
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="w-full rounded-xl border border-gray-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 text-xs font-semibold text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500/20 truncate">
           <SelectValue placeholder="Select reciter" />
         </SelectTrigger>
-        <SelectContent className="max-h-[300px]">
+        <SelectContent className="max-h-[280px] rounded-xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900">
           {reciters.length === 0 ? (
-            <SelectItem value={currentValue}>
+            <SelectItem value={currentValue} className="text-xs font-medium">
               {currentValue === "7" ? "Mishary Rashid Alafasy" : `Reciter ${currentValue}`}
             </SelectItem>
           ) : (
@@ -63,7 +65,7 @@ export default function ReciterSelect({
               const name = r.translated_name?.name || r.reciter_name;
               const style = r.style ? ` (${r.style})` : "";
               return (
-                <SelectItem key={r.id} value={String(r.id)}>
+                <SelectItem key={r.id} value={String(r.id)} className="text-xs font-medium cursor-pointer">
                   {name}{style}
                 </SelectItem>
               );
