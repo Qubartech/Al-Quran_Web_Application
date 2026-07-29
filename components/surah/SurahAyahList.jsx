@@ -299,12 +299,12 @@ const SurahAyahList = ({
                       ? "bg-primaryColor dark:bg-emerald-500"
                       : "bg-primaryColor/10 dark:bg-emerald-500/10"
                   }`}>
-                    <span className={`text-[8px] md:text-[10px] font-bold ${
+                    <span className={`text-[7px] md:text-[9px] font-bold leading-none ${
                       isPlaying
                         ? "text-white"
                         : "text-primaryColor dark:text-primaryColor-light"
                     }`}>
-                      {idx + 1}
+                      {pageId}:{idx + 1}
                     </span>
                   </div>
                   
