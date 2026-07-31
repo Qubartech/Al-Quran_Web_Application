@@ -23,7 +23,16 @@ import {
   Target,
   Flame,
   BrainCircuit,
-  BookmarkCheck
+  BookmarkCheck,
+  Library,
+  ExternalLink,
+  BookMarked,
+  Globe,
+  ShieldCheck,
+  ChevronDown,
+  ChevronUp,
+  Eye,
+  EyeOff
 } from "lucide-react";
 
 export default function LearnPage() {
@@ -36,6 +45,7 @@ export default function LearnPage() {
   const [selectedLevelId, setSelectedLevelId] = useState("level-1");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [showResources, setShowResources] = useState(false);
 
   // Fetch progress from database if logged in, or fallback to localStorage
   useEffect(() => {
@@ -300,7 +310,7 @@ export default function LearnPage() {
         <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3 px-1">
           Select Academy Level
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-8 gap-3">
           {learnLevels.map((lvl) => {
             const isSelected = lvl.id === selectedLevelId;
             const lvlCompletedCount = lvl.modules.filter((m) =>
@@ -524,6 +534,184 @@ export default function LearnPage() {
           <Sparkles size={16} />
           Launch Level {selectedLevel.levelNumber} Quiz
         </button>
+      </div>
+
+      {/* Curriculum Resources & Reference Library Section */}
+      <div className="mt-12 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl glass border border-gray-200/60 dark:border-slate-800/80 shadow-sm">
+          <div>
+            <span className="text-xs font-black uppercase tracking-widest text-primaryColor dark:text-primaryColor-light flex items-center gap-2">
+              <Library size={16} />
+              Curriculum Sources & Bibliography
+            </span>
+            <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 mt-1">
+              Learning Resources & Reference Library
+            </h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mt-1">
+              All academy modules are curated from authentic classical Tajweed treatises, recognized Tafseers, and validated digital Quranic datasets.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
+              <ShieldCheck size={15} />
+              Verified Authentic
+            </div>
+
+            <button
+              onClick={() => setShowResources(!showResources)}
+              className="px-4 py-2.5 rounded-xl border border-gray-200/60 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 hover:bg-gray-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+            >
+              {showResources ? (
+                <>
+                  <EyeOff size={15} className="text-rose-500" />
+                  Hide Resources
+                  <ChevronUp size={15} />
+                </>
+              ) : (
+                <>
+                  <Eye size={15} className="text-primaryColor" />
+                  Show Resources
+                  <ChevronDown size={15} />
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Collapsible Resources Grid by Category */}
+        {showResources && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
+          {[
+            {
+              category: "Tajweed & Qaida Foundations",
+              icon: "📖",
+              items: [
+                {
+                  title: "Madani & Noorani Qaida Standards",
+                  author: "Traditional Articulation Benchmarks",
+                  description: "Fundamental primer for Arabic alphabet shapes, vocal makharij, and primary vowel movement exercises.",
+                  tag: "Core Primer",
+                  link: "https://quran.com"
+                },
+                {
+                  title: "Matn al-Jazariyyah",
+                  author: "Imam Ibn al-Jazari (751–833 AH)",
+                  description: "Classical poetic treatise detailing precise makharij, heavy/light letter rules, and waqf stopping principles.",
+                  tag: "Classic Tajweed Poem",
+                  link: "https://quran.com"
+                },
+                {
+                  title: "Tajweed Rules of the Quran",
+                  author: "Sheikh Dr. Ayman Swayd",
+                  description: "Comprehensive modern reference work covering Nun Sakinah, Meem Sakinah, Qalqala, and Madd elongations.",
+                  tag: "Tajweed Reference",
+                  link: "https://quran.com"
+                }
+              ]
+            },
+            {
+              category: "Quranic Vocabulary & Grammar",
+              icon: "💡",
+              items: [
+                {
+                  title: "80% of Quranic Vocabulary",
+                  author: "Dr. Abdulazeez Abdulraheem",
+                  description: "High-frequency word frequency list covering the most common nouns, pronouns, verbs, and prepositions in the Quran.",
+                  tag: "Vocabulary Guide",
+                  link: "https://quran.com"
+                },
+                {
+                  title: "Madinah Arabic Course (Nahw & Sarf)",
+                  author: "Dr. V. Abdur Rahim",
+                  description: "Systematic methodology for understanding Arabic grammar, triliteral roots, sentence structures, and morphology.",
+                  tag: "Grammar Course",
+                  link: "https://quran.com"
+                }
+              ]
+            },
+            {
+              category: "Tafseer & Context of Revelation",
+              icon: "🏛️",
+              items: [
+                {
+                  title: "Tafsir Ibn Kathir (تفسير ابن كثير)",
+                  author: "Imam Hafiz Ibn Kathir",
+                  description: "Classical Quranic exegesis detailing Asbab al-Nuzul (revelation context), Hadith authentications, and verse commentary.",
+                  tag: "Authentic Exegesis",
+                  link: "https://quran.com"
+                },
+                {
+                  title: "Ma'ariful Qur'an",
+                  author: "Mufti Muhammad Shafi",
+                  description: "Accessible contemporary Tafseer explaining moral wisdom, legal rulings, and thematic insights of each Surah.",
+                  tag: "Modern Tafseer",
+                  link: "https://quran.com"
+                }
+              ]
+            },
+            {
+              category: "Digital Quranic APIs & Datasets",
+              icon: "🌐",
+              items: [
+                {
+                  title: "Quran.com API v4",
+                  author: "Quran.com Engineering",
+                  description: "Verified digital Uthmani script, audio recitations by world-renowned Qaris, word-by-word translations, and metadata.",
+                  tag: "Verified API",
+                  link: "https://quran.com"
+                },
+                {
+                  title: "Tanzil Quran Text Project",
+                  author: "Tanzil.net Text Corpus",
+                  description: "Highly accurate, internationally verified Unicode text corpus of the Holy Quran.",
+                  tag: "Text Corpus",
+                  link: "https://tanzil.net"
+                }
+              ]
+            }
+          ].map((cat, idx) => (
+            <div
+              key={idx}
+              className="p-6 rounded-3xl glass border border-gray-200/60 dark:border-slate-800/80 shadow-sm flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100 dark:border-slate-800/80">
+                  <span className="text-2xl">{cat.icon}</span>
+                  <h3 className="text-base font-extrabold text-slate-800 dark:text-slate-100">
+                    {cat.category}
+                  </h3>
+                </div>
+
+                <div className="space-y-4">
+                  {cat.items.map((item, i) => (
+                    <div
+                      key={i}
+                      className="p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-gray-200/40 dark:border-slate-800/60 hover:border-primaryColor/30 transition-all"
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <h4 className="text-xs font-black text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                          <BookMarked size={13} className="text-primaryColor" />
+                          {item.title}
+                        </h4>
+                        <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-md bg-primaryColor/10 text-primaryColor dark:text-primaryColor-light shrink-0">
+                          {item.tag}
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 block mb-1">
+                        {item.author}
+                      </span>
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        )}
       </div>
 
       {/* Lesson Modal */}
