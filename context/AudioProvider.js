@@ -19,10 +19,24 @@ export default function AudioProvider({ children }) {
   const [title, setTitle] = useState("");
   const [pauseTick, setPauseTick] = useState(0);
   const [playTick, setPlayTick] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
 
   // Dynamic reciter states
   const [reciters, setReciters] = useState([]);
   const [reciterName, setReciterName] = useState("Mishary Rashid Alafasy");
+
+  // Track playback time
+  useEffect(() => {
+    const handleTimeUpdate = (e) => {
+      if (typeof e.detail?.currentTime === "number") {
+        setCurrentTime(e.detail.currentTime);
+      }
+    };
+    window.addEventListener("quran-audio-timeupdate", handleTimeUpdate);
+    return () => {
+      window.removeEventListener("quran-audio-timeupdate", handleTimeUpdate);
+    };
+  }, []);
 
   useEffect(() => {
     // Restore last audio on reload
@@ -91,9 +105,13 @@ export default function AudioProvider({ children }) {
   };
 
   // Play a Surah by fetching its recitation URL dynamically from the API based on current reciter
-  const playSurah = async (surahNumber, surahName = "") => {
+  const playSurah = async (surahNumber, surahName = "", startSeekTime = 0) => {
     const num = parseInt(surahNumber, 10);
     if (isNaN(num)) return;
+
+    if (typeof window !== "undefined" && typeof startSeekTime === "number" && startSeekTime > 0) {
+      window.pendingQuranAudioSeekTime = startSeekTime;
+    }
 
     let reciterId = "7";
     if (typeof window !== "undefined") {
@@ -126,6 +144,7 @@ export default function AudioProvider({ children }) {
     setPlaylist([]);
     setCurrentIndex(-1);
     setTitle("");
+    setCurrentTime(0);
     if (typeof window !== "undefined") {
       try {
         localStorage.removeItem("__audio_src__");
@@ -181,10 +200,39 @@ export default function AudioProvider({ children }) {
     setPlayTick((t) => t + 1);
   };
 
+  // Word tooltip toggle state
+  const [showWordTooltip, setShowWordTooltip] = useState(true);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("__audio_show_word_tooltip__");
+        if (saved !== null) {
+          setShowWordTooltip(saved === "true");
+        }
+      } catch (e) {}
+    }
+  }, []);
+
+  const toggleWordTooltip = () => {
+    setShowWordTooltip((prev) => {
+      const next = !prev;
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("__audio_show_word_tooltip__", String(next));
+        } catch (e) {}
+      }
+      return next;
+    });
+  };
+
   const value = {
     src,
     open,
     paused,
+    currentTime,
+    showWordTooltip,
+    toggleWordTooltip,
     play,
     playList,
     playSurah,

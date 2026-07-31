@@ -246,7 +246,12 @@ export default function JuzAyahList({
     const verseSeg = timestamps.find((t) => t.verse_key === verseKey);
     const seekTime = (verseSeg?.timestamp_from || 0) / 1000;
 
-    const isCurrentSurahPlaying = audio?.playlistId === surahNumber || audio?.playlistId === `surah_${surahNumber}`;
+    const isCurrentSurahPlaying =
+      audio?.src &&
+      (audio?.playlistId === surahNumber ||
+        audio?.playlistId === `surah_${surahNumber}` ||
+        String(audio?.playlistId) === String(surahNumber) ||
+        String(audio?.playlistId) === `surah_${surahNumber}`);
 
     if (isCurrentSurahPlaying) {
       window.dispatchEvent(
@@ -256,7 +261,7 @@ export default function JuzAyahList({
         audio?.resume();
       }
     } else {
-      audio?.playSurah(surahNumber, surahName);
+      audio?.playSurah(surahNumber, surahName, seekTime);
       
       // Log to Recently Played
       if (user && session?.access_token) {
@@ -329,20 +334,30 @@ export default function JuzAyahList({
             <div
               id={`juz_${juzId}_ayah_${idx}`}
               tabIndex={-1}
-              className={`px-3 md:px-6 py-6 flex gap-4 justify-between w-full transition-all duration-300 rounded-xl ${
+              className={`px-3 md:px-6 py-3 md:py-6 flex flex-col md:flex-row gap-2 md:gap-5 w-full transition-all duration-300 rounded-xl ${
                 isPlaying
                   ? "bg-primaryColor/5 border-l-4 border-primaryColor shadow-sm dark:bg-emerald-500/10"
                   : "border-b border-gray-250/50 dark:border-slate-800/50 hover:bg-gray-50/50 dark:hover:bg-slate-800/20"
               }`}
             >
-              {/* Play Button and Verse identifier */}
-              <div className="flex flex-col items-center justify-start min-w-[50px] pt-1">
-                <span className="text-xs font-bold text-gray-500 dark:text-gray-400">
-                  {verseKey}
-                </span>
-                <div className="mt-1">
+              {/* Action Controls — Right-aligned horizontal row on mobile, vertical column on desktop */}
+              <div className="flex flex-row md:flex-col items-center justify-end md:justify-center gap-2 md:gap-2.5 shrink-0 md:pt-0.5 min-w-[32px] md:min-w-[36px] w-full md:w-auto">
+                <div className={`ayah-badge w-8 h-8 md:w-9 md:h-9 shrink-0 transition-all ${
+                  isPlaying
+                    ? "bg-primaryColor dark:bg-emerald-500 shadow-md shadow-emerald-500/20"
+                    : "bg-primaryColor/10 dark:bg-emerald-500/10"
+                }`}>
+                  <span className={`text-[7.5px] md:text-[9px] font-black leading-none ${
+                    isPlaying
+                      ? "text-white"
+                      : "text-primaryColor dark:text-primaryColor-light"
+                  }`}>
+                    {verseKey}
+                  </span>
+                </div>
+                <div>
                   {loadingSurah === surahNumber ? (
-                    <div className="w-6 h-6 border-2 border-primaryColor border-t-transparent rounded-full animate-spin mt-2" />
+                    <div className="w-8 h-8 border-2 border-primaryColor border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <SurahPlayBtn
                       isPlaying={
@@ -357,19 +372,17 @@ export default function JuzAyahList({
                   )}
                 </div>
                 {/* BOOKMARK BUTTON */}
-                <div className="w-full flex justify-center mt-2">
-                  <button
-                    onClick={() => toggleBookmark(idx)}
-                    className={`p-1.5 rounded-lg hover:bg-gray-155 dark:hover:bg-slate-800 transition-colors ${
-                      bookmarks[`${surahNumber}_${parseInt(verseKey.split(":")[1], 10)}`]
-                        ? "text-emerald-500"
-                        : "text-gray-400 hover:text-emerald-500"
-                    }`}
-                    title="Bookmark Ayah"
-                  >
-                    <Bookmark size={15} fill={bookmarks[`${surahNumber}_${parseInt(verseKey.split(":")[1], 10)}`] ? "currentColor" : "none"} />
-                  </button>
-                </div>
+                <button
+                  onClick={() => toggleBookmark(idx)}
+                  className={`w-8 h-8 md:w-9 md:h-9 rounded-xl flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer ${
+                    bookmarks[`${surahNumber}_${parseInt(verseKey.split(":")[1], 10)}`]
+                      ? "text-emerald-500 bg-emerald-500/10"
+                      : "text-gray-400 hover:text-emerald-500 hover:bg-emerald-500/10"
+                  }`}
+                  title="Bookmark Ayah"
+                >
+                  <Bookmark size={14} fill={bookmarks[`${surahNumber}_${parseInt(verseKey.split(":")[1], 10)}`] ? "currentColor" : "none"} className="shrink-0" />
+                </button>
               </div>
 
               {/* Verse Content */}
@@ -390,18 +403,24 @@ export default function JuzAyahList({
                       const wordTranslit = word.transliteration?.text;
 
                       const isActiveWord = isPlaying && activeWordIndex === wIdx;
-                      const isHighlightStyle = isActiveWord;
                       const isDimmedStyle = isPlaying && activeWordIndex !== -1 && !isActiveWord;
+                      const shouldShowAutoTooltip = isActiveWord && (audio?.showWordTooltip ?? true);
 
                       return (
                         <div
                           key={wIdx}
-                          className="relative flex flex-col items-center justify-center p-1 rounded-md hover:bg-gray-150 dark:hover:bg-slate-800/40 transition-all duration-200 group cursor-pointer border border-transparent hover:border-gray-200/30 dark:hover:border-slate-700/30"
+                          className={`relative flex flex-col items-center justify-center px-1.5 py-1 rounded-xl transition-all duration-200 group cursor-pointer outline-none focus:outline-none ${
+                            isActiveWord
+                              ? "bg-emerald-500/15 dark:bg-emerald-400/20 border border-emerald-500/40 dark:border-emerald-400/50 shadow-md shadow-emerald-500/15 scale-105 z-10"
+                              : isDimmedStyle
+                              ? "border border-transparent opacity-40 hover:opacity-100"
+                              : "border border-transparent hover:bg-gray-100/70 dark:hover:bg-slate-800/40 hover:border-gray-200/30 dark:hover:border-slate-700/30"
+                          }`}
                         >
                           <span
                             className={`font-semibold select-none transition-all duration-150 font-arabic ayah-arabic-text ${
-                              isHighlightStyle
-                                ? "text-primaryColor scale-110 font-bold"
+                              isActiveWord
+                                ? "text-emerald-600 dark:text-emerald-300 font-bold drop-shadow-[0_2px_8px_rgba(16,185,129,0.3)]"
                                 : isDimmedStyle
                                 ? "text-gray-900/30 dark:text-gray-100/30"
                                 : "text-gray-900 dark:text-gray-100 group-hover:text-primaryColor"
@@ -411,20 +430,22 @@ export default function JuzAyahList({
                             {wordText}
                           </span>
 
-                          {/* Tooltip on Hover */}
+                          {/* Tooltip on Hover OR when Word is Active (controlled by user setting) */}
                           {isWord && (wordTrans || wordTranslit) && (
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center bg-gray-900 dark:bg-slate-800 text-white text-[11px] p-2 rounded shadow-lg z-30 pointer-events-none whitespace-nowrap min-w-[60px] border border-gray-700 dark:border-slate-700">
+                            <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2.5 flex-col items-center bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white text-[11px] p-2 rounded-xl shadow-2xl z-30 pointer-events-none whitespace-nowrap min-w-[65px] border border-emerald-500/30 transition-all duration-200 ${
+                              shouldShowAutoTooltip ? "flex animate-fadeIn" : "hidden group-hover:flex"
+                            }`}>
                               {wordTranslit && (
-                                <span className="font-semibold text-gray-300 font-sans tracking-wide mb-0.5" dir="ltr">
+                                <span className="font-bold text-emerald-300 font-sans tracking-wide mb-0.5" dir="ltr">
                                   {wordTranslit}
                                 </span>
                               )}
                               {wordTrans && (
-                                <span className="text-gray-400 font-sans text-center font-normal leading-normal" dir="ltr">
+                                <span className="text-gray-200 font-sans text-center font-normal leading-normal" dir="ltr">
                                   {wordTrans}
                                 </span>
                               )}
-                              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-gray-900 dark:border-t-slate-800"></div>
+                              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-slate-900 dark:border-t-slate-800"></div>
                             </div>
                           )}
                         </div>

@@ -272,7 +272,8 @@ export default function useSettings() {
         num = parseInt(audio.playlistId, 10);
       }
       if (num) {
-        audio.playSurah(num, audio.title || "");
+        const currentPos = audio?.currentTime || 0;
+        audio.playSurah(num, audio.title || "", currentPos);
       }
     }
 

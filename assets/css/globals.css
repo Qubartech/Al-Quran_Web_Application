@@ -345,6 +345,15 @@
   animation: subtleGlow 2.5s ease-in-out infinite;
 }
 
+/* Remove default harsh browser outlines for focused verse cards & elements */
+.verse-card,
+[tabindex="-1"]:focus,
+[tabindex="-1"]:focus-visible,
+button:focus,
+button:focus-visible {
+  outline: none !important;
+}
+
 /* Islamic star / octagonal badge for ayah numbers */
 .ayah-badge {
   clip-path: polygon(
