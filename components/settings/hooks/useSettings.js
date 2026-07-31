@@ -332,7 +332,7 @@ export default function useSettings() {
     identifier,
     fontSize,
     arabicFontSize,
-    reciterId,
+    showWordTooltip: audio?.showWordTooltip ?? true,
     // handlers
     handleThemeChange,
     handleLanguageChange,
@@ -340,6 +340,7 @@ export default function useSettings() {
     handleFontSizeChange,
     handleArabicFontSizeChange,
     handleReciterIdChange,
+    handleToggleWordTooltip: audio?.toggleWordTooltip,
     resetAll,
   };
 }

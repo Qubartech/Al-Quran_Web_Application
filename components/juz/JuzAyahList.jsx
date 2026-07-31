@@ -409,18 +409,18 @@ export default function JuzAyahList({
                       return (
                         <div
                           key={wIdx}
-                          className={`relative flex flex-col items-center justify-center px-1.5 py-1 rounded-xl transition-all duration-200 group cursor-pointer outline-none focus:outline-none ${
+                          className={`relative flex flex-col items-center justify-center p-1 rounded-lg transition-all duration-200 group cursor-pointer outline-none focus:outline-none ${
                             isActiveWord
-                              ? "bg-emerald-500/15 dark:bg-emerald-400/20 border border-emerald-500/40 dark:border-emerald-400/50 shadow-md shadow-emerald-500/15 scale-105 z-10"
+                              ? "z-10"
                               : isDimmedStyle
-                              ? "border border-transparent opacity-40 hover:opacity-100"
-                              : "border border-transparent hover:bg-gray-100/70 dark:hover:bg-slate-800/40 hover:border-gray-200/30 dark:hover:border-slate-700/30"
+                              ? "opacity-40 hover:opacity-100"
+                              : "hover:bg-gray-100/70 dark:hover:bg-slate-800/40"
                           }`}
                         >
                           <span
                             className={`font-semibold select-none transition-all duration-150 font-arabic ayah-arabic-text ${
                               isActiveWord
-                                ? "text-emerald-600 dark:text-emerald-300 font-bold drop-shadow-[0_2px_8px_rgba(16,185,129,0.3)]"
+                                ? "text-emerald-500 dark:text-emerald-400 font-bold scale-110 drop-shadow-[0_2px_10px_rgba(16,185,129,0.4)]"
                                 : isDimmedStyle
                                 ? "text-gray-900/30 dark:text-gray-100/30"
                                 : "text-gray-900 dark:text-gray-100 group-hover:text-primaryColor"
