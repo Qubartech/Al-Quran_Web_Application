@@ -158,10 +158,17 @@ const SurahAyahList = ({
   function playControl(ayahIndex) {
     const targetAyah = arabicAyah[ayahIndex];
     if (!targetAyah) return;
-    const seekTime = targetAyah.timestamp_from / 1000;
+    const seekTime = (targetAyah.timestamp_from || 0) / 1000;
+
+    const isCurrentSurahPlaying =
+      audio?.src &&
+      (audio?.playlistId === pageId ||
+        audio?.playlistId === `surah_${pageId}` ||
+        String(audio?.playlistId) === String(pageId) ||
+        String(audio?.playlistId) === `surah_${pageId}`);
 
     // Check if the full Surah audio is already playing
-    if (audio?.playlistId === pageId || audio?.playlistId === `surah_${pageId}`) {
+    if (isCurrentSurahPlaying) {
       window.dispatchEvent(
         new CustomEvent("quran-audio-seek", { detail: { time: seekTime } })
       );
@@ -169,8 +176,8 @@ const SurahAyahList = ({
         audio?.resume();
       }
     } else {
-      // Load and play the full Surah audio
-      audio?.playSurah(pageId, surahName);
+      // Load and play full Surah starting from exact Ayah timestamp
+      audio?.playSurah(pageId, surahName, seekTime);
       
       // Log to Recently Played
       if (user && session?.access_token) {
@@ -187,13 +194,6 @@ const SurahAyahList = ({
           }),
         }).catch((err) => console.error("Error logging recent play:", err));
       }
-
-      // Wait for player state to populate, then seek
-      setTimeout(() => {
-        window.dispatchEvent(
-          new CustomEvent("quran-audio-seek", { detail: { time: seekTime } })
-        );
-      }, 300);
     }
   }
 
@@ -279,27 +279,27 @@ const SurahAyahList = ({
           return (
             <div
               key={idx}
-              className="animate-slideUp"
+              className="animate-slideUp outline-none focus:outline-none focus-visible:outline-none"
               id={`sura_${pageId}_ayah_${idx + 1}`}
               tabIndex={-1}
               style={{ animationDelay: animDelay }}
             >
-              <div className={`px-3 md:px-6 py-3 md:py-6 flex flex-col md:flex-row gap-2 md:gap-5 w-full transition-all duration-300 rounded-xl verse-card ${
+              <div className={`px-3 md:px-6 py-3 md:py-6 flex flex-col md:flex-row gap-2 md:gap-5 w-full transition-all duration-300 rounded-xl verse-card outline-none focus:outline-none ${
                 isPlaying
-                  ? "bg-primaryColor/[0.06] dark:bg-emerald-500/[0.08] border border-primaryColor/20 dark:border-emerald-500/20 verse-active-glow shadow-sm"
+                  ? "bg-primaryColor/[0.06] dark:bg-emerald-500/[0.08] border border-primaryColor/25 dark:border-emerald-500/25 verse-active-glow shadow-sm"
                   : "bg-white/20 dark:bg-slate-900/10 border border-gray-200/20 dark:border-slate-800/20 hover:border-gray-300/30 dark:hover:border-slate-700/30"
               }`}>
                 
-                {/* Action Controls — Horizontal row on mobile, vertical column on desktop */}
-                <div className="flex flex-row md:flex-col items-center gap-2 md:gap-2 shrink-0 md:pt-0.5">
+                {/* Action Controls — Right-aligned horizontal row on mobile, vertical column on desktop */}
+                <div className="flex flex-row md:flex-col items-center justify-end md:justify-center gap-2 md:gap-2.5 shrink-0 md:pt-0.5 min-w-[32px] md:min-w-[36px] w-full md:w-auto">
                   
                   {/* Islamic Star Ayah Badge */}
-                  <div className={`ayah-badge w-7 h-7 md:w-10 md:h-10 shrink-0 ${
+                  <div className={`ayah-badge w-8 h-8 md:w-9 md:h-9 shrink-0 transition-all ${
                     isPlaying
-                      ? "bg-primaryColor dark:bg-emerald-500"
+                      ? "bg-primaryColor dark:bg-emerald-500 shadow-md shadow-emerald-500/20"
                       : "bg-primaryColor/10 dark:bg-emerald-500/10"
                   }`}>
-                    <span className={`text-[7px] md:text-[9px] font-bold leading-none ${
+                    <span className={`text-[8px] md:text-[9.5px] font-black leading-none ${
                       isPlaying
                         ? "text-white"
                         : "text-primaryColor dark:text-primaryColor-light"
@@ -330,14 +330,14 @@ const SurahAyahList = ({
                   {/* Bookmark Button */}
                   <button
                     onClick={() => toggleBookmark(idx)}
-                    className={`p-1 md:p-1.5 rounded-lg transition-all duration-200 ${
+                    className={`w-8 h-8 md:w-9 md:h-9 rounded-xl flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer ${
                       bookmarks[`${pageId}_${idx + 1}`]
                         ? "text-emerald-500 bg-emerald-500/10"
-                        : "text-gray-400 hover:text-emerald-500 hover:bg-emerald-500/5"
+                        : "text-gray-400 hover:text-emerald-500 hover:bg-emerald-500/10"
                     }`}
                     title="Bookmark Ayah"
                   >
-                    <Bookmark size={12} className="md:w-3.5 md:h-3.5" fill={bookmarks[`${pageId}_${idx + 1}`] ? "currentColor" : "none"} />
+                    <Bookmark size={14} fill={bookmarks[`${pageId}_${idx + 1}`] ? "currentColor" : "none"} className="shrink-0" />
                   </button>
                 </div>
 
@@ -348,7 +348,7 @@ const SurahAyahList = ({
                       const activeWordIndex = getActiveWordIndex(ayah, audioCurrentTime);
                       return (
                         <div
-                          className="flex flex-wrap gap-x-3 gap-y-5 justify-start w-full pb-5"
+                          className="flex flex-wrap gap-x-2.5 gap-y-4 justify-start w-full pb-5"
                           dir="rtl"
                         >
                           {ayah.words.map((word, wIdx) => {
@@ -361,19 +361,25 @@ const SurahAyahList = ({
                             const wordTranslit = word.transliteration?.text;
 
                             const isActiveWord = isPlaying && activeWordIndex === wIdx;
-                            const isHighlightStyle = isActiveWord;
                             const isDimmedStyle = isPlaying && activeWordIndex !== -1 && !isActiveWord;
+                            const shouldShowAutoTooltip = isActiveWord && (audio?.showWordTooltip ?? true);
 
                             return (
                               <div
                                 key={wIdx}
-                                className="relative flex flex-col items-center justify-center p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/30 transition-all duration-200 group cursor-pointer border border-transparent hover:border-gray-200/30 dark:hover:border-gray-700/30"
+                                className={`relative flex flex-col items-center justify-center p-1 rounded-lg transition-all duration-200 group cursor-pointer outline-none focus:outline-none ${
+                                  isActiveWord
+                                    ? "z-10"
+                                    : isDimmedStyle
+                                    ? "opacity-40 hover:opacity-100"
+                                    : "hover:bg-gray-100/70 dark:hover:bg-slate-800/40"
+                                }`}
                               >
                                 {/* Arabic word */}
                                 <span
                                   className={`font-semibold select-none transition-all duration-150 font-arabic ayah-arabic-text ${
-                                    isHighlightStyle
-                                      ? "text-primaryColor scale-110 font-bold"
+                                    isActiveWord
+                                      ? "text-emerald-500 dark:text-emerald-400 font-bold scale-110 drop-shadow-[0_2px_10px_rgba(16,185,129,0.4)]"
                                       : isDimmedStyle
                                       ? "text-gray-900/30 dark:text-gray-100/30"
                                       : "text-gray-900 dark:text-gray-100 group-hover:text-primaryColor"
@@ -383,21 +389,23 @@ const SurahAyahList = ({
                                   {wordText}
                                 </span>
 
-                                {/* Tooltip on Hover */}
+                                {/* Tooltip on Hover OR when Word is Active (controlled by user setting) */}
                                 {isWord && (wordTrans || wordTranslit) && (
-                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center bg-gray-900/95 dark:bg-gray-800/95 backdrop-blur-sm text-white text-[11px] p-2.5 rounded-lg shadow-xl z-30 pointer-events-none whitespace-nowrap min-w-[60px] border border-gray-700/50 transition-all duration-200">
+                                  <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2.5 flex-col items-center bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white text-[11px] p-2 rounded-xl shadow-2xl z-30 pointer-events-none whitespace-nowrap min-w-[65px] border border-emerald-500/30 transition-all duration-200 ${
+                                    shouldShowAutoTooltip ? "flex animate-fadeIn" : "hidden group-hover:flex"
+                                  }`}>
                                     {wordTranslit && (
-                                      <span className="font-semibold text-emerald-300 font-sans tracking-wide mb-0.5" dir="ltr">
+                                      <span className="font-bold text-emerald-300 font-sans tracking-wide mb-0.5" dir="ltr">
                                         {wordTranslit}
                                       </span>
                                     )}
                                     {wordTrans && (
-                                      <span className="text-gray-300 font-sans text-center font-normal leading-normal" dir="ltr">
+                                      <span className="text-gray-200 font-sans text-center font-normal leading-normal" dir="ltr">
                                         {wordTrans}
                                       </span>
                                     )}
                                     {/* Tooltip triangle arrow */}
-                                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-gray-900 dark:border-t-gray-800"></div>
+                                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-slate-900 dark:border-t-slate-800"></div>
                                   </div>
                                 )}
                               </div>

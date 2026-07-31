@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useAudio } from "@/context/AudioProvider";
 import {
   Play,
   Pause,
@@ -11,6 +12,7 @@ import {
   X,
   Repeat,
   Loader2,
+  Languages,
 } from "lucide-react";
 
 function SurahAudioPlayer({
@@ -101,10 +103,15 @@ function SurahAudioPlayer({
     };
   }, []);
 
-  // Reset state on src change
+  // Reset state on src change, preserving pending seek time if present
   useEffect(() => {
     setActiveAyahIndex(-1);
-    setCurrentTime(0);
+    const pending = typeof window !== "undefined" ? window.pendingQuranAudioSeekTime : null;
+    if (typeof pending === "number" && pending > 0) {
+      setCurrentTime(pending);
+    } else {
+      setCurrentTime(0);
+    }
     setDuration(0);
   }, [src]);
 
@@ -115,12 +122,16 @@ function SurahAudioPlayer({
 
     const handleSeek = (e) => {
       if (typeof e.detail.time === "number") {
+        const targetTime = e.detail.time;
         if (audioEl.readyState < 1) {
           if (typeof window !== "undefined") {
-            window.pendingQuranAudioSeekTime = e.detail.time;
+            window.pendingQuranAudioSeekTime = targetTime;
           }
         } else {
-          audioEl.currentTime = e.detail.time;
+          try {
+            audioEl.currentTime = targetTime;
+            setCurrentTime(targetTime);
+          } catch (err) {}
         }
       }
     };
@@ -131,27 +142,33 @@ function SurahAudioPlayer({
     };
   }, [src]);
 
-  // Execute pending seeks when metadata loads
+  // Execute pending seeks when metadata loads or audio starts playing
   useEffect(() => {
     const audioEl = audioRef.current;
     if (!audioEl) return;
 
     const handleLoadedMetadata = () => {
-      setDuration(audioEl.duration);
+      if (audioEl.duration) setDuration(audioEl.duration);
       if (
         typeof window !== "undefined" &&
         typeof window.pendingQuranAudioSeekTime === "number"
       ) {
-        audioEl.currentTime = window.pendingQuranAudioSeekTime;
+        const seekTime = window.pendingQuranAudioSeekTime;
         window.pendingQuranAudioSeekTime = null;
+        try {
+          audioEl.currentTime = seekTime;
+          setCurrentTime(seekTime);
+        } catch (e) {}
       }
     };
 
     audioEl.addEventListener("loadedmetadata", handleLoadedMetadata);
     audioEl.addEventListener("canplay", handleLoadedMetadata);
+    audioEl.addEventListener("play", handleLoadedMetadata);
     return () => {
       audioEl.removeEventListener("loadedmetadata", handleLoadedMetadata);
       audioEl.removeEventListener("canplay", handleLoadedMetadata);
+      audioEl.removeEventListener("play", handleLoadedMetadata);
     };
   }, [src]);
 
@@ -171,6 +188,9 @@ function SurahAudioPlayer({
   }, [playTick]);
 
   if (!src) return null;
+
+  const audioCtx = useAudio();
+  const showWordTooltip = audioCtx?.showWordTooltip ?? true;
 
   // Audio HTML5 Events
   const handleTimeUpdate = () => {
@@ -418,6 +438,20 @@ function SurahAudioPlayer({
               aria-label="Toggle repeat"
             >
               <Repeat size={15} className={isLooping ? "stroke-[2.5px]" : ""} />
+            </button>
+
+            {/* Word Meaning Tooltip Toggle */}
+            <button
+              onClick={audioCtx?.toggleWordTooltip}
+              className={`p-1.5 rounded-full transition-all ${
+                showWordTooltip
+                  ? "text-emerald-500 bg-emerald-500/10 dark:bg-emerald-500/20"
+                  : "text-slate-400 hover:text-slate-655 dark:text-slate-500 dark:hover:text-slate-300 opacity-60"
+              }`}
+              title={showWordTooltip ? "Word Tooltips: AUTO POPUP ON (Click to Disable)" : "Word Tooltips: OFF (Click to Enable)"}
+              aria-label="Toggle word meaning popup"
+            >
+              <Languages size={15} className={showWordTooltip ? "stroke-[2.5px]" : ""} />
             </button>
 
             {/* Playback speed menu */}

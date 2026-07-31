@@ -17,6 +17,7 @@ import LanguageSelect from "@/components/settings/LanguageSelect";
 import TranslationSelect from "@/components/settings/TranslationSelect";
 import ReciterSelect from "@/components/settings/ReciterSelect";
 import FontSizeControls from "@/components/settings/FontSizeControls";
+import WordTooltipToggle from "@/components/settings/WordTooltipToggle";
 import SettingsResetButton from "@/components/settings/SettingsResetButton";
 import useSettings from "@/components/settings/hooks/useSettings";
 
@@ -31,12 +32,14 @@ export default function SettingsDrawer({ open, onClose }) {
     fontSize,
     arabicFontSize,
     reciterId,
+    showWordTooltip,
     handleThemeChange,
     handleLanguageChange,
     handleIdentifierChange,
     handleFontSizeChange,
     handleArabicFontSizeChange,
     handleReciterIdChange,
+    handleToggleWordTooltip,
     resetAll,
   } = useSettings();
 
@@ -104,7 +107,15 @@ export default function SettingsDrawer({ open, onClose }) {
             />
           </div>
 
-          {/* Card 4: Typography & Live Preview */}
+          {/* Card 4: Word Meaning Tooltip Toggle */}
+          <div className="p-4 rounded-2xl bg-white/70 dark:bg-slate-900/60 border border-gray-200/60 dark:border-slate-800/80 shadow-sm">
+            <WordTooltipToggle
+              checked={showWordTooltip}
+              onChange={handleToggleWordTooltip}
+            />
+          </div>
+
+          {/* Card 5: Typography & Live Preview */}
           <div className="p-4 rounded-2xl bg-white/70 dark:bg-slate-900/60 border border-gray-200/60 dark:border-slate-800/80 shadow-sm">
             <FontSizeControls
               fontSize={fontSize}

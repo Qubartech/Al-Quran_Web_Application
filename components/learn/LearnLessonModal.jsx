@@ -76,18 +76,23 @@ export default function LearnLessonModal({ module, levelTitle, onClose, onComple
               {currentSlide.gridItems.map((item, idx) => (
                 <div
                   key={idx}
-                  className="p-3.5 rounded-2xl glass border border-gray-200/50 dark:border-slate-800/80 text-center flex flex-col items-center justify-between group hover:border-primaryColor/40 transition-all shadow-sm"
+                  className="p-3 rounded-2xl glass border border-gray-200/50 dark:border-slate-800/80 text-center flex flex-col items-center justify-between group hover:border-primaryColor/40 transition-all shadow-sm"
                 >
                   <span className="font-arabic text-3xl font-bold text-slate-800 dark:text-slate-100 group-hover:text-primaryColor transition-colors">
                     {item.arabic}
                   </span>
-                  <div className="mt-2 text-center">
+                  <div className="mt-1.5 text-center w-full">
                     <span className="text-xs font-extrabold text-primaryColor dark:text-primaryColor-light block">
                       {item.name}
                     </span>
                     <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium block truncate">
                       {item.trans}
                     </span>
+                    {item.tip && (
+                      <span className="text-[9px] text-amber-600 dark:text-amber-400 font-bold block mt-1 leading-tight line-clamp-2">
+                        {item.tip}
+                      </span>
+                    )}
                   </div>
                 </div>
               ))}
