@@ -104,7 +104,7 @@ export default function AudioProvider({ children }) {
     }
   };
 
-  // Play a Surah by fetching its recitation URL dynamically from the API based on current reciter
+  // Play a Surah by fetching its recitation URL dynamically based on current reciter
   const playSurah = async (surahNumber, surahName = "", startSeekTime = 0) => {
     const num = parseInt(surahNumber, 10);
     if (isNaN(num)) return;
@@ -118,23 +118,38 @@ export default function AudioProvider({ children }) {
       reciterId = localStorage.getItem("app_reciter_id") || "7";
     }
 
+    // Direct CDN URL mapping for instant synchronous playback inside user gesture
+    const reciterCdnMap = {
+      "1": `https://download.quranicaudio.com/qdc/abdul_baset/mujawwad/${num}.mp3`,
+      "2": `https://download.quranicaudio.com/qdc/abdul_baset/murattal/${num}.mp3`,
+      "3": `https://download.quranicaudio.com/qdc/abu_bakr_shatri/murattal/${num}.mp3`,
+      "4": `https://download.quranicaudio.com/qdc/hani_ar_rifai/murattal/${num}.mp3`,
+      "5": `https://download.quranicaudio.com/qdc/khalil_al_husary/murattal/${num}.mp3`,
+      "6": `https://download.quranicaudio.com/qdc/siddiq_minshawi/murattal/${num}.mp3`,
+      "7": `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${num}.mp3`,
+      "8": `https://download.quranicaudio.com/qdc/saud_ash_shuraym/murattal/${num}.mp3`,
+      "9": `https://download.quranicaudio.com/qdc/siddiq_minshawi/mujawwad/${num}.mp3`,
+      "10": `https://download.quranicaudio.com/qdc/saad_al_ghamdi/murattal/${num}.mp3`,
+    };
+
+    const initialUrl = reciterCdnMap[reciterId] || `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${num}.mp3`;
+    
+    // Immediately start playback in user click gesture context
+    playList([initialUrl], 0, `surah_${num}`, surahName);
+
+    // Fetch API asynchronously in background to sync custom URLs if needed
     try {
       const res = await fetch(`https://api.quran.com/api/v4/chapter_recitations/${reciterId}/${num}`);
       if (res.ok) {
         const data = await res.json();
-        const audioUrl = data.audio_file?.audio_url;
-        if (audioUrl) {
-          playList([audioUrl], 0, `surah_${num}`, surahName);
-          return;
+        const apiAudioUrl = data.audio_file?.audio_url;
+        if (apiAudioUrl && apiAudioUrl !== initialUrl) {
+          setSrc(apiAudioUrl);
         }
       }
     } catch (e) {
       console.error("Failed to fetch recitation from API:", e);
     }
-
-    // Fallback to Mishary
-    const fallbackUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${num}.mp3`;
-    playList([fallbackUrl], 0, `surah_${num}`, surahName);
   };
 
   const close = () => {
