@@ -1,30 +1,52 @@
-# 📖 Al-Quran Application (Next.js)
+# 📖 Al-Quran Application (Next.js 13+ App Router)
 
-A modern, feature-rich, interactive web application built with **Next.js (App Router)**, **Tailwind CSS**, and **Prisma & Supabase** for reading, searching, exploring, and listening to the Holy Quran.
+A state-of-the-art, feature-rich, interactive web application built with **Next.js (App Router)**, **Tailwind CSS**, **Prisma ORM**, and **Supabase** for reading, searching, exploring, listening to, and learning the Holy Quran.
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-- 📖 **Surah Directory**: Browse all 114 Surahs with Meccan/Medinan tags, English translations, verse counts, audio playback, and instant search/sorting.
-- 📚 **Juz Directory**: Explore the 30 partitions (Paras) of the Holy Quran with starting/ending verse details, quick audio play, and list/grid views.
-- 🎨 **Premium Sidebar UI**: Sleek glassmorphic sidebar featuring active route highlighting, smooth transition states, search query clearing, and automatic scroll-to-view of active items.
-- 🎧 **Centralized Dynamic Audio Streaming**: Dynamic chapter and segment streaming fetched on-the-fly from the Quran.com API, eliminating hardcoded local audio files.
-- 🎙️ **Dynamic Reciter Controls**: Settings drawer and Profile modal allow changing reciters in real-time. Choices are fetched dynamically from the Quran.com resources API.
-- 🔄 **Profile & Settings Sync**: Settings (Theme, Translation Language, Edition, Font Size, and Reciter Preference) are stored in cookies (preventing layout shift) and synced directly to the user's database profile when authenticated.
-- 🔍 **Dynamic Text Scaling**: Responsive sliding controls for both Translation and Arabic font sizes that dynamically update both normal reading and word-by-word layouts in real-time.
-- 🕌 **Prayer Times (Namaz)**: Live calculation of Islamic daily prayer schedules.
-- 🔍 **Global Search**: Quick search modal for finding Surahs, Juz, and Ayahs instantly.
-- 📌 **Bookmarks & Favorites**: Track recent activity, save favorite Ayahs, and manage bookmarks (backed by Prisma/Supabase).
+### 🕌 1. Surah & Juz Reading Experience
+- 📖 **Surah Directory**: Browse all 114 Surahs with Meccan/Medinan tags, English translations, verse counts, quick audio playback, and instant search/filtering.
+- 🎨 **Grand Islamic Hero Banner**: Majestic header with Rub el Hizb 8-pointed star geometric pattern backdrop, Mihrab arch silhouettes, gradient Arabic calligraphy, and a 1-click **"Play Full Surah"** button.
+- 📚 **Juz / Para Directory**: Explore all 30 partitions (Paras) with starting/ending verse keys, quick audio play, and responsive grid views.
+- ✨ **Text-Only Active Word Highlight**: Synchronized audio word-by-word highlight featuring a vibrant emerald text glow without bulky container boxes.
+- 🌐 **Word Meaning Tooltips & User Toggle**: Auto-popup translation & transliteration tooltips during recitation with full user toggle control (accessible via the Floating Audio Player toolbar and the Settings Drawer).
+
+### 🎓 2. Comprehensive Quran Learning Academy (`/learn`)
+- 🏆 **8 Complete Academy Levels (33 Curriculum Modules)**:
+  - **Level 1**: *Arabic Alphabets & Qaida* (All 28 Arabic letters with vocal tract Makharij articulation tips across interactive slides).
+  - **Level 2**: *Essential Tajweed Rules* (Ghunnah, Noon Sakinah, Meem Sakinah, Qalqalah, Madd).
+  - **Level 3**: *Quranic Vocabulary & Roots* (Top 100 high-frequency Quranic words & root verbs).
+  - **Level 4**: *Quranic Arabic Grammar* (Nouns, Verbs, Particles, Pronouns, Sentence Structures).
+  - **Level 5**: *Tafseer & Contextual Study* (Asbab al-Nuzul, Surah themes, and historical contexts).
+  - **Level 6**: *Hifz & Memorization Techniques* (Spaced repetition, visual page anchoring, revision loops).
+  - **Level 7**: *Advanced Qira'at & Variant Recitations* (The 10 Mutawatir Qira'at, Warsh vs. Hafs, Shatibiyyah rules, and Isnad chains).
+  - **Level 8**: *Advanced Quranic Rhetoric & Eloquence (Balagha)* (Ilm al-Bayan metaphors, Ilm al-Ma'ani word order emphasis/Taqdeem, and structural I'jaz inimitability).
+- ✍️ **130+ Interactive Quiz Questions**: Comprehensive multi-choice quizzes with instant feedback, explanations, retry mechanisms, and academy score counters.
+- 📚 **Collapsible Reference Library**: Collapsible resource section showcasing 4 curriculum resource categories (Tajweed foundations, Quranic vocabulary, Tafseer context, and digital datasets).
+
+### 🎧 3. Centralized Audio & Player Controls
+- ⚡ **Instant Synchronous Audio Playback**: Direct Reciter CDN mapping ensures instant playback on user clicks, completely bypassing browser autoplay policy restrictions.
+- 🔄 **Reciter Hot-Swapping**: Seamlessly change reciters mid-verse without losing your current audio timestamp or position.
+- 🎵 **Floating Audio Player**: Glassmorphic player card with timeline seeking, repeat loop, speed controls (`0.5x` to `2x`), volume slider, and word tooltip auto-popup toggle button.
+
+### ⚙️ 4. Personalization & Settings
+- 🎨 **Theme Toggle**: Light, Dark, and System preference support with zero FOUC.
+- 🌐 **Language & Translation Selection**: Multi-language translations fetched dynamically from Quran.com API.
+- 🔤 **Dynamic Font Resizing**: Independent sliders for Arabic script size and Translation font size.
+- 🔄 **Settings Persistence & Sync**: Settings persist via cookies and `localStorage`, automatically syncing to PostgreSQL database profiles when logged in.
+- 📱 **RTL-Optimized Mobile Layout**: Right-aligned action controls on mobile screens matching natural Arabic Right-to-Left reading flow.
 
 ---
 
 ## 🛠️ Tech Stack
 
 - **Framework**: [Next.js 13+ (App Router)](https://nextjs.org/)
-- **UI & Styling**: [Tailwind CSS](https://tailwindcss.com/), Lucide Icons, Radix UI primitives
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/), Vanilla CSS design system, Lucide Icons
 - **Database & Auth**: [Prisma ORM](https://www.prisma.io/), PostgreSQL / [Supabase](https://supabase.com/)
-- **State & Audio**: React Context API (`AudioProvider`, `UserProvider`)
+- **State Management**: React Context API (`AudioProvider`, `UserProvider`)
+- **API Integration**: Quran.com API v4 (Verses, Translations, Recitations, Segments)
 
 ---
 
@@ -32,11 +54,9 @@ A modern, feature-rich, interactive web application built with **Next.js (App Ro
 
 ### 1. Prerequisites
 
-Make sure you have Node.js (v18+) installed on your machine.
+Node.js (v18+) and npm/yarn installed on your machine.
 
 ### 2. Installation
-
-Clone the repository and install dependencies:
 
 ```bash
 git clone https://github.com/TahirAhmad01/Quran_Application_With_NextJs.git
@@ -44,9 +64,9 @@ cd Quran_Application_With_NextJs
 npm install
 ```
 
-### 3. Environment Variables
+### 3. Environment Setup
 
-Create a `.env` file in the root directory and set up your Supabase & database connection strings:
+Create a `.env` file in the root directory:
 
 ```env
 DATABASE_URL="your-postgresql-database-url"
@@ -61,16 +81,16 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to view the app.
+Open [http://localhost:3000](http://localhost:3000) with your browser.
 
 ---
 
 ## 📦 Scripts
 
-- `npm run dev` — Starts the development server
-- `npm run build` — Runs Prisma code generation and builds the application for production
-- `npm run start` — Starts the production server
-- `npm run lint` — Runs ESLint code quality check
+- `npm run dev` — Starts dev server (`localhost:3000`)
+- `npm run build` — Runs Prisma code generation and builds production bundle
+- `npm run start` — Starts production server
+- `npm run lint` — Runs ESLint checks
 
 ---
 
