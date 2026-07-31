@@ -516,7 +516,7 @@ export default function LearnPage() {
               Test Your Knowledge Across All Levels!
             </h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mt-1">
-              Select any level above or click "Quiz" on any module card to test your Arabic, Tajweed, and Grammar comprehension.
+              Select any level above or click &quot;Quiz&quot; on any module card to test your Arabic, Tajweed, and Grammar comprehension.
             </p>
           </div>
         </div>
