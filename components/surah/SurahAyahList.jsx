@@ -339,19 +339,49 @@ const SurahAyahList = ({
 
   // React to language/identifier changes from Settings and refetch translation
   useEffect(() => {
-    const fetchByIdentifier = async (identifier) => {
+    const fetchByIdentifier = async (rawIdentifier) => {
       try {
-        const url = `${QURAN_API_BASE_URL}/verses/by_chapter/${pageId}?per_page=300&translations=${identifier}`;
-        const res = await fetch(url);
-        if (!res.ok) return;
-        const json = await res.json();
-        const verses = Array.isArray(json?.verses) ? json.verses : [];
-        const newTransAyahs = verses.map((v) => ({
-          text: v.translations?.[0]?.text || "",
-          number: v.verse_number,
-        }));
-        if (newTransAyahs.length) setEnglishTrans(newTransAyahs);
-      } catch {}
+        const identifiers = String(rawIdentifier)
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+        if (!identifiers.length) return;
+
+        const promises = identifiers.map((id) =>
+          fetch(
+            `${QURAN_API_BASE_URL}/verses/by_chapter/${pageId}?per_page=300&translations=${id}`
+          ).then((res) => (res.ok ? res.json() : null))
+        );
+
+        const results = await Promise.all(promises);
+        const validResults = results.filter(Boolean);
+        if (!validResults.length) return;
+
+        const totalAyahs = validResults[0]?.verses?.length || 0;
+        const combinedTranslations = [];
+
+        for (let i = 0; i < totalAyahs; i++) {
+          const verseTransList = [];
+          validResults.forEach((resData) => {
+            const verse = resData?.verses?.[i];
+            const transObj = verse?.translations?.[0];
+            if (transObj && transObj.text) {
+              verseTransList.push({
+                text: transObj.text || "",
+                name: transObj.resource_name || "",
+                id: transObj.resource_id,
+              });
+            }
+          });
+          combinedTranslations.push(verseTransList);
+        }
+
+        if (combinedTranslations.length) {
+          setEnglishTrans(combinedTranslations);
+        }
+      } catch (e) {
+        console.error("Error fetching translations:", e);
+      }
     };
 
     if (!pageId || typeof window === "undefined") return;
@@ -645,9 +675,26 @@ const SurahAyahList = ({
                     {/* Gradient fade divider */}
                     <div className="verse-divider my-2"></div>
                     
-                    {/* Translation */}
-                    <div className="text-gray-700 dark:text-gray-300 ayah-text pt-2 leading-relaxed">
-                      {englishTrans[idx]?.text}
+                    {/* Multi-Translation List */}
+                    <div className="flex flex-col gap-3 pt-2">
+                      {Array.isArray(englishTrans[idx]) ? (
+                        englishTrans[idx].map((transItem, tIdx) => (
+                          <div key={tIdx} className="flex flex-col gap-1">
+                            {englishTrans[idx].length > 1 && (
+                              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md w-max border border-emerald-500/20">
+                                {transItem.name || `Translation ${tIdx + 1}`}
+                              </span>
+                            )}
+                            <p className="text-gray-700 dark:text-gray-300 ayah-text leading-relaxed">
+                              {transItem.text}
+                            </p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-700 dark:text-gray-300 ayah-text leading-relaxed">
+                          {englishTrans[idx]?.text || englishTrans[idx]}
+                        </p>
+                      )}
                     </div>
 
                     {/* ── Quran.com Verse Card Footer Toolbar ── */}
