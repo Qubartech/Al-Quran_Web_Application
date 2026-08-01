@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useAudio } from "@/context/AudioProvider";
-import { Play, Pause, MapPin, BookOpen, Layers, ChevronLeft, ChevronRight, Info, Globe, PanelLeft } from "lucide-react";
+import { Play, Pause, MapPin, BookOpen, Layers, ChevronLeft, ChevronRight, Info, Globe } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 export default function SurahHeroHeader({
@@ -196,16 +196,6 @@ export default function SurahHeroHeader({
             >
               <Info size={14} />
               <span>Info</span>
-            </button>
-
-            {/* Sidebar Toggle Button */}
-            <button
-              onClick={() => window.dispatchEvent(new CustomEvent("quran-toggle-leftbar"))}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/70 dark:bg-slate-900/70 border border-emerald-500/30 text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm backdrop-blur-md cursor-pointer hover:border-emerald-500 hover:text-emerald-500 transition-all"
-              title="Toggle Sidebar Navigation"
-            >
-              <PanelLeft size={14} className="text-emerald-500" />
-              <span>Sidebar</span>
             </button>
           </div>
 

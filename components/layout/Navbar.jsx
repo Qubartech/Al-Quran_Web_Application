@@ -6,6 +6,7 @@ import SettingsDrawer from "@/components/settings/SettingsDrawer";
 import AuthModal from "@/components/auth/AuthModal";
 import ProfileEditModal from "@/components/auth/ProfileEditModal";
 import { useUser } from "@/context/UserProvider";
+import { useSidebar } from "@/context/SidebarProvider";
 import { 
   Settings, 
   Menu, 
@@ -24,6 +25,7 @@ import {
 
 function Navbar() {
   const { user, signOut } = useUser();
+  const { isLeftBarOpen, toggleSidebar } = useSidebar();
   const router = useRouter();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -71,7 +73,7 @@ function Navbar() {
         <div className="flex items-center gap-2">
           {/* Sidebar Toggle Icon Button (Quran.com Style) */}
           <button
-            onClick={() => window.dispatchEvent(new CustomEvent("quran-toggle-leftbar"))}
+            onClick={toggleSidebar}
             aria-label="Toggle Sidebar Navigation"
             title="Toggle Sidebar Navigation"
             className="p-2 rounded-xl text-gray-500 hover:text-emerald-500 hover:bg-emerald-500/10 dark:text-gray-400 dark:hover:text-emerald-400 dark:hover:bg-emerald-500/10 transition-all cursor-pointer border border-transparent hover:border-emerald-500/20"
