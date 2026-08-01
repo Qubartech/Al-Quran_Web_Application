@@ -10,6 +10,7 @@ import { Bookmark, Copy, Check, Repeat1, Share2 } from "lucide-react";
 const ayahAnim = {
   animation: "ayahHighlight 7s",
 };
+
 import SurahAudioPlayer from "@/components/audio/SurahAudioPlayer";
 import SurahPlayBtn from "./SurahPlayBtn";
 // import { useRouter } from "next/router";
@@ -380,13 +381,15 @@ const SurahAyahList = ({
                   
                   {/* Left Controls: Ayah Badge, Play, Bookmark */}
                   <div className="flex items-center gap-2 md:gap-2.5">
-                    {/* Ayah Badge */}
-                    <div className={`ayah-badge px-2.5 py-1 rounded-lg shrink-0 transition-all flex items-center justify-center ${
-                      isPlaying
-                        ? "bg-primaryColor dark:bg-emerald-500 shadow-md shadow-emerald-500/20 text-white font-black"
-                        : "bg-primaryColor/10 dark:bg-emerald-500/10 text-primaryColor dark:text-primaryColor-light font-bold"
-                    }`}>
-                      <span className="text-xs md:text-sm leading-none font-mono">
+                    {/* Islamic Star Ayah Badge */}
+                    <div
+                      className={`ayah-badge w-8 h-8 md:w-9 md:h-9 shrink-0 transition-all flex items-center justify-center ${
+                        isPlaying
+                          ? "bg-primaryColor dark:bg-emerald-500 shadow-md shadow-emerald-500/20 text-white font-black"
+                          : "bg-primaryColor/10 dark:bg-emerald-500/10 text-primaryColor dark:text-primaryColor-light font-bold"
+                      }`}
+                    >
+                      <span className="text-[8px] md:text-[9.5px] font-black leading-none select-none">
                         {pageId}:{idx + 1}
                       </span>
                     </div>
@@ -487,7 +490,7 @@ const SurahAyahList = ({
                       const activeWordIndex = getActiveWordIndex(ayah, audioCurrentTime);
                       return (
                         <div
-                          className="flex flex-wrap gap-x-2.5 gap-y-4 justify-start w-full pb-5"
+                          className="flex flex-wrap gap-x-1 sm:gap-x-2 md:gap-x-2.5 gap-y-2 md:gap-y-4 justify-start w-full pb-3 md:pb-5"
                           dir="rtl"
                         >
                           {ayah.words.map((word, wIdx) => {
@@ -506,7 +509,7 @@ const SurahAyahList = ({
                             return (
                               <div
                                 key={wIdx}
-                                className={`relative flex flex-col items-center justify-center p-1 rounded-lg transition-all duration-200 group cursor-pointer outline-none focus:outline-none ${
+                                className={`relative flex flex-col items-center justify-center px-0.5 sm:px-1 py-0.5 rounded-lg transition-all duration-200 group cursor-pointer outline-none focus:outline-none ${
                                   isActiveWord
                                     ? "z-10"
                                     : isDimmedStyle
