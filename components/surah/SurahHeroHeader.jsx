@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useAudio } from "@/context/AudioProvider";
-import { Play, Pause, MapPin, BookOpen, Layers } from "lucide-react";
+import { Play, Pause, MapPin, BookOpen, Layers, ChevronLeft, ChevronRight, Info, Globe } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 export default function SurahHeroHeader({
@@ -179,23 +180,40 @@ export default function SurahHeroHeader({
               <Layers size={14} className="text-emerald-500 dark:text-emerald-400 shrink-0" />
               Surah {surahNumber} / 114
             </span>
+
+            {/* Quran.com Style Translation Selector Dropdown */}
+            <div className="relative group">
+              <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/70 dark:bg-slate-900/70 border border-emerald-500/30 text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm backdrop-blur-md cursor-pointer hover:border-emerald-500">
+                <Globe size={14} className="text-emerald-500" />
+                <span>Translation: Dr. Mustafa Khattab</span>
+              </div>
+            </div>
+
+            {/* Info Button */}
+            <button
+              onClick={() => alert(`Surah ${englishName} (${surahNumber}): Revealed in ${revelationPlace || "Makkah"}. Total Ayahs: ${versesCount || 7}.`)}
+              className="flex items-center gap-1 px-3 py-2 rounded-full bg-white/60 dark:bg-slate-900/60 border border-gray-200/50 dark:border-slate-800/80 text-xs font-bold text-gray-600 dark:text-gray-300 hover:text-emerald-500 backdrop-blur-md cursor-pointer"
+            >
+              <Info size={14} />
+              <span>Info</span>
+            </button>
           </div>
 
         </div>
       </div>
 
-      {/* ── 2. Compact Sticky Header Bar on Scroll (Only visible when scrolled down) ── */}
+      {/* ── 2. Compact Sticky Header Bar on Scroll (Quran.com Style) ── */}
       <div
         ref={containerRef}
-        className={`sticky top-0 z-30 transition-all duration-300 transform ${
+        className={`sticky top-0 z-40 transition-all duration-300 transform ${
           isScrolled
-            ? "translate-y-0 opacity-100 pointer-events-auto shadow-xl my-2 py-2.5"
+            ? "translate-y-0 opacity-100 pointer-events-auto shadow-lg py-2.5 my-0 rounded-b-2xl border-b"
             : "-translate-y-4 opacity-0 pointer-events-none h-0 overflow-hidden py-0 my-0 border-none"
-        } bg-white/90 dark:bg-slate-900/95 backdrop-blur-xl border border-emerald-500/20 dark:border-emerald-500/30 px-4 rounded-2xl flex items-center justify-between gap-3`}
+        } bg-white/85 dark:bg-slate-900/90 backdrop-blur-xl border-emerald-500/20 dark:border-emerald-500/30 px-4 flex items-center justify-between gap-3`}
       >
         {/* Left: Badge + Surah Names */}
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm shadow-emerald-500/20">
             {surahNumber}
           </div>
           <div className="flex items-center gap-2 truncate">
@@ -203,28 +221,61 @@ export default function SurahHeroHeader({
               {englishName}
             </span>
             {arabicName && (
-              <span className="font-arabic text-base md:text-xl text-emerald-600 dark:text-emerald-400 font-semibold shrink-0">
+              <span className="font-arabic text-base md:text-lg text-emerald-600 dark:text-emerald-400 font-semibold shrink-0">
                 {arabicName}
               </span>
             )}
             {translatedName && (
-              <span className="hidden lg:inline text-xs text-gray-500 dark:text-gray-400 italic truncate">
+              <span className="hidden xl:inline text-xs text-gray-500 dark:text-gray-400 italic truncate">
                 ({translatedName})
               </span>
             )}
           </div>
         </div>
 
-        {/* Right: Quick Action Controls & Metadata */}
+        {/* Right: Quick Controls, Reciter & Surah Jump Nav */}
         <div className="flex items-center gap-2 md:gap-3 shrink-0">
           {versesCount && (
-            <span className="hidden sm:inline-block text-xs font-semibold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-slate-800 px-2.5 py-1 rounded-full border border-gray-200/60 dark:border-slate-700/60">
+            <span className="hidden sm:inline-block text-xs font-semibold text-gray-600 dark:text-gray-300 bg-gray-100/80 dark:bg-slate-800/80 px-2.5 py-1 rounded-lg border border-gray-200/50 dark:border-slate-700/60">
               {versesCount} Ayahs
             </span>
           )}
+
+          {/* Surah Navigation Arrows (< >) */}
+          <div className="flex items-center gap-1 bg-gray-100/60 dark:bg-slate-800/60 p-0.5 rounded-lg border border-gray-200/40 dark:border-slate-700/50">
+            {surahNumber > 1 ? (
+              <Link
+                href={`/surah/${surahNumber - 1}`}
+                className="w-7 h-7 rounded-md flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-emerald-500 hover:bg-white dark:hover:bg-slate-700 transition-all"
+                title="Previous Surah"
+              >
+                <ChevronLeft size={16} />
+              </Link>
+            ) : (
+              <span className="w-7 h-7 flex items-center justify-center text-gray-300 dark:text-slate-600 cursor-not-allowed">
+                <ChevronLeft size={16} />
+              </span>
+            )}
+
+            {surahNumber < 114 ? (
+              <Link
+                href={`/surah/${surahNumber + 1}`}
+                className="w-7 h-7 rounded-md flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-emerald-500 hover:bg-white dark:hover:bg-slate-700 transition-all"
+                title="Next Surah"
+              >
+                <ChevronRight size={16} />
+              </Link>
+            ) : (
+              <span className="w-7 h-7 flex items-center justify-center text-gray-300 dark:text-slate-600 cursor-not-allowed">
+                <ChevronRight size={16} />
+              </span>
+            )}
+          </div>
+
+          {/* Play Full Surah Button */}
           <button
             onClick={handlePlaySurah}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-bold text-xs transition-all shadow-sm ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs transition-all shadow-sm ${
               isCurrentSurahPlaying
                 ? "bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20"
                 : "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-emerald-500/20"
