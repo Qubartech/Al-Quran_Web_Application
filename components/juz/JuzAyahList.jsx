@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { QURAN_API_BASE_URL } from "@/lib/api/config";
 import { useAudio } from "@/context/AudioProvider";
 import { useUser } from "@/context/UserProvider";
@@ -291,6 +291,8 @@ export default function JuzAyahList({
   }
 
   // Single Ayah Repeat Loop Handler for Juz
+  const lastSeekTimeRef = useRef(0);
+
   useEffect(() => {
     if (repeatAyahIndex === null) return;
     const targetAyah = arabicAyah[repeatAyahIndex];
@@ -300,10 +302,19 @@ export default function JuzAyahList({
     const seg = surahTimestamps.find((s) => s.verse_key === targetAyah.verseKey);
     if (!seg) return;
 
+    const fromMs = typeof seg.timestamp_from === "number" ? seg.timestamp_from : 0;
+    const toMs = typeof seg.timestamp_to === "number" ? seg.timestamp_to : 0;
+
+    if (toMs <= fromMs) return;
+
     const onTimeUpdate = (e) => {
-      const timeMs = e.detail.currentTime * 1000;
-      if (timeMs >= seg.timestamp_to - 150 || timeMs < seg.timestamp_from - 300) {
-        const seekSec = (seg.timestamp_from || 0) / 1000;
+      const timeMs = (e.detail?.currentTime || 0) * 1000;
+      const now = Date.now();
+      if (now - lastSeekTimeRef.current < 800) return;
+
+      if (timeMs >= toMs - 200 || timeMs < fromMs - 1500) {
+        lastSeekTimeRef.current = now;
+        const seekSec = fromMs / 1000;
         window.dispatchEvent(
           new CustomEvent("quran-audio-seek", { detail: { time: seekSec } })
         );
