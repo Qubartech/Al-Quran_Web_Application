@@ -2,7 +2,7 @@
 
 import { useAudio } from "@/context/AudioProvider";
 import { Play, Pause, MapPin, BookOpen, Layers } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function SurahHeroHeader({
   surahNumber,
@@ -14,17 +14,31 @@ export default function SurahHeroHeader({
 }) {
   const audio = useAudio();
   const [isScrolled, setIsScrolled] = useState(false);
+  const containerRef = useRef(null);
 
   useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    // Find closest scrollable parent container or window
+    const scrollParent = el.closest(".overflow-y-auto") || window;
+
     const handleScroll = () => {
-      if (window.scrollY > 200) {
+      const scrollTop =
+        scrollParent === window
+          ? window.scrollY
+          : scrollParent.scrollTop;
+      if (scrollTop > 180) {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
       }
     };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    handleScroll();
+
+    scrollParent.addEventListener("scroll", handleScroll, { passive: true });
+    return () => scrollParent.removeEventListener("scroll", handleScroll);
   }, []);
 
   const isMatch =
@@ -48,7 +62,7 @@ export default function SurahHeroHeader({
   return (
     <>
       {/* ── 1. Main Hero Banner Content ── */}
-      <div className="relative py-10 md:py-12 px-6 md:px-10 rounded-3xl overflow-hidden glass shadow-2xl mb-6 border border-emerald-500/25 dark:border-emerald-500/30 animate-fadeIn">
+      <div className="relative py-10 md:py-12 px-6 md:px-10 rounded-3xl overflow-hidden glass shadow-2xl mb-4 border border-emerald-500/25 dark:border-emerald-500/30 animate-fadeIn">
         
         {/* Islamic Ambient Glows & Mesh Gradients */}
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-emerald-600/10 dark:from-emerald-500/15 dark:via-teal-500/10 dark:to-emerald-600/15 z-0 pointer-events-none" />
@@ -170,65 +184,64 @@ export default function SurahHeroHeader({
         </div>
       </div>
 
-      {/* ── 2. Compact Sticky Header Bar on Scroll ── */}
+      {/* ── 2. Compact Sticky Header Bar on Scroll (Only visible when scrolled down) ── */}
       <div
-        className={`fixed top-16 left-0 right-0 z-40 transition-all duration-300 transform ${
+        ref={containerRef}
+        className={`sticky top-0 z-30 transition-all duration-300 transform ${
           isScrolled
-            ? "translate-y-0 opacity-100 pointer-events-auto shadow-md"
-            : "-translate-y-full opacity-0 pointer-events-none"
-        } bg-white/85 dark:bg-slate-900/90 backdrop-blur-xl border-b border-emerald-500/20 dark:border-emerald-500/30 px-4 py-2.5`}
+            ? "translate-y-0 opacity-100 pointer-events-auto shadow-xl my-2 py-2.5"
+            : "-translate-y-4 opacity-0 pointer-events-none h-0 overflow-hidden py-0 my-0 border-none"
+        } bg-white/90 dark:bg-slate-900/95 backdrop-blur-xl border border-emerald-500/20 dark:border-emerald-500/30 px-4 rounded-2xl flex items-center justify-between gap-3`}
       >
-        <div className="max-w-screen-xl mx-auto flex items-center justify-between gap-3">
-          {/* Left: Badge + Surah Names */}
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
-              {surahNumber}
-            </div>
-            <div className="flex items-center gap-2 truncate">
-              <span className="font-bold text-sm md:text-base text-slate-900 dark:text-slate-100 truncate">
-                {englishName}
-              </span>
-              {arabicName && (
-                <span className="font-arabic text-base md:text-xl text-emerald-600 dark:text-emerald-400 font-semibold shrink-0">
-                  {arabicName}
-                </span>
-              )}
-              {translatedName && (
-                <span className="hidden lg:inline text-xs text-gray-500 dark:text-gray-400 italic truncate">
-                  ({translatedName})
-                </span>
-              )}
-            </div>
+        {/* Left: Badge + Surah Names */}
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
+            {surahNumber}
           </div>
-
-          {/* Right: Quick Action Controls & Metadata */}
-          <div className="flex items-center gap-2 md:gap-3 shrink-0">
-            {versesCount && (
-              <span className="hidden sm:inline-block text-xs font-semibold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-slate-800 px-2.5 py-1 rounded-full border border-gray-200/60 dark:border-slate-700/60">
-                {versesCount} Ayahs
+          <div className="flex items-center gap-2 truncate">
+            <span className="font-bold text-sm md:text-base text-slate-900 dark:text-slate-100 truncate">
+              {englishName}
+            </span>
+            {arabicName && (
+              <span className="font-arabic text-base md:text-xl text-emerald-600 dark:text-emerald-400 font-semibold shrink-0">
+                {arabicName}
               </span>
             )}
-            <button
-              onClick={handlePlaySurah}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-bold text-xs transition-all shadow-sm ${
-                isCurrentSurahPlaying
-                  ? "bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20"
-                  : "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-emerald-500/20"
-              }`}
-            >
-              {isCurrentSurahPlaying ? (
-                <>
-                  <Pause size={14} fill="currentColor" />
-                  <span className="hidden sm:inline">Pause</span>
-                </>
-              ) : (
-                <>
-                  <Play size={14} fill="currentColor" className="ml-0.5" />
-                  <span className="hidden sm:inline">Play Surah</span>
-                </>
-              )}
-            </button>
+            {translatedName && (
+              <span className="hidden lg:inline text-xs text-gray-500 dark:text-gray-400 italic truncate">
+                ({translatedName})
+              </span>
+            )}
           </div>
+        </div>
+
+        {/* Right: Quick Action Controls & Metadata */}
+        <div className="flex items-center gap-2 md:gap-3 shrink-0">
+          {versesCount && (
+            <span className="hidden sm:inline-block text-xs font-semibold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-slate-800 px-2.5 py-1 rounded-full border border-gray-200/60 dark:border-slate-700/60">
+              {versesCount} Ayahs
+            </span>
+          )}
+          <button
+            onClick={handlePlaySurah}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-bold text-xs transition-all shadow-sm ${
+              isCurrentSurahPlaying
+                ? "bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20"
+                : "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-emerald-500/20"
+            }`}
+          >
+            {isCurrentSurahPlaying ? (
+              <>
+                <Pause size={14} fill="currentColor" />
+                <span className="hidden sm:inline">Pause</span>
+              </>
+            ) : (
+              <>
+                <Play size={14} fill="currentColor" className="ml-0.5" />
+                <span className="hidden sm:inline">Play Surah</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
     </>
