@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { QURAN_API_BASE_URL } from "@/lib/api/config";
 import { useAudio } from "@/context/AudioProvider";
 import { useUser } from "@/context/UserProvider";
 import { Bookmark } from "lucide-react";
@@ -234,7 +235,7 @@ const SurahAyahList = ({
   useEffect(() => {
     const fetchByIdentifier = async (identifier) => {
       try {
-        const url = `https://api.quran.com/api/v4/verses/by_chapter/${pageId}?per_page=300&translations=${identifier}`;
+        const url = `${QURAN_API_BASE_URL}/verses/by_chapter/${pageId}?per_page=300&translations=${identifier}`;
         const res = await fetch(url);
         if (!res.ok) return;
         const json = await res.json();

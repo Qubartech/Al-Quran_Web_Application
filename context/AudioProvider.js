@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { QURAN_API_BASE_URL, QURANICAUDIO_BASE_URL } from "@/lib/api/config";
 import SurahAudioPlayer from "@/components/audio/SurahAudioPlayer";
 
 const AudioContext = createContext(null);
@@ -47,7 +48,7 @@ export default function AudioProvider({ children }) {
     }
 
     // Fetch reciters list to get the name of the selected reciter
-    fetch("https://api.quran.com/api/v4/resources/recitations?language=en")
+    fetch(`${QURAN_API_BASE_URL}/resources/recitations?language=en`)
       .then((res) => res.json())
       .then((data) => {
         if (data?.recitations) {
@@ -120,26 +121,26 @@ export default function AudioProvider({ children }) {
 
     // Direct CDN URL mapping for instant synchronous playback inside user gesture
     const reciterCdnMap = {
-      "1": `https://download.quranicaudio.com/qdc/abdul_baset/mujawwad/${num}.mp3`,
-      "2": `https://download.quranicaudio.com/qdc/abdul_baset/murattal/${num}.mp3`,
-      "3": `https://download.quranicaudio.com/qdc/abu_bakr_shatri/murattal/${num}.mp3`,
-      "4": `https://download.quranicaudio.com/qdc/hani_ar_rifai/murattal/${num}.mp3`,
-      "5": `https://download.quranicaudio.com/qdc/khalil_al_husary/murattal/${num}.mp3`,
-      "6": `https://download.quranicaudio.com/qdc/siddiq_minshawi/murattal/${num}.mp3`,
-      "7": `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${num}.mp3`,
-      "8": `https://download.quranicaudio.com/qdc/saud_ash_shuraym/murattal/${num}.mp3`,
-      "9": `https://download.quranicaudio.com/qdc/siddiq_minshawi/mujawwad/${num}.mp3`,
-      "10": `https://download.quranicaudio.com/qdc/saad_al_ghamdi/murattal/${num}.mp3`,
+      "1": `${QURANICAUDIO_BASE_URL}/qdc/abdul_baset/mujawwad/${num}.mp3`,
+      "2": `${QURANICAUDIO_BASE_URL}/qdc/abdul_baset/murattal/${num}.mp3`,
+      "3": `${QURANICAUDIO_BASE_URL}/qdc/abu_bakr_shatri/murattal/${num}.mp3`,
+      "4": `${QURANICAUDIO_BASE_URL}/qdc/hani_ar_rifai/murattal/${num}.mp3`,
+      "5": `${QURANICAUDIO_BASE_URL}/qdc/khalil_al_husary/murattal/${num}.mp3`,
+      "6": `${QURANICAUDIO_BASE_URL}/qdc/siddiq_minshawi/murattal/${num}.mp3`,
+      "7": `${QURANICAUDIO_BASE_URL}/qdc/mishari_al_afasy/murattal/${num}.mp3`,
+      "8": `${QURANICAUDIO_BASE_URL}/qdc/saud_ash_shuraym/murattal/${num}.mp3`,
+      "9": `${QURANICAUDIO_BASE_URL}/qdc/siddiq_minshawi/mujawwad/${num}.mp3`,
+      "10": `${QURANICAUDIO_BASE_URL}/qdc/saad_al_ghamdi/murattal/${num}.mp3`,
     };
 
-    const initialUrl = reciterCdnMap[reciterId] || `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${num}.mp3`;
+    const initialUrl = reciterCdnMap[reciterId] || `${QURANICAUDIO_BASE_URL}/qdc/mishari_al_afasy/murattal/${num}.mp3`;
     
     // Immediately start playback in user click gesture context
     playList([initialUrl], 0, `surah_${num}`, surahName);
 
     // Fetch API asynchronously in background to sync custom URLs if needed
     try {
-      const res = await fetch(`https://api.quran.com/api/v4/chapter_recitations/${reciterId}/${num}`);
+      const res = await fetch(`${QURAN_API_BASE_URL}/chapter_recitations/${reciterId}/${num}`);
       if (res.ok) {
         const data = await res.json();
         const apiAudioUrl = data.audio_file?.audio_url;

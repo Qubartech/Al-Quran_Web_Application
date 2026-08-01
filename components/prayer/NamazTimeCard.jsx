@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
+import { ALADHAN_API_BASE_URL } from "@/lib/api/config";
 import { 
   Settings, 
   MapPin, 
@@ -199,13 +200,13 @@ const NamazTimeCard = ({ gpsLocation }) => {
       try {
         let url = "";
         if (activeLocation.isGps) {
-          url = `https://api.aladhan.com/v1/timings?latitude=${activeLocation.latitude}&longitude=${activeLocation.longitude}&method=${method}&school=${school}`;
+          url = `${ALADHAN_API_BASE_URL}/timings?latitude=${activeLocation.latitude}&longitude=${activeLocation.longitude}&method=${method}&school=${school}`;
         } else {
           // Fetch by city/country or general address
           const query = activeLocation.country
             ? `${activeLocation.city}, ${activeLocation.country}`
             : activeLocation.city;
-          url = `https://api.aladhan.com/v1/timingsByAddress?address=${encodeURIComponent(query)}&method=${method}&school=${school}`;
+          url = `${ALADHAN_API_BASE_URL}/timingsByAddress?address=${encodeURIComponent(query)}&method=${method}&school=${school}`;
         }
 
         const response = await fetch(url);
@@ -256,7 +257,7 @@ const NamazTimeCard = ({ gpsLocation }) => {
 
     try {
       const response = await fetch(
-        `https://api.aladhan.com/v1/timingsByAddress?address=${encodeURIComponent(searchQuery)}&method=${method}&school=${school}`
+        `${ALADHAN_API_BASE_URL}/timingsByAddress?address=${encodeURIComponent(searchQuery)}&method=${method}&school=${school}`
       );
       const data = await response.json();
 

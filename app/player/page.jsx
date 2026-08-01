@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { QURAN_API_BASE_URL } from "@/lib/api/config";
 import { useAudio } from "@/context/AudioProvider";
 import { useUser } from "@/context/UserProvider";
 import { 
@@ -57,7 +58,7 @@ export default function AudioPlayerPage() {
 
   // Load all Surahs on mount
   useEffect(() => {
-    fetch("https://api.quran.com/api/v4/chapters?language=en")
+    fetch(`${QURAN_API_BASE_URL}/chapters?language=en`)
       .then((res) => res.json())
       .then((json) => {
         const mapped = (json.chapters || []).map((c) => ({
@@ -120,9 +121,9 @@ export default function AudioPlayerPage() {
       }
     }
 
-    const textUrl = `https://api.quran.com/api/v4/verses/by_chapter/${activeSurahNum}?per_page=300&translations=${translationId}&words=true&word_fields=text_qpc_hafs,text_indopak,text_uthmani,code_v1,code_v2`;
-    const segmentsUrl = `https://api.quran.com/api/v4/chapter_recitations/${reciterId}/${activeSurahNum}?segments=true`;
-    const chapterUrl = `https://api.quran.com/api/v4/chapters/${activeSurahNum}?language=en`;
+    const textUrl = `${QURAN_API_BASE_URL}/verses/by_chapter/${activeSurahNum}?per_page=300&translations=${translationId}&words=true&word_fields=text_qpc_hafs,text_indopak,text_uthmani,code_v1,code_v2`;
+    const segmentsUrl = `${QURAN_API_BASE_URL}/chapter_recitations/${reciterId}/${activeSurahNum}?segments=true`;
+    const chapterUrl = `${QURAN_API_BASE_URL}/chapters/${activeSurahNum}?language=en`;
 
     Promise.all([
       fetch(textUrl).then((r) => r.json()),

@@ -3,11 +3,13 @@ import JuzBookmarkBtn from "@/components/juz/JuzBookmarkBtn";
 import getSingleJuz from "@/lib/api/getSingleJuz";
 import { juzList } from "@/lib/juzData";
 import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import { IoChevronBack } from "react-icons/io5";
 
 export async function generateMetadata({ params }) {
-  const { id } = params || {};
+  const resolvedParams = await params;
+  const id = resolvedParams?.id;
   return {
     title: `Juz ${id} - Quran Application`,
     description: `Read Holy Quran Juz ${id}`,
@@ -15,9 +17,14 @@ export async function generateMetadata({ params }) {
 }
 
 async function Juz({ params }) {
-  const { id } = params || {};
+  const resolvedParams = await params;
+  const id = resolvedParams?.id;
   const juzId = parseInt(id, 10);
   
+  if (isNaN(juzId) || juzId < 1 || juzId > 30) {
+    notFound();
+  }
+
   const cookieStore = cookies();
   const langCode = cookieStore.get("__language__")?.value || "bn";
   const editionIdentifier = cookieStore.get(
@@ -27,9 +34,9 @@ async function Juz({ params }) {
 
   const singleJuz = await getSingleJuz(juzId, langCode, editionIdentifier, reciterId);
   const { data } = singleJuz || {};
-  const { ayahs: arabicAyah } = data[0] || {};
-  const { ayahs: englishTransAyah } = data[1] || {};
-  const { ayahs: ayahAudio } = data[2] || {};
+  const { ayahs: arabicAyah } = data?.[0] || {};
+  const { ayahs: englishTransAyah } = data?.[1] || {};
+  const { ayahs: ayahAudio } = data?.[2] || {};
 
   const juzMeta = juzList.find((j) => j.number === juzId);
 

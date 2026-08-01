@@ -2,9 +2,17 @@ import SurahAyahList from "@/components/surah/SurahAyahList";
 import SurahHeroHeader from "@/components/surah/SurahHeroHeader";
 import getSingleSurah from "@/lib/api/getSingleSurah";
 import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
 
 async function Surah({ params }) {
-  const { id } = params || {};
+  const resolvedParams = await params;
+  const id = resolvedParams?.id;
+  const surahNum = Number(id);
+  
+  if (isNaN(surahNum) || surahNum < 1 || surahNum > 114) {
+    notFound();
+  }
+
   // Read language and translation identifier from cookies to persist across refreshes
   const cookieStore = cookies();
   const langCode = cookieStore.get("__language__")?.value || "bn";
@@ -16,9 +24,9 @@ async function Surah({ params }) {
   const singleSurah = await getSingleSurah(id, langCode, editionIdentifier, reciterId);
 
   const { data } = singleSurah || {};
-  const { ayahs: arabicAyah, englishName, arabicName, number: surahNumber, versesCount, revelationPlace, translatedName, audioUrl } = data[0] || {};
-  const { ayahs: englishTransAyah } = data[1] || {};
-  const { ayahs: ayahAudio } = data[2] || {};
+  const { ayahs: arabicAyah, englishName, arabicName, number: surahNumber, versesCount, revelationPlace, translatedName, audioUrl } = data?.[0] || {};
+  const { ayahs: englishTransAyah } = data?.[1] || {};
+  const { ayahs: ayahAudio } = data?.[2] || {};
 
   // Surah At-Tawbah (9) does not begin with Bismillah
   const showBismillah = Number(id) !== 9 && Number(id) !== 1;
