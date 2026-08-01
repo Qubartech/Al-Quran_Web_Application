@@ -3,15 +3,26 @@
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Search, X } from "lucide-react";
+import { Search, X, Volume2 } from "lucide-react";
+import { useAudio } from "@/context/AudioProvider";
 
 export default function LeftBar({ data }) {
   const params = useParams();
+  const audio = useAudio();
   const [query, setQuery] = useState("");
 
   const activeSurahNumber = useMemo(() => {
     return params?.id ? parseInt(params.id, 10) : null;
   }, [params?.id]);
+
+  const playingSurahNumber = useMemo(() => {
+    if (!audio?.src || !audio?.playlistId) return null;
+    const pId = String(audio.playlistId);
+    if (pId.startsWith("surah_")) {
+      return parseInt(pId.replace("surah_", ""), 10);
+    }
+    return !isNaN(Number(pId)) ? parseInt(pId, 10) : null;
+  }, [audio?.src, audio?.playlistId]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -32,7 +43,6 @@ export default function LeftBar({ data }) {
   // Scroll the active surah into view on mount or when activeSurahNumber changes
   useEffect(() => {
     if (activeSurahNumber) {
-      // Small timeout to allow the list to render and scroll
       const timer = setTimeout(() => {
         const activeEl = document.querySelector(".active-surah-card");
         if (activeEl) {
@@ -74,37 +84,48 @@ export default function LeftBar({ data }) {
       <div className="flex flex-col gap-2 overflow-y-auto pr-1 hover-scrollbar flex-1">
         {filtered.map((surah, idx) => {
           const isActive = surah?.number === activeSurahNumber;
+          const isPlayingSurah = surah?.number === playingSurahNumber && !audio?.paused;
           return (
             <Link href={`/surah/${surah?.number}`} key={idx} className="w-full">
               <div
                 className={`w-full p-2.5 rounded-xl border flex items-center transition-all duration-200 group cursor-pointer ${
                   isActive
                     ? "active-surah-card border-primaryColor/40 dark:border-emerald-500/40 bg-gradient-to-r from-primaryColor/10 to-emerald-500/5 dark:from-primaryColor/20 dark:to-emerald-500/10 shadow-sm shadow-primaryColor/5"
+                    : isPlayingSurah
+                    ? "border-amber-500/40 dark:border-amber-400/40 bg-amber-500/10 dark:bg-amber-500/15"
                     : "border-transparent dark:border-slate-800/10 hover:border-primaryColor/20 dark:hover:border-emerald-500/20 bg-white/20 dark:bg-slate-900/5 hover:bg-white/60 dark:hover:bg-slate-800/20 hover:scale-[1.01]"
                 }`}
               >
-                {/* Index badge */}
+                {/* Index / Audio Playing badge */}
                 <div
                   className={`h-8 w-8 shrink-0 border flex items-center justify-center rounded-lg font-bold text-[11px] transition-all duration-200 ${
-                    isActive
+                    isPlayingSurah
+                      ? "bg-amber-500 border-transparent text-white shadow-md shadow-amber-500/30"
+                      : isActive
                       ? "bg-primaryColor border-transparent text-white dark:bg-primaryColor-light dark:text-slate-950 font-extrabold"
                       : "bg-primaryColor/10 dark:bg-emerald-500/10 border-primaryColor/25 dark:border-emerald-500/25 text-primaryColor dark:text-primaryColor-light group-hover:bg-primaryColor group-hover:border-transparent group-hover:text-white"
                   }`}
                 >
-                  {surah?.number}
+                  {isPlayingSurah ? (
+                    <Volume2 size={14} className="text-white" />
+                  ) : (
+                    surah?.number
+                  )}
                 </div>
 
                 {/* Details */}
                 <div className="pl-3 flex justify-between items-center w-full min-w-0">
                   <div className="truncate pr-2">
                     <div
-                      className={`text-xs font-bold truncate transition-colors ${
+                      className={`text-xs font-bold truncate transition-colors flex items-center gap-1.5 ${
                         isActive
                           ? "text-primaryColor dark:text-primaryColor-light"
+                          : isPlayingSurah
+                          ? "text-amber-600 dark:text-amber-400"
                           : "text-slate-800 dark:text-slate-200 group-hover:text-primaryColor"
                       }`}
                     >
-                      {surah?.englishName}
+                      <span>{surah?.englishName}</span>
                     </div>
                     <div className="text-[9px] text-gray-500 dark:text-gray-400 truncate mt-0.5 leading-none">
                       {surah?.englishNameTranslation}
@@ -115,6 +136,8 @@ export default function LeftBar({ data }) {
                       className={`font-arabic text-sm transition-colors leading-none mb-1 ${
                         isActive
                           ? "text-primaryColor dark:text-primaryColor-light font-semibold"
+                          : isPlayingSurah
+                          ? "text-amber-600 dark:text-amber-400 font-semibold"
                           : "text-slate-700 dark:text-slate-300 group-hover:text-primaryColor"
                       }`}
                     >
