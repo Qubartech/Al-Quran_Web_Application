@@ -1,11 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Lateef:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&family=Scheherazade+New:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* 
-@font-face {
-  font-family: "Arabic";
-  src: url("/font/UthmanicHafs1Ver18.woff2");
-} */
+
+/* Dynamic Arabic Font Switcher Rules */
+[data-arabic-font="uthmani"] .font-arabic,
+.font-arabic-uthmani {
+  font-family: var(--font-arabic), 'UthmanicHafs1Ver18', 'Amiri', serif !important;
+}
+
+[data-arabic-font="amiri"] .font-arabic,
+.font-arabic-amiri {
+  font-family: 'Amiri', serif !important;
+}
+
+[data-arabic-font="lateef"] .font-arabic,
+.font-arabic-lateef {
+  font-family: 'Lateef', cursive, serif !important;
+}
+
+[data-arabic-font="scheherazade"] .font-arabic,
+.font-arabic-scheherazade {
+  font-family: 'Scheherazade New', serif !important;
+}
+
+[data-arabic-font="noto"] .font-arabic,
+.font-arabic-noto {
+  font-family: 'Noto Naskh Arabic', serif !important;
+}
 
 /* Glassy utility */
 .glass {

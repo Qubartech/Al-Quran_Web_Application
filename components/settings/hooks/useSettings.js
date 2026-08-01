@@ -23,6 +23,7 @@ export default function useSettings() {
   const [identifier, setIdentifier] = React.useState("");
   const [fontSize, setFontSize] = React.useState(18);
   const [arabicFontSize, setArabicFontSize] = React.useState(24);
+  const [arabicFontFamily, setArabicFontFamily] = React.useState("uthmani");
   const [reciterId, setReciterId] = React.useState("7");
 
   // Initial load
@@ -47,6 +48,13 @@ export default function useSettings() {
     try {
       const savedLang = localStorage.getItem("app_language");
       if (savedLang) setLanguage(savedLang);
+    } catch {}
+
+    // Arabic Font Family
+    try {
+      const savedArabicFont = localStorage.getItem("app_arabic_font_family") || "uthmani";
+      setArabicFontFamily(savedArabicFont);
+      document.documentElement.setAttribute("data-arabic-font", savedArabicFont);
     } catch {}
 
     // Font sizes
@@ -240,6 +248,14 @@ export default function useSettings() {
     document.documentElement.style.setProperty("--ayah-arabic-font-size", `${clamped}px`);
   };
 
+  const handleArabicFontChange = (val) => {
+    setArabicFontFamily(val);
+    try {
+      localStorage.setItem("app_arabic_font_family", val);
+      document.documentElement.setAttribute("data-arabic-font", val);
+    } catch {}
+  };
+
   const handleReciterIdChange = (val) => {
     const stringVal = String(val);
     setReciterId(stringVal);
@@ -332,6 +348,7 @@ export default function useSettings() {
     identifier,
     fontSize,
     arabicFontSize,
+    arabicFontFamily,
     showWordTooltip: audio?.showWordTooltip ?? true,
     // handlers
     handleThemeChange,
@@ -339,6 +356,7 @@ export default function useSettings() {
     handleIdentifierChange,
     handleFontSizeChange,
     handleArabicFontSizeChange,
+    handleArabicFontChange,
     handleReciterIdChange,
     handleToggleWordTooltip: audio?.toggleWordTooltip,
     resetAll,

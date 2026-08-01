@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useAudio } from "@/context/AudioProvider";
 import { Play, Pause, MapPin, BookOpen, Layers, ChevronLeft, ChevronRight, Info, Globe } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import SurahInfoModal from "./SurahInfoModal";
 
 export default function SurahHeroHeader({
   surahNumber,
@@ -15,6 +16,7 @@ export default function SurahHeroHeader({
 }) {
   const audio = useAudio();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -191,7 +193,7 @@ export default function SurahHeroHeader({
 
             {/* Info Button */}
             <button
-              onClick={() => alert(`Surah ${englishName} (${surahNumber}): Revealed in ${revelationPlace || "Makkah"}. Total Ayahs: ${versesCount || 7}.`)}
+              onClick={() => setIsInfoOpen(true)}
               className="flex items-center gap-1 px-3 py-2 rounded-full bg-white/60 dark:bg-slate-900/60 border border-gray-200/50 dark:border-slate-800/80 text-xs font-bold text-gray-600 dark:text-gray-300 hover:text-emerald-500 backdrop-blur-md cursor-pointer"
             >
               <Info size={14} />
@@ -200,6 +202,18 @@ export default function SurahHeroHeader({
           </div>
 
         </div>
+
+        {/* Surah Info Modal */}
+        <SurahInfoModal
+          isOpen={isInfoOpen}
+          onClose={() => setIsInfoOpen(false)}
+          surahNumber={surahNumber}
+          englishName={englishName}
+          arabicName={arabicName}
+          translatedName={translatedName}
+          revelationPlace={revelationPlace}
+          versesCount={versesCount}
+        />
       </div>
 
       {/* ── 2. Compact Sticky Header Bar on Scroll (Quran.com Style) ── */}
