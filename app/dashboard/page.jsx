@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { QURAN_API_BASE_URL, QURANICAUDIO_BASE_URL } from "@/lib/api/config";
 import { useUser } from "@/context/UserProvider";
 import { useAudio } from "@/context/AudioProvider";
 import { useRouter } from "next/navigation";
@@ -89,7 +90,7 @@ export default function DashboardPage() {
   const playAyah = async (surahNumber, ayahNumber) => {
     try {
       const res = await fetch(
-        `https://api.quran.com/api/v4/chapter_recitations/7/${surahNumber}?segments=true`
+        `${QURAN_API_BASE_URL}/chapter_recitations/7/${surahNumber}?segments=true`
       );
       if (!res.ok) return;
       const json = await res.json();
@@ -98,7 +99,7 @@ export default function DashboardPage() {
       const verseSeg = timestamps.find((t) => t.verse_key === verseKey);
       const seekTime = (verseSeg?.timestamp_from || 0) / 1000;
 
-      const fullAudioUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${surahNumber}.mp3`;
+      const fullAudioUrl = `${QURANICAUDIO_BASE_URL}/qdc/mishari_al_afasy/murattal/${surahNumber}.mp3`;
 
       audio?.playList([fullAudioUrl], 0, `surah_${surahNumber}`, `Surah ${surahNumber}`);
       setTimeout(() => {
@@ -112,7 +113,7 @@ export default function DashboardPage() {
   };
 
   const playSurah = (surahNumber, surahName) => {
-    const fullAudioUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${surahNumber}.mp3`;
+    const fullAudioUrl = `${QURANICAUDIO_BASE_URL}/qdc/mishari_al_afasy/murattal/${surahNumber}.mp3`;
     audio?.playList([fullAudioUrl], 0, `surah_${surahNumber}`, surahName);
   };
 

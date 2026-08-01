@@ -93,7 +93,7 @@ function SurahAudioPlayer({
   // Sync active ayah change event
   useEffect(() => {
     const handleAyahChange = (e) => {
-      if (typeof e.detail.ayahIndex === "number") {
+      if (typeof e.detail?.ayahIndex === "number") {
         setActiveAyahIndex(e.detail.ayahIndex);
       }
     };

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { BookOpen, RefreshCw, Volume2, Copy, Check, Sparkles } from "lucide-react";
+import { QURAN_API_BASE_URL } from "@/lib/api/config";
 
 // Curated list of impactful ayahs (surah:ayah)
 const CURATED_AYAHS = [
@@ -51,8 +52,8 @@ export default function VerseOfTheDay() {
 
     try {
       const [arabicRes, translationRes] = await Promise.all([
-        fetch(`https://api.quran.com/api/v4/quran/verses/uthmani?verse_key=${pick.surah}:${pick.ayah}`),
-        fetch(`https://api.quran.com/api/v4/quran/translations/131?verse_key=${pick.surah}:${pick.ayah}`),
+        fetch(`${QURAN_API_BASE_URL}/quran/verses/uthmani?verse_key=${pick.surah}:${pick.ayah}`),
+        fetch(`${QURAN_API_BASE_URL}/quran/translations/131?verse_key=${pick.surah}:${pick.ayah}`),
       ]);
 
       const arabicData = await arabicRes.json();

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { QURANICAUDIO_BASE_URL } from "@/lib/api/config";
 import { useUser } from "@/context/UserProvider";
 import { useAudio } from "@/context/AudioProvider";
 import { useEffect, useState } from "react";
@@ -100,7 +101,7 @@ export default function SurahPageWidgets() {
   }, [user, session?.access_token]);
 
   const playSurah = (surahNumber, surahName) => {
-    const fullAudioUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${surahNumber}.mp3`;
+    const fullAudioUrl = `${QURANICAUDIO_BASE_URL}/qdc/mishari_al_afasy/murattal/${surahNumber}.mp3`;
     audio?.playList([fullAudioUrl], 0, `surah_${surahNumber}`, surahName);
   };
 

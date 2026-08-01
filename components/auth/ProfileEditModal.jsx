@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { QURAN_API_BASE_URL } from "@/lib/api/config";
 import { X, User, Calendar, Headphones, BookOpen, Clock, Loader2, Check, AlertCircle } from "lucide-react";
 import { useUser } from "@/context/UserProvider";
 
@@ -44,7 +45,7 @@ export default function ProfileEditModal({ isOpen, onClose }) {
   // Fetch reciters list from API on mount
   useEffect(() => {
     setLoadingReciters(true);
-    fetch("https://api.quran.com/api/v4/resources/recitations?language=en")
+    fetch(`${QURAN_API_BASE_URL}/resources/recitations?language=en`)
       .then((res) => res.json())
       .then((data) => {
         if (data?.recitations) {

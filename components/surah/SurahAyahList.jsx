@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { QURAN_API_BASE_URL } from "@/lib/api/config";
 import { useAudio } from "@/context/AudioProvider";
 import { useUser } from "@/context/UserProvider";
-import { Bookmark } from "lucide-react";
+import { Bookmark, Copy, Check, Repeat1, Share2 } from "lucide-react";
 
 // Add custom animation style
 const ayahAnim = {
   animation: "ayahHighlight 7s",
 };
+
 import SurahAudioPlayer from "@/components/audio/SurahAudioPlayer";
 import SurahPlayBtn from "./SurahPlayBtn";
 // import { useRouter } from "next/router";
@@ -28,6 +30,9 @@ const SurahAyahList = ({
   const { user, session } = useUser();
   const [audioCurrentTime, setAudioCurrentTime] = useState(0);
   const [bookmarks, setBookmarks] = useState({});
+  const [repeatAyahIndex, setRepeatAyahIndex] = useState(null);
+  const [copiedAyahIdx, setCopiedAyahIdx] = useState(null);
+  const [sharedAyahIdx, setSharedAyahIdx] = useState(null);
 
   useEffect(() => {
     if (!user || !session?.access_token) {
@@ -111,8 +116,16 @@ const SurahAyahList = ({
     };
   }, []);
 
+  const isCurrentSurahPlaying = useMemo(() => {
+    if (!audio?.src) return false;
+    const pId = String(audio?.playlistId || "").replace("surah_", "").trim();
+    const curId = String(pageId || "").replace("surah_", "").trim();
+    if (!pId || !curId) return false;
+    return pId === curId;
+  }, [audio?.src, audio?.playlistId, pageId]);
+
   function getActiveWordIndex(ayah, currentTimeSeconds) {
-    if (!ayah?.segments || ayah.segments.length === 0) return -1;
+    if (!isCurrentSurahPlaying || !ayah?.segments || ayah.segments.length === 0) return -1;
     const currentTimeMs = currentTimeSeconds * 1000;
 
     const activeSegment = ayah.segments.find(
@@ -125,35 +138,108 @@ const SurahAyahList = ({
     return -1;
   }
 
-  // Track the active ayah index based on audioCurrentTime
+  // Track the active ayah index based on audioCurrentTime ONLY if this Surah is currently playing
   const activeAyahIndex = useMemo(() => {
+    if (!isCurrentSurahPlaying) return -1;
     const timeMs = audioCurrentTime * 1000;
     return arabicAyah.findIndex(
       (ayah) => timeMs >= ayah.timestamp_from && timeMs <= ayah.timestamp_to
     );
-  }, [arabicAyah, audioCurrentTime]);
+  }, [arabicAyah, audioCurrentTime, isCurrentSurahPlaying]);
 
-  // Sync scroll on active ayah index change
+  // Sync scroll on active ayah index change ONLY if this Surah is currently playing
   useEffect(() => {
-    if (activeAyahIndex !== -1 && !isPaused) {
+    if (isCurrentSurahPlaying && activeAyahIndex !== -1 && !isPaused) {
       const elId = `sura_${pageId}_ayah_${activeAyahIndex + 1}`;
       const el = document.getElementById(elId);
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     }
-  }, [activeAyahIndex, isPaused, pageId]);
+  }, [activeAyahIndex, isCurrentSurahPlaying, isPaused, pageId]);
 
-  // Dispatch active ayah index to custom event listener in AudioPlayer
+  // Dispatch active ayah index to custom event listener in AudioPlayer ONLY if this Surah is playing
   useEffect(() => {
-    if (activeAyahIndex !== -1) {
+    if (isCurrentSurahPlaying && activeAyahIndex !== -1) {
       window.dispatchEvent(
         new CustomEvent("quran-audio-ayah-change", {
-          detail: { ayahIndex: activeAyahIndex },
+          detail: { ayahIndex: activeAyahIndex, surahNumber: pageId },
         })
       );
     }
-  }, [activeAyahIndex]);
+  }, [activeAyahIndex, isCurrentSurahPlaying, pageId]);
+
+  // Single Ayah Repeat Loop Handler
+  useEffect(() => {
+    if (repeatAyahIndex === null || !isCurrentSurahPlaying) return;
+    const targetAyah = arabicAyah[repeatAyahIndex];
+    if (!targetAyah || !targetAyah.timestamp_to || !targetAyah.timestamp_from) return;
+
+    const onTimeUpdate = (e) => {
+      const timeMs = e.detail.currentTime * 1000;
+      if (timeMs >= targetAyah.timestamp_to - 150 || timeMs < targetAyah.timestamp_from - 300) {
+        const seekSec = (targetAyah.timestamp_from || 0) / 1000;
+        window.dispatchEvent(
+          new CustomEvent("quran-audio-seek", { detail: { time: seekSec } })
+        );
+      }
+    };
+
+    window.addEventListener("quran-audio-timeupdate", onTimeUpdate);
+    return () => {
+      window.removeEventListener("quran-audio-timeupdate", onTimeUpdate);
+    };
+  }, [repeatAyahIndex, isCurrentSurahPlaying, arabicAyah]);
+
+  const toggleRepeatSingleAyah = (idx) => {
+    if (repeatAyahIndex === idx) {
+      setRepeatAyahIndex(null);
+    } else {
+      setRepeatAyahIndex(idx);
+      playControl(idx);
+    }
+  };
+
+  const copyAyahText = (ayah, idx) => {
+    try {
+      const arabicText = ayah?.text || (ayah?.words || []).map((w) => w.text_uthmani || w.text).join(" ");
+      const translationText = englishTrans[idx]?.text || "";
+      const textToCopy = `Surah ${surahName ? surahName + " " : ""}(${pageId}:${idx + 1})\n\n${arabicText}\n\n${translationText}`;
+      
+      navigator.clipboard.writeText(textToCopy);
+      setCopiedAyahIdx(idx);
+      setTimeout(() => setCopiedAyahIdx(null), 2000);
+    } catch (err) {
+      console.error("Copy failed", err);
+    }
+  };
+
+  const shareAyah = async (ayah, idx) => {
+    const url = typeof window !== "undefined" ? `${window.location.origin}/surah/${pageId}#sura_${pageId}_ayah_${idx + 1}` : "";
+    const arabicText = ayah?.text || (ayah?.words || []).map((w) => w.text_uthmani || w.text).join(" ");
+    const translationText = englishTrans[idx]?.text || "";
+    const shareData = {
+      title: `Surah (${pageId}:${idx + 1})`,
+      text: `${arabicText}\n\n${translationText}`,
+      url: url,
+    };
+
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (e) {
+        if (e.name !== "AbortError") {
+          navigator.clipboard?.writeText(url);
+          setSharedAyahIdx(idx);
+          setTimeout(() => setSharedAyahIdx(null), 2000);
+        }
+      }
+    } else {
+      navigator.clipboard?.writeText(url);
+      setSharedAyahIdx(idx);
+      setTimeout(() => setSharedAyahIdx(null), 2000);
+    }
+  };
 
   function playControl(ayahIndex) {
     const targetAyah = arabicAyah[ayahIndex];
@@ -234,7 +320,7 @@ const SurahAyahList = ({
   useEffect(() => {
     const fetchByIdentifier = async (identifier) => {
       try {
-        const url = `https://api.quran.com/api/v4/verses/by_chapter/${pageId}?per_page=300&translations=${identifier}`;
+        const url = `${QURAN_API_BASE_URL}/verses/by_chapter/${pageId}?per_page=300&translations=${identifier}`;
         const res = await fetch(url);
         if (!res.ok) return;
         const json = await res.json();
@@ -284,71 +370,127 @@ const SurahAyahList = ({
               tabIndex={-1}
               style={{ animationDelay: animDelay }}
             >
-              <div className={`px-3 md:px-6 py-3 md:py-6 flex flex-col md:flex-row gap-2 md:gap-5 w-full transition-all duration-300 rounded-xl verse-card outline-none focus:outline-none ${
+              <div className={`px-4 md:px-6 py-4 md:py-5 flex flex-col gap-3.5 w-full transition-all duration-300 rounded-2xl verse-card outline-none focus:outline-none ${
                 isPlaying
                   ? "bg-primaryColor/[0.06] dark:bg-emerald-500/[0.08] border border-primaryColor/25 dark:border-emerald-500/25 verse-active-glow shadow-sm"
                   : "bg-white/20 dark:bg-slate-900/10 border border-gray-200/20 dark:border-slate-800/20 hover:border-gray-300/30 dark:hover:border-slate-700/30"
               }`}>
                 
-                {/* Action Controls — Right-aligned horizontal row on mobile, vertical column on desktop */}
-                <div className="flex flex-row md:flex-col items-center justify-end md:justify-center gap-2 md:gap-2.5 shrink-0 md:pt-0.5 min-w-[32px] md:min-w-[36px] w-full md:w-auto">
+                {/* ── Top Header Action Bar (Quran.com Style) ── */}
+                <div className="flex items-center justify-between w-full border-b border-gray-200/15 dark:border-slate-800/40 pb-3">
                   
-                  {/* Islamic Star Ayah Badge */}
-                  <div className={`ayah-badge w-8 h-8 md:w-9 md:h-9 shrink-0 transition-all ${
-                    isPlaying
-                      ? "bg-primaryColor dark:bg-emerald-500 shadow-md shadow-emerald-500/20"
-                      : "bg-primaryColor/10 dark:bg-emerald-500/10"
-                  }`}>
-                    <span className={`text-[8px] md:text-[9.5px] font-black leading-none ${
-                      isPlaying
-                        ? "text-white"
-                        : "text-primaryColor dark:text-primaryColor-light"
-                    }`}>
-                      {pageId}:{idx + 1}
-                    </span>
+                  {/* Left Controls: Ayah Badge, Play, Bookmark */}
+                  <div className="flex items-center gap-2 md:gap-2.5">
+                    {/* Islamic Star Ayah Badge */}
+                    <div
+                      className={`ayah-badge w-8 h-8 md:w-9 md:h-9 shrink-0 transition-all flex items-center justify-center ${
+                        isPlaying
+                          ? "bg-primaryColor dark:bg-emerald-500 shadow-md shadow-emerald-500/20 text-white font-black"
+                          : "bg-primaryColor/10 dark:bg-emerald-500/10 text-primaryColor dark:text-primaryColor-light font-bold"
+                      }`}
+                    >
+                      <span className="text-[8px] md:text-[9.5px] font-black leading-none select-none">
+                        {pageId}:{idx + 1}
+                      </span>
+                    </div>
+
+                    {/* Play Button */}
+                    <SurahPlayBtn
+                      key={`spb_${idx}_pid_${audio?.playlistId ?? "-"}_ci_${
+                        audio?.currentIndex ?? -1
+                      }_open_${audio?.open ? 1 : 0}_paused_${
+                        audio?.paused ? 1 : 0
+                      }_play_${audio?.playTick ?? 0}_pause_${
+                        audio?.pauseTick ?? 0
+                      }_active_${activeAyahIndex === idx ? 1 : 0}_src_${audio?.src ?? "-"}`}
+                      isPlaying={
+                        audio?.open &&
+                        (audio?.playlistId === pageId || audio?.playlistId === `surah_${pageId}`) &&
+                        activeAyahIndex === idx &&
+                        !isPaused
+                      }
+                      playControl={() => playControl(idx)}
+                      pauseControl={() => audio?.pause()}
+                    />
+
+                    {/* Bookmark Button */}
+                    <button
+                      onClick={() => toggleBookmark(idx)}
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer ${
+                        bookmarks[`${pageId}_${idx + 1}`]
+                          ? "text-emerald-500 bg-emerald-500/10"
+                          : "text-gray-400 hover:text-emerald-500 hover:bg-emerald-500/10"
+                      }`}
+                      title="Bookmark Ayah"
+                    >
+                      <Bookmark size={15} fill={bookmarks[`${pageId}_${idx + 1}`] ? "currentColor" : "none"} className="shrink-0" />
+                    </button>
                   </div>
-                  
-                  {/* Play Button */}
-                  <SurahPlayBtn
-                    key={`spb_${idx}_pid_${audio?.playlistId ?? "-"}_ci_${
-                      audio?.currentIndex ?? -1
-                    }_open_${audio?.open ? 1 : 0}_paused_${
-                      audio?.paused ? 1 : 0
-                    }_play_${audio?.playTick ?? 0}_pause_${
-                      audio?.pauseTick ?? 0
-                    }_active_${activeAyahIndex === idx ? 1 : 0}_src_${audio?.src ?? "-"}`}
-                    isPlaying={
-                      audio?.open &&
-                      (audio?.playlistId === pageId || audio?.playlistId === `surah_${pageId}`) &&
-                      activeAyahIndex === idx &&
-                      !isPaused
-                    }
-                    playControl={() => playControl(idx)}
-                    pauseControl={() => audio?.pause()}
-                  />
-                  
-                  {/* Bookmark Button */}
-                  <button
-                    onClick={() => toggleBookmark(idx)}
-                    className={`w-8 h-8 md:w-9 md:h-9 rounded-xl flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer ${
-                      bookmarks[`${pageId}_${idx + 1}`]
-                        ? "text-emerald-500 bg-emerald-500/10"
-                        : "text-gray-400 hover:text-emerald-500 hover:bg-emerald-500/10"
-                    }`}
-                    title="Bookmark Ayah"
-                  >
-                    <Bookmark size={14} fill={bookmarks[`${pageId}_${idx + 1}`] ? "currentColor" : "none"} className="shrink-0" />
-                  </button>
+
+                  {/* Right Controls: Repeat, Copy, Share */}
+                  <div className="flex items-center gap-1 md:gap-1.5">
+                    {/* Single Ayah Repeat Button */}
+                    <button
+                      onClick={() => toggleRepeatSingleAyah(idx)}
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer relative ${
+                        repeatAyahIndex === idx
+                          ? "text-amber-500 bg-amber-500/15 border border-amber-500/30 shadow-sm"
+                          : "text-gray-400 hover:text-amber-500 hover:bg-amber-500/10"
+                      }`}
+                      title={repeatAyahIndex === idx ? "Single Ayah Repeat ON" : "Repeat single Ayah loop"}
+                    >
+                      <Repeat1 size={15} className="shrink-0" />
+                      {repeatAyahIndex === idx && (
+                        <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-500 text-white text-[8px] font-black flex items-center justify-center">
+                          1
+                        </span>
+                      )}
+                    </button>
+
+                    {/* Copy Ayah Button */}
+                    <button
+                      onClick={() => copyAyahText(ayah, idx)}
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer ${
+                        copiedAyahIdx === idx
+                          ? "text-emerald-500 bg-emerald-500/15 border border-emerald-500/30"
+                          : "text-gray-400 hover:text-emerald-500 hover:bg-emerald-500/10"
+                      }`}
+                      title={copiedAyahIdx === idx ? "Copied!" : "Copy Ayah Text & Translation"}
+                    >
+                      {copiedAyahIdx === idx ? (
+                        <Check size={15} className="shrink-0 text-emerald-500 animate-bounce" />
+                      ) : (
+                        <Copy size={14} className="shrink-0" />
+                      )}
+                    </button>
+
+                    {/* Share Ayah Button */}
+                    <button
+                      onClick={() => shareAyah(ayah, idx)}
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer ${
+                        sharedAyahIdx === idx
+                          ? "text-emerald-500 bg-emerald-500/15 border border-emerald-500/30"
+                          : "text-gray-400 hover:text-teal-500 hover:bg-teal-500/10"
+                      }`}
+                      title={sharedAyahIdx === idx ? "Link Copied!" : "Share Ayah"}
+                    >
+                      {sharedAyahIdx === idx ? (
+                        <Check size={15} className="shrink-0 text-emerald-500 animate-bounce" />
+                      ) : (
+                        <Share2 size={14} className="shrink-0" />
+                      )}
+                    </button>
+                  </div>
                 </div>
 
-                {/* Content Column — Arabic + Translation */}
-                <div className="w-full min-w-0">
+                {/* ── Main Full-Width Content Column ── */}
+                <div className="w-full min-w-0 pt-1">
                   {ayah.words && ayah.words.length > 0 ? (
                     (() => {
                       const activeWordIndex = getActiveWordIndex(ayah, audioCurrentTime);
                       return (
                         <div
-                          className="flex flex-wrap gap-x-2.5 gap-y-4 justify-start w-full pb-5"
+                          className="flex flex-wrap gap-x-1 sm:gap-x-2 md:gap-x-2.5 gap-y-2 md:gap-y-4 justify-start w-full pb-3 md:pb-5"
                           dir="rtl"
                         >
                           {ayah.words.map((word, wIdx) => {
@@ -367,7 +509,7 @@ const SurahAyahList = ({
                             return (
                               <div
                                 key={wIdx}
-                                className={`relative flex flex-col items-center justify-center p-1 rounded-lg transition-all duration-200 group cursor-pointer outline-none focus:outline-none ${
+                                className={`relative flex flex-col items-center justify-center px-0.5 sm:px-1 py-0.5 rounded-lg transition-all duration-200 group cursor-pointer outline-none focus:outline-none ${
                                   isActiveWord
                                     ? "z-10"
                                     : isDimmedStyle

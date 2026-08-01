@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { QURAN_API_BASE_URL } from "@/lib/api/config";
 import {
   Select,
   SelectContent,
@@ -19,7 +20,7 @@ export default function ReciterSelect({
 
   React.useEffect(() => {
     setLoading(true);
-    fetch("https://api.quran.com/api/v4/resources/recitations?language=en")
+    fetch(`${QURAN_API_BASE_URL}/resources/recitations?language=en`)
       .then((res) => res.json())
       .then((data) => {
         if (data?.recitations) {
