@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { QURAN_API_BASE_URL } from "@/lib/api/config";
 import { useAudio } from "@/context/AudioProvider";
 import { useUser } from "@/context/UserProvider";
@@ -180,15 +180,26 @@ const SurahAyahList = ({
   }, [activeAyahIndex, isCurrentSurahPlaying, pageId]);
 
   // Single Ayah Repeat Loop Handler
+  const lastSeekTimeRef = useRef(0);
+
   useEffect(() => {
     if (repeatAyahIndex === null || !isCurrentSurahPlaying) return;
     const targetAyah = arabicAyah[repeatAyahIndex];
-    if (!targetAyah || !targetAyah.timestamp_to || !targetAyah.timestamp_from) return;
+    if (!targetAyah) return;
+
+    const fromMs = typeof targetAyah.timestamp_from === "number" ? targetAyah.timestamp_from : 0;
+    const toMs = typeof targetAyah.timestamp_to === "number" ? targetAyah.timestamp_to : 0;
+
+    if (toMs <= fromMs) return;
 
     const onTimeUpdate = (e) => {
-      const timeMs = e.detail.currentTime * 1000;
-      if (timeMs >= targetAyah.timestamp_to - 150 || timeMs < targetAyah.timestamp_from - 300) {
-        const seekSec = (targetAyah.timestamp_from || 0) / 1000;
+      const timeMs = (e.detail?.currentTime || 0) * 1000;
+      const now = Date.now();
+      if (now - lastSeekTimeRef.current < 800) return;
+
+      if (timeMs >= toMs - 200 || timeMs < fromMs - 1500) {
+        lastSeekTimeRef.current = now;
+        const seekSec = fromMs / 1000;
         window.dispatchEvent(
           new CustomEvent("quran-audio-seek", { detail: { time: seekSec } })
         );
@@ -394,10 +405,11 @@ const SurahAyahList = ({
       </div>
 
       {viewMode === "reading" ? (
-        /* ── Quran.com Reading Mode (Continuous Mushaf Style Arabic Text with Generous Spacing) ── */
+        /* ── Quran.com Reading Mode (Continuous Mushaf Style Arabic Text with Generous Spacing & RTL Right Alignment) ── */
         <div
-          className="p-8 md:p-12 rounded-3xl glass border border-emerald-500/25 leading-[3.2] md:leading-[3.6] text-right font-arabic text-2xl md:text-3.5xl text-slate-900 dark:text-slate-100 flex flex-wrap gap-x-3 md:gap-x-4 gap-y-6 md:gap-y-8 shadow-xl justify-end"
+          className="p-8 md:p-12 rounded-3xl glass border border-emerald-500/25 leading-[3.2] md:leading-[3.6] text-right font-arabic text-2xl md:text-3.5xl text-slate-900 dark:text-slate-100 flex flex-wrap gap-x-3 md:gap-x-4 gap-y-6 md:gap-y-8 shadow-xl justify-start w-full text-end"
           dir="rtl"
+          style={{ textAlign: "right", direction: "rtl" }}
         >
           {arabicAyah.map((ayah, idx) => {
             const verseText = ayah?.text || ayah?.words?.map((w) => w.text_qpc_hafs || w.text_uthmani || w.text).join(" ");
@@ -405,7 +417,8 @@ const SurahAyahList = ({
               <span
                 key={idx}
                 id={`sura_${pageId}_ayah_${idx + 1}`}
-                className="inline-flex items-center flex-wrap hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors cursor-pointer select-none tracking-wide"
+                className="inline-flex items-center flex-wrap hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors cursor-pointer select-none tracking-wide text-right"
+                dir="rtl"
               >
                 <span>{verseText}</span>
               </span>
