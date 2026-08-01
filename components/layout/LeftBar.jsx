@@ -81,7 +81,7 @@ export default function LeftBar({ data }) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 overflow-y-auto pr-1 hover-scrollbar flex-1">
+      <div className="flex flex-col gap-2 overflow-y-auto px-1.5 py-1 hover-scrollbar flex-1">
         {filtered.map((surah, idx) => {
           const isActive = surah?.number === activeSurahNumber;
           const isPlayingSurah = surah?.number === playingSurahNumber && !audio?.paused;
@@ -93,7 +93,7 @@ export default function LeftBar({ data }) {
                     ? "active-surah-card border-primaryColor/40 dark:border-emerald-500/40 bg-gradient-to-r from-primaryColor/10 to-emerald-500/5 dark:from-primaryColor/20 dark:to-emerald-500/10 shadow-sm shadow-primaryColor/5"
                     : isPlayingSurah
                     ? "border-amber-500/40 dark:border-amber-400/40 bg-amber-500/10 dark:bg-amber-500/15"
-                    : "border-transparent dark:border-slate-800/10 hover:border-primaryColor/20 dark:hover:border-emerald-500/20 bg-white/20 dark:bg-slate-900/5 hover:bg-white/60 dark:hover:bg-slate-800/20 hover:scale-[1.01]"
+                    : "border-transparent dark:border-slate-800/10 hover:border-primaryColor/30 dark:hover:border-emerald-500/30 bg-white/20 dark:bg-slate-900/5 hover:bg-white/60 dark:hover:bg-slate-800/20"
                 }`}
               >
                 {/* Index / Audio Playing badge */}
