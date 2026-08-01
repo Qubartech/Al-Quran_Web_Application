@@ -5,12 +5,14 @@ import { createContext, useContext, useState, useEffect } from "react";
 const SidebarContext = createContext();
 
 export function SidebarProvider({ children }) {
-  const [isLeftBarOpen, setIsLeftBarOpen] = useState(true);
+  const [isLeftBarOpen, setIsLeftBarOpen] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("quran_leftbar_open");
     if (saved !== null) {
       setIsLeftBarOpen(saved === "true");
+    } else {
+      setIsLeftBarOpen(window.innerWidth >= 768);
     }
   }, []);
 
