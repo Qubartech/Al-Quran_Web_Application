@@ -25,7 +25,7 @@ import {
 
 function Navbar() {
   const { user, signOut } = useUser();
-  const { isLeftBarOpen, toggleSidebar } = useSidebar();
+  const { toggleSidebar } = useSidebar();
   const router = useRouter();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -33,6 +33,7 @@ function Navbar() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const pathname = usePathname();
+  const isReadingPage = /^\/(surah|juz|page)\/\d+/.test(pathname);
 
   useEffect(() => {
     const handleOpenSettings = () => {
@@ -69,17 +70,18 @@ function Navbar() {
   return (
     <nav className="px-6 bg-background/70 text-foreground backdrop-blur-xl transition-all duration-300 fixed top-0 left-0 right-0 w-full z-50 border-b border-border/50 shadow-sm dark:shadow-slate-950/50">
       <div className="max-w-screen-2xl mx-auto py-3.5 flex justify-between items-center">
-        {/* Logo container + Sidebar Toggle */}
+        {/* Logo container */}
         <div className="flex items-center gap-2">
-          {/* Sidebar Toggle Icon Button (Quran.com Style) */}
-          <button
-            onClick={toggleSidebar}
-            aria-label="Toggle Sidebar Navigation"
-            title="Toggle Sidebar Navigation"
-            className="p-2 rounded-xl text-gray-500 hover:text-emerald-500 hover:bg-emerald-500/10 dark:text-gray-400 dark:hover:text-emerald-400 dark:hover:bg-emerald-500/10 transition-all cursor-pointer border border-transparent hover:border-emerald-500/20"
-          >
-            <PanelLeft size={18} />
-          </button>
+          {isReadingPage && (
+            <button
+              onClick={toggleSidebar}
+              aria-label="Toggle Sidebar Navigation"
+              title="Toggle Sidebar Navigation"
+              className="mr-1 p-2 rounded-xl text-gray-500 hover:text-emerald-500 hover:bg-emerald-500/10 dark:text-gray-400 dark:hover:text-emerald-400 dark:hover:bg-emerald-500/10 transition-all cursor-pointer border border-transparent hover:border-emerald-500/20"
+            >
+              <PanelLeft size={18} />
+            </button>
+          )}
 
           <Link href="/" className="hover:opacity-95 transition-all flex items-center gap-2.5 whitespace-nowrap">
             <span className="w-8 h-8 shrink-0 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white text-sm font-black shadow-md shadow-emerald-500/25">

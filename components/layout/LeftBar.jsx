@@ -5,10 +5,12 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Search, X, Volume2 } from "lucide-react";
 import { useAudio } from "@/context/AudioProvider";
+import { useSidebar } from "@/context/SidebarProvider";
 
 export default function LeftBar({ data }) {
   const params = useParams();
   const audio = useAudio();
+  const { toggleSidebar } = useSidebar();
   const [query, setQuery] = useState("");
   const [verseQuery, setVerseQuery] = useState("");
   const [pageQuery, setPageQuery] = useState("");
@@ -88,9 +90,19 @@ export default function LeftBar({ data }) {
         
         {/* Title Header matching user screenshot */}
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-emerald-400 tracking-tight">
-            Surah List
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold text-emerald-400 tracking-tight">
+              Surah List
+            </h2>
+            {/* Close button on mobile */}
+            <button
+              onClick={toggleSidebar}
+              className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors ml-1 cursor-pointer"
+              title="Close Sidebar"
+            >
+              <X size={16} />
+            </button>
+          </div>
           
           {/* Top Navigation Mode Pills */}
           <div className="flex items-center bg-slate-900/80 p-0.5 rounded-lg border border-slate-800/80 text-[11px] font-bold">
