@@ -28,24 +28,9 @@ export default function LeftBarContainer({ data, children }) {
         <LeftBar data={data} />
       </div>
 
-      {/* Main Container wrapping Top Control Bar + Reading Pane */}
-      <div className="flex-1 flex flex-col h-[calc(100vh-130px)] relative min-w-0">
-        {/* Top Control Bar for Inside Pages */}
-        <div className="flex items-center gap-2 mb-3.5 shrink-0 px-1 md:px-0">
-          <button
-            onClick={toggleSidebar}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:text-emerald-500 hover:bg-emerald-500/10 dark:text-gray-300 dark:hover:text-emerald-400 dark:hover:bg-emerald-500/10 border border-slate-200 dark:border-slate-800 transition-all cursor-pointer font-semibold text-xs md:text-sm shadow-xs bg-white/60 dark:bg-slate-900/60 backdrop-blur-md"
-            title={isLeftBarOpen ? "Hide Sidebar" : "Show Sidebar"}
-          >
-            <PanelLeft size={16} />
-            <span>{isLeftBarOpen ? "Hide Sidebar" : "Show Sidebar"}</span>
-          </button>
-        </div>
-
-        {/* Main Reading Pane */}
-        <div className="w-full rounded-2xl overflow-y-auto scroll-smooth duration-700 glass hover-scrollbar flex-1 relative">
-          {children}
-        </div>
+      {/* Main Reading Pane */}
+      <div className="w-full rounded-2xl h-[calc(100vh-130px)] overflow-y-auto scroll-smooth duration-700 glass hover-scrollbar flex-1 relative">
+        {children}
       </div>
     </div>
   );

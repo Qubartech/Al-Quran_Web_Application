@@ -6,6 +6,7 @@ import SettingsDrawer from "@/components/settings/SettingsDrawer";
 import AuthModal from "@/components/auth/AuthModal";
 import ProfileEditModal from "@/components/auth/ProfileEditModal";
 import { useUser } from "@/context/UserProvider";
+import { useSidebar } from "@/context/SidebarProvider";
 import { 
   Settings, 
   Menu, 
@@ -18,11 +19,13 @@ import {
   ChevronDown, 
   LayoutDashboard,
   GraduationCap,
-  UserCheck
+  UserCheck,
+  PanelLeft
 } from "lucide-react";
 
 function Navbar() {
   const { user, signOut } = useUser();
+  const { toggleSidebar } = useSidebar();
   const router = useRouter();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -30,6 +33,7 @@ function Navbar() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const pathname = usePathname();
+  const isReadingPage = /^\/(surah|juz|page)\/\d+/.test(pathname);
 
   useEffect(() => {
     const handleOpenSettings = () => {
@@ -68,6 +72,16 @@ function Navbar() {
       <div className="max-w-screen-2xl mx-auto py-3.5 flex justify-between items-center">
         {/* Logo container */}
         <div className="flex items-center gap-2">
+          {isReadingPage && (
+            <button
+              onClick={toggleSidebar}
+              aria-label="Toggle Sidebar Navigation"
+              title="Toggle Sidebar Navigation"
+              className="mr-1 p-2 rounded-xl text-gray-500 hover:text-emerald-500 hover:bg-emerald-500/10 dark:text-gray-400 dark:hover:text-emerald-400 dark:hover:bg-emerald-500/10 transition-all cursor-pointer border border-transparent hover:border-emerald-500/20"
+            >
+              <PanelLeft size={18} />
+            </button>
+          )}
 
           <Link href="/" className="hover:opacity-95 transition-all flex items-center gap-2.5 whitespace-nowrap">
             <span className="w-8 h-8 shrink-0 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white text-sm font-black shadow-md shadow-emerald-500/25">
