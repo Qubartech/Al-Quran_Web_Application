@@ -91,7 +91,7 @@ export default function Loading() {
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="w-full p-4.5 rounded-2xl flex items-center justify-between border border-transparent dark:border-slate-800/80 glass"
+                className="w-full p-5 rounded-2xl flex items-center justify-between border border-transparent dark:border-slate-800/80 glass"
               >
                 <div className="flex items-center gap-4">
                   {/* Badge Circle */}
