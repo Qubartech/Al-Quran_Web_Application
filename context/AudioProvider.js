@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { QURAN_API_BASE_URL, QURANICAUDIO_BASE_URL } from "@/lib/api/config";
 import SurahAudioPlayer from "@/components/audio/SurahAudioPlayer";
 
@@ -21,6 +21,7 @@ export default function AudioProvider({ children }) {
   const [pauseTick, setPauseTick] = useState(0);
   const [playTick, setPlayTick] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const currentTimeRef = useRef(0);
 
   // Dynamic reciter states
   const [reciters, setReciters] = useState([]);
@@ -31,6 +32,7 @@ export default function AudioProvider({ children }) {
     const handleTimeUpdate = (e) => {
       if (typeof e.detail?.currentTime === "number") {
         setCurrentTime(e.detail.currentTime);
+        currentTimeRef.current = e.detail.currentTime;
       }
     };
     window.addEventListener("quran-audio-timeupdate", handleTimeUpdate);
@@ -98,6 +100,7 @@ export default function AudioProvider({ children }) {
     setPaused(false);
     setTitle(listTitle || "");
     setPlayTick((t) => t + 1);
+    currentTimeRef.current = 0;
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem("__audio_src__", nextSrc || "");
@@ -137,6 +140,7 @@ export default function AudioProvider({ children }) {
     
     // Immediately start playback in user click gesture context
     playList([initialUrl], 0, `surah_${num}`, surahName);
+    currentTimeRef.current = startSeekTime;
 
     // Fetch API asynchronously in background to sync custom URLs if needed
     try {
@@ -145,6 +149,10 @@ export default function AudioProvider({ children }) {
         const data = await res.json();
         const apiAudioUrl = data.audio_file?.audio_url;
         if (apiAudioUrl && apiAudioUrl !== initialUrl) {
+          const targetSeek = currentTimeRef.current > 0 ? currentTimeRef.current : startSeekTime;
+          if (typeof window !== "undefined") {
+            window.pendingQuranAudioSeekTime = targetSeek;
+          }
           setSrc(apiAudioUrl);
         }
       }

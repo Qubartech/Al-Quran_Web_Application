@@ -196,6 +196,16 @@ function SurahAudioPlayer({
   const handleTimeUpdate = () => {
     const audioEl = audioRef.current;
     if (!audioEl) return;
+
+    // Prevent premature timeupdate events (usually 0 when loading new source) from resetting highlights
+    if (
+      typeof window !== "undefined" &&
+      typeof window.pendingQuranAudioSeekTime === "number" &&
+      audioEl.currentTime === 0
+    ) {
+      return;
+    }
+
     setCurrentTime(audioEl.currentTime);
 
     // Propagate custom timeupdate event for page verse highlights
