@@ -3,17 +3,17 @@ import React, { useState, useEffect, useRef } from "react";
 import { ALADHAN_API_BASE_URL } from "@/lib/api/config";
 import { usePrayerTracker } from "@/context/PrayerTrackerContext";
 import Link from "next/link";
-import { 
-  Settings, 
-  MapPin, 
-  Search, 
-  Sunrise, 
-  Sun, 
-  Sunset, 
-  Moon, 
-  CloudSun, 
-  Loader2, 
-  Check, 
+import {
+  Settings,
+  MapPin,
+  Search,
+  Sunrise,
+  Sun,
+  Sunset,
+  Moon,
+  CloudSun,
+  Loader2,
+  Check,
   X,
   AlertCircle,
   RefreshCw,
@@ -68,7 +68,7 @@ const NamazTimeCard = ({ gpsLocation }) => {
   const [school, setSchool] = useState(0); // Default to Standard/Shafi
   const [isManual, setIsManual] = useState(false);
   const [activeLocation, setActiveLocation] = useState(null);
-  
+
   // UI & Search States
   const [searchQuery, setSearchQuery] = useState("");
   const [showSettings, setShowSettings] = useState(false);
@@ -98,7 +98,7 @@ const NamazTimeCard = ({ gpsLocation }) => {
   const calculateCountdown = (timingsData) => {
     if (!timingsData) return null;
     const now = new Date();
-    
+
     // Core prayers for calculation
     const prayers = [
       { name: "Fajr", timeStr: timingsData.Fajr },
@@ -347,7 +347,7 @@ const NamazTimeCard = ({ gpsLocation }) => {
 
   return (
     <div className="glass h-fit w-full p-5 md:p-6 rounded-2xl text-gray-900 dark:text-gray-100 flex flex-col gap-3 md:gap-3.5 relative overflow-hidden transition-all duration-300 border border-white/20 dark:border-slate-800/80 shadow-md">
-      
+
       {/* Header */}
       <div className="flex flex-col gap-1.5 border-b border-gray-200/50 dark:border-gray-700/50 pb-3">
         <div className="flex items-center justify-between">
@@ -366,17 +366,16 @@ const NamazTimeCard = ({ gpsLocation }) => {
             {/* Reminder Toggle Button */}
             <button
               onClick={() => tracker?.toggleGlobalReminders()}
-              className={`p-1.5 rounded-lg transition-colors flex items-center gap-1 text-xs font-semibold ${
-                tracker?.remindersEnabled
-                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                  : "text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
-              }`}
+              className={`p-1.5 rounded-lg transition-colors flex items-center gap-1 text-xs font-semibold ${tracker?.remindersEnabled
+                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                : "text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                }`}
               title={tracker?.remindersEnabled ? "Reminders ON" : "Turn ON Reminders"}
             >
               {tracker?.remindersEnabled ? <Bell size={14} className="text-emerald-500 fill-emerald-500/20" /> : <BellOff size={14} />}
             </button>
-            
-            <button 
+
+            <button
               onClick={() => setShowSettings(!showSettings)}
               className={`p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${showSettings ? 'text-primaryColor' : 'text-gray-500'}`}
               title="Configure settings"
@@ -385,7 +384,7 @@ const NamazTimeCard = ({ gpsLocation }) => {
             </button>
           </div>
         </div>
-        
+
         {/* Date & Location Line */}
         <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-0.5">
           <div className="flex items-center gap-1.5 truncate max-w-[210px] font-medium">
@@ -425,8 +424,8 @@ const NamazTimeCard = ({ gpsLocation }) => {
         <div className="p-3.5 rounded-xl bg-gray-50/90 dark:bg-slate-800/90 border border-gray-200/80 dark:border-slate-700/80 flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-200 text-xs">
           <div className="flex items-center justify-between border-b border-gray-200/50 dark:border-slate-700/50 pb-1.5">
             <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Prayer Settings</span>
-            <button 
-              onClick={() => setShowSettings(false)} 
+            <button
+              onClick={() => setShowSettings(false)}
               className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-0.5 rounded"
             >
               <X size={14} />
@@ -443,7 +442,7 @@ const NamazTimeCard = ({ gpsLocation }) => {
                 placeholder="e.g. London, UK"
                 className="flex-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-2.5 py-1 text-xs text-gray-800 dark:text-gray-150 focus:outline-none focus:ring-1 focus:ring-primaryColor"
               />
-              <button 
+              <button
                 type="submit"
                 disabled={loading}
                 className="bg-primaryColor hover:bg-primaryColor/90 text-white px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors"
@@ -455,7 +454,7 @@ const NamazTimeCard = ({ gpsLocation }) => {
           </form>
 
           {isManual && (
-            <button 
+            <button
               onClick={handleResetGps}
               className="text-left text-[11px] text-primaryColor hover:underline font-semibold flex items-center gap-1"
             >
@@ -485,22 +484,20 @@ const NamazTimeCard = ({ gpsLocation }) => {
               <button
                 type="button"
                 onClick={() => handleSaveConfig(method, 0)}
-                className={`flex-1 py-1 px-2 rounded-lg text-[11px] font-bold border transition-all ${
-                  school === 0
-                    ? "bg-primaryColor text-white border-primaryColor"
-                    : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-655 dark:text-gray-300"
-                }`}
+                className={`flex-1 py-1 px-2 rounded-lg text-[11px] font-bold border transition-all ${school === 0
+                  ? "bg-primaryColor text-white border-primaryColor"
+                  : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-655 dark:text-gray-300"
+                  }`}
               >
                 Standard (Shafi)
               </button>
               <button
                 type="button"
                 onClick={() => handleSaveConfig(method, 1)}
-                className={`flex-1 py-1 px-2 rounded-lg text-[11px] font-bold border transition-all ${
-                  school === 1
-                    ? "bg-primaryColor text-white border-primaryColor"
-                    : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-655 dark:text-gray-300"
-                }`}
+                className={`flex-1 py-1 px-2 rounded-lg text-[11px] font-bold border transition-all ${school === 1
+                  ? "bg-primaryColor text-white border-primaryColor"
+                  : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-655 dark:text-gray-300"
+                  }`}
               >
                 Hanafi
               </button>
@@ -538,7 +535,7 @@ const NamazTimeCard = ({ gpsLocation }) => {
       {/* Timings Content */}
       {timings && !loading && (
         <div className="flex flex-col gap-3">
-          
+
           {/* Sleek Compact Countdown Banner */}
           {prayerStatus && (
             <div className="bg-gradient-to-br from-primaryColor/10 via-emerald-500/5 to-teal-500/10 dark:from-primaryColor/20 dark:to-emerald-500/10 rounded-xl py-2.5 px-3.5 border border-primaryColor/15 dark:border-primaryColor/25 flex items-center justify-between relative overflow-hidden">
@@ -570,39 +567,71 @@ const NamazTimeCard = ({ gpsLocation }) => {
               return (
                 <div
                   key={key}
-                  className={`flex justify-between items-center py-2.5 md:py-3 px-3.5 md:px-4 rounded-xl transition-all duration-200 ${
-                    isActive
-                      ? "bg-primaryColor/15 border-2 border-primaryColor dark:bg-primaryColor/25 shadow-sm scale-[1.01]"
+                  className={`flex justify-between items-center py-2.5 md:py-3 px-3.5 md:px-4 rounded-xl transition-all duration-200 ${isActive
+                    ? "bg-primaryColor/15 border-2 border-primaryColor dark:bg-primaryColor/25 shadow-sm scale-[1.01]"
+                    : key === "Sunrise"
+                      ? "bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20 dark:border-amber-500/20"
                       : "bg-white/40 dark:bg-gray-800/40 border border-gray-200/40 dark:border-gray-700/40 hover:bg-white/60 dark:hover:bg-gray-800/60"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`p-1.5 rounded-md ${isActive ? 'bg-primaryColor text-white' : 'bg-gray-200/60 dark:bg-slate-800 text-gray-600 dark:text-gray-300'}`}>
+                    <div
+                      className={`px-2 p-2.5 rounded-md ${isActive
+                        ? "bg-primaryColor text-white"
+                        : key === "Sunrise"
+                          ? "bg-amber-500/20 text-amber-600 dark:text-amber-400"
+                          : "bg-gray-200/60 dark:bg-slate-800 text-gray-600 dark:text-gray-300"
+                        }`}
+                    >
                       <Icon size={15} />
                     </div>
-                    <span className={`text-xs md:text-sm font-bold ${isActive ? "text-primaryColor" : "text-gray-800 dark:text-gray-200"}`}>
-                      {item.label}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs md:text-sm font-bold ${isActive
+                          ? "text-primaryColor"
+                          : key === "Sunrise"
+                            ? "text-amber-700 dark:text-amber-300 font-extrabold"
+                            : "text-gray-800 dark:text-gray-200"
+                          }`}
+                      >
+                        {item.label}
+                      </span>
+                      {key === "Sunrise" && (
+                        <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25 tracking-wide">
+                          Shuruq
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className={`text-xs md:text-sm font-bold font-mono ${isActive ? "text-primaryColor text-sm font-extrabold" : "text-gray-700 dark:text-gray-300"}`}>
+                    <span
+                      className={`text-xs md:text-sm font-bold font-mono ${isActive
+                        ? "text-primaryColor text-sm font-extrabold"
+                        : key === "Sunrise"
+                          ? "text-amber-600 dark:text-amber-400 font-bold"
+                          : "text-gray-700 dark:text-gray-300"
+                        }`}
+                    >
                       {timeFormatted}
                     </span>
 
-                    {/* Completion Checkmark */}
-                    {isCheckable && (
+                    {/* Completion Checkmark / Alignment Slot */}
+                    {isCheckable ? (
                       <button
                         onClick={() => tracker?.togglePrayerCompletion(todayDateStr, key)}
-                        className={`p-0.5 rounded-md transition-all ${
-                          isCompleted
-                            ? "text-emerald-500 hover:scale-110"
-                            : "text-gray-300 hover:text-emerald-400 dark:text-gray-600"
-                        }`}
+                        className={`p-0.5 rounded-md transition-all ${isCompleted
+                          ? "text-emerald-500 hover:scale-110"
+                          : "text-gray-300 hover:text-emerald-400 dark:text-gray-600"
+                          }`}
                         title={isCompleted ? `Mark ${key} incomplete` : `Mark ${key} completed`}
                       >
                         {isCompleted ? <CheckCircle2 size={17} className="fill-emerald-500/20" /> : <Circle size={17} />}
                       </button>
+                    ) : (
+                      <div className="w-[18px] h-[18px] flex items-center justify-center">
+                        <Sunrise size={14} className="text-amber-500/50 dark:text-amber-400/50" />
+                      </div>
                     )}
                   </div>
                 </div>
