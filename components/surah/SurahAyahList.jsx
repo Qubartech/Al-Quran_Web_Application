@@ -153,7 +153,7 @@ const SurahAyahList = ({
     if (!isCurrentSurahPlaying) return -1;
     const timeMs = audioCurrentTime * 1000;
     return arabicAyah.findIndex(
-      (ayah) => timeMs >= ayah.timestamp_from && timeMs <= ayah.timestamp_to
+      (ayah) => timeMs >= ayah.timestamp_from && timeMs < ayah.timestamp_to
     );
   }, [arabicAyah, audioCurrentTime, isCurrentSurahPlaying]);
 
@@ -276,6 +276,7 @@ const SurahAyahList = ({
 
     // Check if the full Surah audio is already playing
     if (isCurrentSurahPlaying) {
+      setAudioCurrentTime(seekTime);
       window.dispatchEvent(
         new CustomEvent("quran-audio-seek", { detail: { time: seekTime } })
       );
@@ -283,6 +284,7 @@ const SurahAyahList = ({
         audio?.resume();
       }
     } else {
+      setAudioCurrentTime(seekTime);
       // Load and play full Surah starting from exact Ayah timestamp
       audio?.playSurah(pageId, surahName, seekTime);
       

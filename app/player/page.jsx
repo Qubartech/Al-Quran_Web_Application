@@ -171,7 +171,7 @@ export default function AudioPlayerPage() {
     const timeMs = audioTime * 1000;
     
     const activeSegIdx = segments.findIndex(
-      (seg) => timeMs >= seg.timestamp_from && timeMs <= seg.timestamp_to
+      (seg) => timeMs >= seg.timestamp_from && timeMs < seg.timestamp_to
     );
 
     if (activeSegIdx !== -1) {

@@ -49,7 +49,7 @@ export default function JuzAyahList({
       if (ayah.surahNumber !== playingSurahNum) return false;
       const seg = surahTimestamps.find((s) => s.verse_key === ayah.verseKey);
       if (!seg) return false;
-      return timeMs >= seg.timestamp_from && timeMs <= seg.timestamp_to;
+      return timeMs >= seg.timestamp_from && timeMs < seg.timestamp_to;
     });
   }, [arabicAyah, audio, audioCurrentTime, segmentsMap]);
 
@@ -258,6 +258,7 @@ export default function JuzAyahList({
         String(audio?.playlistId) === `surah_${surahNumber}`);
 
     if (isCurrentSurahPlaying) {
+      setAudioCurrentTime(seekTime);
       window.dispatchEvent(
         new CustomEvent("quran-audio-seek", { detail: { time: seekTime } })
       );
@@ -265,6 +266,7 @@ export default function JuzAyahList({
         audio?.resume();
       }
     } else {
+      setAudioCurrentTime(seekTime);
       audio?.playSurah(surahNumber, surahName, seekTime);
       
       // Log to Recently Played
