@@ -439,7 +439,7 @@ const SurahAyahList = ({
       {viewMode === "reading" ? (
         /* ── Quran.com Reading Mode (Continuous Mushaf Style Arabic Text with Generous Spacing & RTL Right Alignment) ── */
         <div
-          className="p-8 md:p-12 rounded-3xl glass border border-emerald-500/25 leading-[3.2] md:leading-[3.6] text-right font-arabic text-2xl md:text-3.5xl text-slate-900 dark:text-slate-100 flex flex-wrap gap-x-3 md:gap-x-4 gap-y-6 md:gap-y-8 shadow-xl justify-start w-full text-end"
+          className="p-4 sm:p-8 md:p-12 rounded-3xl glass border border-emerald-500/25 leading-[2.8] sm:leading-[3.2] md:leading-[3.6] text-right font-arabic text-xl sm:text-2xl md:text-3.5xl text-slate-900 dark:text-slate-100 flex flex-wrap gap-x-3 md:gap-x-4 gap-y-6 md:gap-y-8 shadow-xl justify-start w-full text-end"
           dir="rtl"
           style={{ textAlign: "right", direction: "rtl" }}
         >

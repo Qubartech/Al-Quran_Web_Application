@@ -247,7 +247,7 @@ export default function LearnPage() {
       </div>
 
       {/* Academy Quick Stats Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-8">
         <div className="p-4 rounded-2xl glass border border-gray-200/50 dark:border-slate-800/80 flex items-center gap-3 shadow-sm">
           <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
             <BookOpen size={20} />

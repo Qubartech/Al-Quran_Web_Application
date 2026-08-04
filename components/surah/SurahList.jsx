@@ -12,10 +12,10 @@ import {
   ArrowUpDown,
   Sparkles,
   X,
-  Compass
+  BookOpen,
+  Volume2
 } from "lucide-react";
 import { useAudio } from "@/context/AudioProvider";
-import SearchSurahModal from "./SearchSurahModal";
 
 export default function SurahList({ data }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,12 +23,11 @@ export default function SurahList({ data }) {
   const [sortBy, setSortBy] = useState("number"); // 'number', 'ayahs', 'name'
   const [sortOrder, setSortOrder] = useState("asc"); // 'asc', 'desc'
   const [viewMode, setViewMode] = useState("grid"); // 'grid', 'list'
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   const audio = useAudio();
   const surahData = useMemo(() => data || [], [data]);
 
-  // Handle playing surah audio directly from card
+  // Play surah audio directly from card
   const handlePlaySurah = (e, surah) => {
     e.preventDefault();
     e.stopPropagation();
@@ -102,51 +101,53 @@ export default function SurahList({ data }) {
 
   return (
     <div className="w-full space-y-6">
-      {/* Control Bar: Search + Filters + Views */}
-      <div className="flex flex-col gap-4 p-4 md:p-5 rounded-2xl glass border border-white/20 dark:border-slate-800/80 shadow-sm">
-
-        {/* Row 1: Search Bar & View Toggle */}
-        <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+      
+      {/* Control Bar: Search + Filters + View Switcher */}
+      <div className="flex flex-col gap-4 p-5 md:p-6 rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 shadow-xl">
+        
+        {/* Row 1: Search Input & Controls */}
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+          
           {/* Search Input */}
-          <div className="relative w-full sm:max-w-md">
+          <div className="relative w-full md:max-w-md">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by Surah name, number, or translation..."
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-gray-200/60 dark:border-slate-800/80 bg-white/60 dark:bg-slate-900/60 text-slate-800 dark:text-slate-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primaryColor/30 text-xs font-semibold shadow-inner transition-all"
+              placeholder="Search by Surah name, translation, or number (e.g. 36, Ya-Sin)..."
+              className="w-full pl-11 pr-10 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/60 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-semibold shadow-inner transition-all"
             />
-            <Search className="absolute left-3.5 top-3 text-gray-400" size={15} />
+            <Search className="absolute left-4 top-3.5 text-slate-400" size={16} />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded"
               >
-                <X size={14} />
+                <X size={15} />
               </button>
             )}
           </div>
 
-          {/* Quick Controls: View mode + Sort */}
-          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
+          {/* Controls: Sort Dropdown & Grid/List Switcher */}
+          <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+            
             {/* Sort selection */}
-            <div className="flex items-center gap-1 bg-white/50 dark:bg-slate-800/50 p-1.5 rounded-xl border border-gray-200/50 dark:border-slate-700/50">
+            <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-transparent text-slate-700 dark:text-slate-200 text-xs font-bold focus:outline-none focus:ring-0 px-2 py-1 cursor-pointer appearance-none pr-6 [&>option]:bg-white [&>option]:dark:bg-slate-800 [&>option]:text-slate-800 [&>option]:dark:text-slate-200"
-                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 4px center' }}
+                className="bg-transparent text-slate-700 dark:text-slate-200 text-xs font-bold focus:outline-none px-2 py-1 cursor-pointer"
               >
-                <option value="number">Sort by Number</option>
-                <option value="ayahs">Sort by Ayahs</option>
-                <option value="name">Sort by Name</option>
+                <option value="number" className="dark:bg-slate-900">Sort by Number</option>
+                <option value="ayahs" className="dark:bg-slate-900">Sort by Verses</option>
+                <option value="name" className="dark:bg-slate-900">Sort by Name</option>
               </select>
               <button
                 onClick={toggleSortOrder}
-                className={`p-1.5 rounded-lg transition-all ${
+                className={`p-1.5 rounded-xl transition-all ${
                   sortOrder === "desc"
-                    ? "bg-primaryColor/15 text-primaryColor dark:text-primaryColor-light"
-                    : "text-gray-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-gray-200/40 dark:hover:bg-slate-700/40"
+                    ? "bg-emerald-600 text-white shadow-sm"
+                    : "text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                 }`}
                 title={`Sort ${sortOrder === "asc" ? "Ascending" : "Descending"}`}
               >
@@ -155,208 +156,247 @@ export default function SurahList({ data }) {
             </div>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center p-1 bg-white/50 dark:bg-slate-800/50 rounded-xl border border-gray-200/50 dark:border-slate-700/50">
+            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-2 rounded-lg transition-all ${viewMode === "grid"
-                    ? "bg-primaryColor text-white shadow-sm shadow-emerald-500/20"
-                    : "text-gray-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-gray-200/40 dark:hover:bg-slate-700/40"
-                  }`}
+                className={`p-2 rounded-xl transition-all ${
+                  viewMode === "grid"
+                    ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30"
+                    : "text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                }`}
                 title="Grid View"
               >
-                <LayoutGrid size={14} />
+                <LayoutGrid size={16} />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-2 rounded-lg transition-all ${viewMode === "list"
-                    ? "bg-primaryColor text-white shadow-sm shadow-emerald-500/20"
-                    : "text-gray-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-gray-200/40 dark:hover:bg-slate-700/40"
-                  }`}
+                className={`p-2 rounded-xl transition-all ${
+                  viewMode === "list"
+                    ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30"
+                    : "text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                }`}
                 title="List View"
               >
-                <List size={14} />
+                <List size={16} />
               </button>
             </div>
+
           </div>
+
         </div>
 
-        {/* Row 2: Category Filter Pills */}
-        <div className="flex items-center gap-2 pt-1 border-t border-gray-200/40 dark:border-slate-800/50 overflow-x-auto no-scrollbar">
-          <button
-            onClick={() => setFilterType("all")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filterType === "all"
-                ? "bg-primaryColor text-white shadow-sm shadow-emerald-500/20"
-                : "bg-white/30 dark:bg-slate-900/30 text-gray-600 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-slate-800/50"
+        {/* Row 2: Category Filter Pills & Counter */}
+        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <button
+              onClick={() => setFilterType("all")}
+              className={`px-4 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all ${
+                filterType === "all"
+                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/20"
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
               }`}
-          >
-            All Surahs ({counts.all})
-          </button>
-          <button
-            onClick={() => setFilterType("makkah")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filterType === "makkah"
-                ? "bg-primaryColor text-white shadow-sm shadow-emerald-500/20"
-                : "bg-white/30 dark:bg-slate-900/30 text-gray-600 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-slate-800/50"
+            >
+              All Surahs ({counts.all})
+            </button>
+
+            <button
+              onClick={() => setFilterType("makkah")}
+              className={`px-4 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all ${
+                filterType === "makkah"
+                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/20"
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
               }`}
-          >
-            Meccan / Makki ({counts.makki})
-          </button>
-          <button
-            onClick={() => setFilterType("madinah")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${filterType === "madinah"
-                ? "bg-primaryColor text-white shadow-sm shadow-emerald-500/20"
-                : "bg-white/30 dark:bg-slate-900/30 text-gray-600 dark:text-gray-400 hover:bg-white/60 dark:hover:bg-slate-800/50"
+            >
+              Meccan / Makki ({counts.makki})
+            </button>
+
+            <button
+              onClick={() => setFilterType("madinah")}
+              className={`px-4 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all ${
+                filterType === "madinah"
+                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/20"
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
               }`}
-          >
-            Medinan / Madani ({counts.madani})
-          </button>
+            >
+              Medinan / Madani ({counts.madani})
+            </button>
+          </div>
+
+          <span className="text-xs font-bold text-slate-400 hidden sm:block">
+            Showing {filteredAndSortedSurahs.length} of 114
+          </span>
         </div>
 
       </div>
 
-      {/* Surah List / Grid Display */}
-      {filteredAndSortedSurahs.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-12 text-center rounded-2xl glass border border-white/20 dark:border-slate-800/80">
-          <Compass className="w-12 h-12 text-gray-400 mb-3 animate-pulse" />
-          <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">No Surahs Found</h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-sm">
-            We couldn&apos;t find any Surah matching &quot;{searchQuery}&quot;. Try adjusting your search term or filter options.
+      {/* Empty Search Result State */}
+      {filteredAndSortedSurahs.length === 0 && (
+        <div className="p-12 text-center rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col items-center gap-3">
+          <BookOpen size={36} className="text-slate-300 dark:text-slate-700" />
+          <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
+            No Surah found matching &quot;{searchQuery}&quot;
+          </h3>
+          <p className="text-xs text-slate-400">
+            Try searching by Surah name, Arabic title, or verse count.
           </p>
           <button
-            onClick={() => {
-              setSearchQuery("");
-              setFilterType("all");
-            }}
-            className="mt-4 px-4 py-2 text-xs font-bold bg-primaryColor/10 text-primaryColor dark:text-primaryColor-light hover:bg-primaryColor hover:text-white rounded-xl transition-all"
+            onClick={() => setSearchQuery("")}
+            className="mt-2 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold"
           >
-            Reset Filters
+            Clear Search Filter
           </button>
         </div>
-      ) : viewMode === "grid" ? (
-        /* GRID VIEW */
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3.5 pb-10">
+      )}
+
+      {/* Grid View Directory */}
+      {viewMode === "grid" ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredAndSortedSurahs.map((surah) => {
-            const surahId = `surah_${surah.number}`;
-            const isPlaying = audio?.trackId === surahId && audio?.isPlaying;
-            const isMeccan = (surah.revelationType || "").toLowerCase().includes("makkah");
+            const isPlayingThis = audio?.trackId === `surah_${surah.number}` && audio?.isPlaying;
+            const isMakki = (surah.revelationType || "").toLowerCase().includes("makkah") || (surah.revelationType || "").toLowerCase().includes("meccan");
 
             return (
-              <Link href={`/surah/${surah.number}`} key={surah.number} className="group">
-                <div className="w-full p-4 rounded-2xl flex items-center justify-between border border-transparent dark:border-slate-800/80 hover:border-primaryColor/40 dark:hover:border-emerald-500/40 group-hover:shadow-md transition-all duration-300 glass glass-hover relative overflow-hidden">
+              <Link
+                key={surah.number}
+                href={`/surah/${surah.number}`}
+                className={`group relative p-5 rounded-3xl border transition-all duration-300 flex flex-col justify-between gap-4 overflow-hidden ${
+                  isPlayingThis
+                    ? "bg-emerald-500/10 border-2 border-emerald-500 shadow-xl shadow-emerald-500/10 scale-[1.01]"
+                    : "bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-slate-200/70 dark:border-slate-800/80 hover:border-emerald-500/40 hover:bg-white dark:hover:bg-slate-900 hover:shadow-xl"
+                }`}
+              >
+                {/* Background Ambient Glow */}
+                <div className="absolute -right-10 -bottom-10 w-28 h-28 rounded-full bg-emerald-500/5 group-hover:scale-150 transition-transform pointer-events-none"></div>
 
-                  <div className="flex items-center gap-3.5 min-w-0 pr-2">
-                    {/* Surah Number Badge / Play Button */}
-                    <div className="relative shrink-0">
-                      <div className={`h-11 w-11 rounded-xl flex items-center justify-center font-bold text-sm transition-all duration-300 ${isPlaying
-                          ? "bg-primaryColor text-white shadow-md shadow-emerald-500/30 scale-105"
-                          : "bg-primaryColor/10 dark:bg-emerald-500/10 text-primaryColor dark:text-primaryColor-light border-2 border-primaryColor/20 group-hover:border-transparent group-hover:bg-primaryColor group-hover:text-white"
-                        }`}>
-                        {isPlaying ? (
-                          <span className="animate-pulse">▶</span>
-                        ) : (
-                          surah.number
-                        )}
-                      </div>
-
-                      {/* Quick Play Overlay Button */}
-                      <button
-                        onClick={(e) => handlePlaySurah(e, surah)}
-                        className="absolute inset-0 rounded-xl bg-primaryColor text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-md"
-                        title={`Play Surah ${surah.englishName}`}
-                      >
-                        {isPlaying ? <Pause size={16} fill="white" /> : <Play size={16} fill="white" className="ml-0.5" />}
-                      </button>
+                {/* Top Row: Number Badge & Arabic Title */}
+                <div className="flex items-center justify-between z-10">
+                  <div className="flex items-center gap-3">
+                    {/* Star Geometric Badge */}
+                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black font-mono text-xs transition-all shadow-sm ${
+                      isPlayingThis
+                        ? "bg-emerald-600 text-white shadow-emerald-600/30"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 group-hover:bg-emerald-500/10 group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
+                    }`}>
+                      {surah.number}
                     </div>
 
-                    {/* Info */}
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-extrabold text-slate-800 dark:text-slate-100 group-hover:text-primaryColor transition-colors truncate">
-                          {surah.englishName}
-                        </h3>
-                        <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full border ${isMeccan
-                            ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                            : "bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20"
-                          }`}>
-                          {isMeccan ? "Makki" : "Madani"}
-                        </span>
-                      </div>
-                      <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium truncate mt-0.5">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-black text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                        {surah.englishName}
+                      </span>
+                      <span className="text-xs text-slate-400 font-medium truncate max-w-[130px]">
                         {surah.englishNameTranslation}
-                      </p>
+                      </span>
                     </div>
                   </div>
 
-                  {/* Arabic Name & Verse Count */}
-                  <div className="text-end shrink-0 pl-2">
-                    <span className="font-arabic text-xl text-slate-800 dark:text-slate-100 group-hover:text-primaryColor transition-colors font-medium">
-                      {surah.name}
+                  {/* Arabic Name */}
+                  <span className="font-arabic text-xl font-bold text-slate-800 dark:text-slate-200 group-hover:scale-105 transition-transform" dir="rtl">
+                    {surah.name}
+                  </span>
+                </div>
+
+                {/* Bottom Row: Metadata & Audio Trigger */}
+                <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800/80 z-10">
+                  <div className="flex items-center gap-2 text-[11px] font-bold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono">
+                      {surah.numberOfAyahs} Verses
                     </span>
-                    <p className="text-[9px] font-bold text-primaryColor dark:text-primaryColor-light mt-0.5">
-                      {surah.numberOfAyahs} Ayahs
-                    </p>
+
+                    <span className={`px-2.5 py-0.5 rounded-full ${
+                      isMakki
+                        ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
+                        : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                    }`}>
+                      {isMakki ? "Makki" : "Madani"}
+                    </span>
                   </div>
 
+                  {/* Audio Play Button */}
+                  <button
+                    type="button"
+                    onClick={(e) => handlePlaySurah(e, surah)}
+                    className={`p-2 rounded-xl transition-all ${
+                      isPlayingThis
+                        ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30 animate-pulse"
+                        : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white"
+                    }`}
+                    title={isPlayingThis ? "Pause" : "Listen Audio"}
+                  >
+                    {isPlayingThis ? <Pause size={14} className="fill-white" /> : <Play size={14} className="fill-emerald-600 dark:fill-emerald-400 group-hover:fill-white" />}
+                  </button>
                 </div>
+
               </Link>
             );
           })}
         </div>
       ) : (
-        /* LIST VIEW */
-        <div className="flex flex-col gap-2 pb-10">
+        /* List View Directory */
+        <div className="flex flex-col gap-2.5">
           {filteredAndSortedSurahs.map((surah) => {
-            const surahId = `surah_${surah.number}`;
-            const isPlaying = audio?.trackId === surahId && audio?.isPlaying;
-            const isMeccan = (surah.revelationType || "").toLowerCase().includes("makkah");
+            const isPlayingThis = audio?.trackId === `surah_${surah.number}` && audio?.isPlaying;
+            const isMakki = (surah.revelationType || "").toLowerCase().includes("makkah") || (surah.revelationType || "").toLowerCase().includes("meccan");
 
             return (
-              <Link href={`/surah/${surah.number}`} key={surah.number} className="group">
-                <div className="w-full px-5 py-3 rounded-xl flex items-center justify-between border border-transparent dark:border-slate-800/80 hover:border-primaryColor/40 dark:hover:border-emerald-500/40 transition-all duration-200 glass glass-hover">
+              <Link
+                key={surah.number}
+                href={`/surah/${surah.number}`}
+                className={`group p-4 rounded-2xl border transition-all duration-200 flex items-center justify-between gap-4 ${
+                  isPlayingThis
+                    ? "bg-emerald-500/10 border-2 border-emerald-500 shadow-md"
+                    : "bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-slate-200/70 dark:border-slate-800/80 hover:border-emerald-500/40 hover:bg-white dark:hover:bg-slate-900"
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-black font-mono text-xs ${
+                    isPlayingThis
+                      ? "bg-emerald-600 text-white"
+                      : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                  }`}>
+                    {surah.number}
+                  </div>
 
-                  <div className="flex items-center gap-4 min-w-0">
-                    <div className="text-xs font-black text-gray-400 group-hover:text-primaryColor w-8">
-                      #{surah.number}
-                    </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-black text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      {surah.englishName}
+                    </span>
+                    <span className="text-xs text-slate-400 font-medium">
+                      {surah.englishNameTranslation}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-6">
+                  <span className="font-arabic text-lg font-bold text-slate-800 dark:text-slate-200">
+                    {surah.name}
+                  </span>
+
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold text-slate-500 font-mono hidden sm:inline">
+                      {surah.numberOfAyahs} Verses
+                    </span>
+
+                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                      isMakki
+                        ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                        : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                    }`}>
+                      {isMakki ? "Makki" : "Madani"}
+                    </span>
 
                     <button
+                      type="button"
                       onClick={(e) => handlePlaySurah(e, surah)}
-                      className={`p-2 rounded-lg transition-all ${isPlaying
-                          ? "bg-primaryColor text-white shadow-sm"
-                          : "bg-primaryColor/10 dark:bg-emerald-500/10 text-primaryColor hover:bg-primaryColor hover:text-white"
-                        }`}
-                      title="Play Audio"
+                      className={`p-2 rounded-xl transition-all ${
+                        isPlayingThis
+                          ? "bg-emerald-600 text-white"
+                          : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white"
+                      }`}
                     >
-                      {isPlaying ? <Pause size={14} fill="white" /> : <Play size={14} fill="currentColor" className="ml-0.5" />}
+                      {isPlayingThis ? <Pause size={14} className="fill-white" /> : <Play size={14} className="fill-emerald-600 dark:fill-emerald-400 group-hover:fill-white" />}
                     </button>
-
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-primaryColor transition-colors truncate">
-                          {surah.englishName}
-                        </h4>
-                        <span className="text-[10px] text-gray-400 hidden md:inline-block">•</span>
-                        <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium truncate hidden md:inline-block">
-                          {surah.englishNameTranslation}
-                        </span>
-                      </div>
-                    </div>
                   </div>
-
-                  <div className="flex items-center gap-6 shrink-0">
-                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${isMeccan
-                        ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                        : "bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20"
-                      }`}>
-                      {isMeccan ? "Meccan" : "Medinan"}
-                    </span>
-                    <span className="text-xs font-bold text-primaryColor dark:text-primaryColor-light w-16 text-right">
-                      {surah.numberOfAyahs} Ayahs
-                    </span>
-                    <span className="font-arabic text-lg text-slate-800 dark:text-slate-100 group-hover:text-primaryColor transition-colors w-24 text-right">
-                      {surah.name}
-                    </span>
-                  </div>
-
                 </div>
               </Link>
             );
@@ -364,12 +404,6 @@ export default function SurahList({ data }) {
         </div>
       )}
 
-      {/* Search Modal */}
-      <SearchSurahModal
-        isOpen={isSearchModalOpen}
-        onClose={() => setIsSearchModalOpen(false)}
-        data={surahData}
-      />
     </div>
   );
 }
