@@ -89,23 +89,23 @@ export default function LeftBar({ data }) {
       <div className="bg-transparent border-b border-gray-200/20 dark:border-slate-800/80 pb-3.5 mb-3 flex flex-col gap-3 shrink-0">
         
         {/* Title Header matching user screenshot */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-2.5">
+          <div className="flex items-center justify-between w-full">
             <h2 className="text-xl font-bold text-emerald-400 tracking-tight">
               Surah List
             </h2>
             {/* Close button on mobile */}
             <button
               onClick={toggleSidebar}
-              className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors ml-1 cursor-pointer"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors cursor-pointer"
               title="Close Sidebar"
             >
-              <X size={16} />
+              <X size={18} />
             </button>
           </div>
           
           {/* Top Navigation Mode Pills */}
-          <div className="flex items-center bg-slate-900/80 p-0.5 rounded-lg border border-slate-800/80 text-[11px] font-bold">
+          <div className="flex items-center justify-between w-full bg-slate-900/80 p-1 rounded-xl border border-slate-800/80 text-xs font-bold">
             {[
               { id: "surah", label: "Surah" },
               { id: "verse", label: "Verse" },
@@ -115,7 +115,7 @@ export default function LeftBar({ data }) {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-2.5 py-1 rounded-md transition-all duration-200 cursor-pointer ${
+                className={`flex-1 py-1 rounded-lg transition-all duration-200 cursor-pointer text-center ${
                   activeTab === tab.id
                     ? "bg-emerald-500 text-slate-950 font-black shadow-xs"
                     : "text-slate-400 hover:text-slate-200"

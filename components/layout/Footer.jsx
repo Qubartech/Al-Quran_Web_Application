@@ -32,7 +32,7 @@ function Footer() {
                 <Globe size={18} />
               </a>
               <a
-                href="https://github.com/TahirAhmad01"
+                href="https://github.com/qubartech"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-xl bg-slate-150 dark:bg-slate-900 hover:bg-primaryColor/10 dark:hover:bg-emerald-500/10 text-slate-500 dark:text-slate-400 hover:text-primaryColor transition-all duration-300 border border-transparent hover:border-primaryColor/10"

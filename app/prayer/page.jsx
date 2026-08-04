@@ -400,7 +400,7 @@ export default function PrayerPage() {
   }, [prayerStatus?.nextPrayer]);
 
   return (
-    <div className="min-h-screen pb-20 pt-6 px-4 md:px-8 max-w-7xl mx-auto flex flex-col gap-8">
+    <div className="min-h-screen pb-20 pt-6 px-4 md:px-6 w-full max-w-screen-2xl mx-auto flex flex-col gap-8">
       
       {/* 1. Dynamic Hero Dashboard Header Card */}
       <div className={`relative overflow-hidden p-6 md:p-10 rounded-3xl bg-gradient-to-br ${activeHeroGradient} text-white shadow-2xl shadow-emerald-500/10 transition-all duration-700`}>

@@ -164,7 +164,7 @@ export default function HomeWelcome() {
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex flex-col gap-2 max-w-2xl">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-white text-xs font-extrabold backdrop-blur-md border border-white/20">
                 <GreetingIcon size={14} className="text-amber-300 animate-pulse" /> {greetingInfo.text}
               </span>
@@ -173,7 +173,7 @@ export default function HomeWelcome() {
               </span>
             </div>
 
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight drop-shadow-sm">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight drop-shadow-sm">
               Assalamu Alaikum Wa Rahmatullah
             </h1>
             <p className="text-xs md:text-sm text-emerald-100 font-medium leading-relaxed">
@@ -205,12 +205,12 @@ export default function HomeWelcome() {
 
       {/* 2. Interactive Verse of the Day Card */}
       <div className="w-full">
-        <div className="p-6 md:p-8 rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 shadow-xl relative overflow-hidden flex flex-col justify-between group transition-all duration-300">
+        <div className="p-5 sm:p-6 md:p-8 rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 shadow-xl relative overflow-hidden flex flex-col justify-between group transition-all duration-300">
           
           <div className="absolute -right-20 -top-20 w-52 h-52 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-700"></div>
 
           {/* Header Row */}
-          <div className="flex justify-between items-center mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
             <span className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
               <BookOpen size={16} />
               Verse of the Day & Inspiration
