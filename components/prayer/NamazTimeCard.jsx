@@ -19,8 +19,7 @@ import {
   BellOff,
   CheckCircle2,
   Circle,
-  BarChart3,
-  Volume2
+  BarChart3
 } from "lucide-react";
 import PrayerSettingsModal from "./PrayerSettingsModal";
 
@@ -54,7 +53,7 @@ const defaultLocation = {
   isGps: false
 };
 
-const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true }) => {
+const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true, className = "" }) => {
   const tracker = usePrayerTracker();
   const todayDateStr = new Date().toISOString().split("T")[0];
   const dailyStatus = tracker?.getDailyStatus(todayDateStr);
@@ -322,13 +321,13 @@ const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true }) =>
   };
 
   return (
-    <div className="relative w-full rounded-3xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/80 shadow-xl p-5 md:p-6 flex flex-col gap-4 overflow-hidden transition-all duration-300">
+    <div className={`relative w-full rounded-3xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/80 shadow-xl p-5 md:p-6 flex flex-col justify-between gap-4 overflow-hidden transition-all duration-300 ${className}`}>
       
       {/* Background Soft Glow Effect */}
       <div className="absolute -top-24 -right-24 w-60 h-60 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none"></div>
 
       {/* Header */}
-      <div className="flex flex-col gap-2 border-b border-slate-200/50 dark:border-slate-800/80 pb-3.5">
+      <div className="flex flex-col gap-2 border-b border-slate-200/50 dark:border-slate-800/80 pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-black bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 dark:from-emerald-400 dark:to-teal-300 bg-clip-text text-transparent">
@@ -387,7 +386,7 @@ const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true }) =>
 
       {/* Loading State */}
       {loading && !timings && (
-        <div className="flex flex-col items-center justify-center py-10 gap-3">
+        <div className="flex flex-col items-center justify-center py-12 gap-3 flex-1">
           <Loader2 size={28} className="text-emerald-500 animate-spin" />
           <span className="text-xs font-semibold text-slate-400">Fetching prayer timings...</span>
         </div>
@@ -401,9 +400,9 @@ const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true }) =>
         </div>
       )}
 
-      {/* Timings List */}
+      {/* Timings Content */}
       {timings && !loading && (
-        <div className="flex flex-col gap-3">
+        <div className="flex-1 flex flex-col justify-between gap-3">
           
           {/* Live Countdown Banner */}
           {prayerStatus && (
@@ -422,8 +421,8 @@ const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true }) =>
             </div>
           )}
 
-          {/* Timings Grid */}
-          <div className="flex flex-col gap-2">
+          {/* Timings List - Flex 1 & Distribute evenly */}
+          <div className="flex-1 flex flex-col justify-between gap-2">
             {Object.keys(PRAYER_METADATA).map((key) => {
               const item = PRAYER_METADATA[key];
               const timeRaw = timings[key];

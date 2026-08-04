@@ -12,7 +12,8 @@ import {
   Play, 
   Loader2, 
   TrendingUp, 
-  Compass 
+  Compass,
+  ArrowRight
 } from "lucide-react";
 
 export default function SidebarResources() {
@@ -36,8 +37,8 @@ export default function SidebarResources() {
       }).then((r) => r.json()),
     ])
       .then(([recentsData, ayahsData]) => {
-        setRecents(Array.isArray(recentsData) ? recentsData.slice(0, 3) : []);
-        setFavoriteAyahs(Array.isArray(ayahsData) ? ayahsData.slice(0, 2) : []);
+        setRecents(Array.isArray(recentsData) ? recentsData.slice(0, 4) : []);
+        setFavoriteAyahs(Array.isArray(ayahsData) ? ayahsData.slice(0, 3) : []);
       })
       .catch((e) => console.error("Error loading sidebar activity:", e))
       .finally(() => setLoading(false));
@@ -51,97 +52,102 @@ export default function SidebarResources() {
   return (
     <div className="flex flex-col gap-6">
       
-      {/* Widget 1: Quran Insights (Stats) */}
-      <div className="p-6 rounded-2xl glass border border-white/20 dark:border-slate-800/80 shadow-sm flex flex-col gap-4">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-primaryColor dark:text-primaryColor-light flex items-center gap-1.5">
-          <TrendingUp size={14} />
-          Quran Insights
+      {/* Widget 1: Quran Insights & Metrics */}
+      <div className="p-6 rounded-3xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/80 shadow-xl flex flex-col gap-4">
+        <h3 className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+          <TrendingUp size={16} />
+          Quran Insights & Structure
         </h3>
         
-        <div className="grid grid-cols-2 gap-3.5">
-          <div className="p-3.5 rounded-xl bg-white/25 dark:bg-slate-900/30 border border-gray-200/20 dark:border-slate-800/20 flex flex-col gap-0.5">
-            <span className="text-xl font-extrabold text-slate-800 dark:text-slate-100">114</span>
-            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">Chapters (Surahs)</span>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 flex flex-col gap-0.5">
+            <span className="text-2xl font-black text-slate-900 dark:text-slate-100 font-mono">114</span>
+            <span className="text-[11px] font-bold text-slate-400">Chapters (Surahs)</span>
           </div>
-          <div className="p-3.5 rounded-xl bg-white/25 dark:bg-slate-900/30 border border-gray-200/20 dark:border-slate-800/20 flex flex-col gap-0.5">
-            <span className="text-xl font-extrabold text-slate-800 dark:text-slate-100">6,236</span>
-            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">Verses (Ayahs)</span>
+
+          <div className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 flex flex-col gap-0.5">
+            <span className="text-2xl font-black text-slate-900 dark:text-slate-100 font-mono">6,236</span>
+            <span className="text-[11px] font-bold text-slate-400">Verses (Ayahs)</span>
           </div>
-          <div className="p-3.5 rounded-xl bg-white/25 dark:bg-slate-900/30 border border-gray-200/20 dark:border-slate-800/20 flex flex-col gap-0.5">
-            <span className="text-xl font-extrabold text-slate-800 dark:text-slate-100">86</span>
-            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">Meccan (Makki)</span>
+
+          <div className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 flex flex-col gap-0.5">
+            <span className="text-2xl font-black text-amber-600 dark:text-amber-400 font-mono">86</span>
+            <span className="text-[11px] font-bold text-slate-400">Meccan (Makki)</span>
           </div>
-          <div className="p-3.5 rounded-xl bg-white/25 dark:bg-slate-900/30 border border-gray-200/20 dark:border-slate-800/20 flex flex-col gap-0.5">
-            <span className="text-xl font-extrabold text-slate-800 dark:text-slate-100">28</span>
-            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">Medinan (Madani)</span>
+
+          <div className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 flex flex-col gap-0.5">
+            <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">28</span>
+            <span className="text-[11px] font-bold text-slate-400">Medinan (Madani)</span>
           </div>
         </div>
       </div>
 
       {/* Widget 2: User Activity (Recents & Bookmarks) */}
-      <div className="p-6 rounded-2xl glass border border-white/20 dark:border-slate-800/80 shadow-sm flex flex-col gap-4">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-primaryColor dark:text-primaryColor-light flex items-center gap-1.5">
-          <Compass size={14} />
-          My Activity
+      <div className="p-6 rounded-3xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/80 shadow-xl flex flex-col gap-4">
+        <h3 className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+          <Compass size={16} />
+          My Personal Activity
         </h3>
 
         {!user ? (
           /* Unauthenticated CTA */
-          <div className="flex flex-col items-center text-center p-4 py-6 rounded-xl border border-gray-200/30 dark:border-slate-800/40 bg-white/15 dark:bg-slate-900/10">
-            <Bookmark size={24} className="text-gray-400 mb-2.5" />
-            <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Track Your Progress</h4>
-            <p className="text-[10px] text-gray-550 dark:text-gray-400 font-semibold leading-relaxed mb-4">
-              Sign In to save your reading history, bookmark important verses, and view insights.
+          <div className="flex flex-col items-center text-center p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 bg-slate-50/60 dark:bg-slate-800/30">
+            <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-3">
+              <Bookmark size={24} />
+            </div>
+            <h4 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 mb-1">Track Your Progress</h4>
+            <p className="text-xs text-slate-400 font-medium leading-relaxed mb-4">
+              Sign In to save your reading history, bookmark favorite verses, and sync across devices.
             </p>
             <Link
               href="/login"
-              className="px-4 py-2 text-[10px] font-extrabold bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-lg transition-all shadow-sm"
+              className="w-full py-2.5 rounded-xl text-xs font-black bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-md shadow-emerald-600/20 text-center"
             >
-              Sign In
+              Sign In to Quran App
             </Link>
           </div>
         ) : loading ? (
           /* Loading Indicator */
-          <div className="flex items-center justify-center py-10 gap-2 text-slate-500">
-            <Loader2 className="animate-spin text-primaryColor" size={18} />
-            <span className="text-[10px] font-bold">Loading dashboard...</span>
+          <div className="flex items-center justify-center py-10 gap-2 text-slate-400">
+            <Loader2 className="animate-spin text-emerald-500" size={20} />
+            <span className="text-xs font-bold">Loading user data...</span>
           </div>
         ) : (
           /* Authenticated Dashboard widgets */
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-5">
             {/* Recent Played */}
             <div>
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 dark:text-gray-500 flex items-center gap-1 mb-2">
-                <History size={12} />
-                Recent Reads
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 mb-2.5">
+                <History size={14} className="text-emerald-500" />
+                Recent Reading History
               </span>
               {recents.length === 0 ? (
-                <p className="text-[10px] text-gray-500 dark:text-gray-450 italic pl-1">No reading history.</p>
+                <p className="text-xs text-slate-400 italic">No recent reading history found.</p>
               ) : (
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-2">
                   {recents.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center justify-between p-2 rounded-xl bg-white/20 dark:bg-slate-900/10 border border-gray-150/20 dark:border-slate-850/20"
+                      className="flex items-center justify-between p-3 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 transition-all"
                     >
                       <div className="min-w-0 pr-2">
-                        <h4 className="text-[10px] font-bold text-slate-800 dark:text-slate-200 truncate">
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
                           Surah {item.surahName}
                         </h4>
-                        <p className="text-[8px] text-gray-500 dark:text-gray-400 mt-0.5">
-                          Surah #{item.surahNumber}
+                        <p className="text-[10px] text-slate-400 mt-0.5">
+                          Chapter #{item.surahNumber}
                         </p>
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="flex items-center gap-2 shrink-0">
                         <button
                           onClick={() => playSurah(item.surahNumber, item.surahName)}
-                          className="p-1 rounded bg-primaryColor/10 dark:bg-emerald-500/10 text-primaryColor hover:bg-primaryColor hover:text-white dark:hover:bg-primaryColor transition-all"
+                          className="p-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white transition-all"
                         >
-                          <Play size={10} fill="currentColor" />
+                          <Play size={12} fill="currentColor" />
                         </button>
                         <Link
                           href={`/surah/${item.surahNumber}`}
-                          className="text-[9px] font-extrabold text-gray-400 hover:text-primaryColor pl-0.5"
+                          className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 hover:underline"
                         >
                           Read →
                         </Link>
@@ -152,23 +158,23 @@ export default function SidebarResources() {
               )}
             </div>
 
-            {/* Whitelisted Ayahs */}
+            {/* Bookmarked Ayahs */}
             <div>
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 dark:text-gray-500 flex items-center gap-1 mb-2">
-                <BookOpen size={12} />
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 mb-2.5">
+                <BookOpen size={14} className="text-emerald-500" />
                 Bookmarked Ayahs
               </span>
               {favoriteAyahs.length === 0 ? (
-                <p className="text-[10px] text-gray-500 dark:text-gray-455 italic pl-1">No bookmarks.</p>
+                <p className="text-xs text-slate-400 italic">No bookmarks saved yet.</p>
               ) : (
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-2">
                   {favoriteAyahs.map((item) => (
                     <Link
                       key={item.id}
                       href={`/surah/${item.surahNumber}`}
-                      className="block p-2.5 rounded-xl bg-white/20 dark:bg-slate-900/10 border border-gray-150/20 dark:border-slate-850/20 hover:border-primaryColor/30 dark:hover:border-emerald-500/30 transition-all"
+                      className="block p-3 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 hover:border-emerald-500/30 transition-all"
                     >
-                      <div className="flex justify-between items-center text-[8px] text-gray-400 dark:text-gray-500 font-bold mb-1">
+                      <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold mb-1">
                         <span>{item.surahName}</span>
                         <span>Ayah {item.ayahNumber}</span>
                       </div>
