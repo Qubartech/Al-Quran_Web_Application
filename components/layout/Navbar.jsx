@@ -20,7 +20,8 @@ import {
   LayoutDashboard,
   GraduationCap,
   UserCheck,
-  PanelLeft
+  PanelLeft,
+  Clock
 } from "lucide-react";
 
 function Navbar() {
@@ -63,6 +64,7 @@ function Navbar() {
     { name: "Home", href: "/", icon: LayoutDashboard },
     { name: "Surahs", href: "/surah", icon: BookOpen },
     { name: "Juz / Paras", href: "/juz", icon: Layers },
+    { name: "Prayer & Tracker", href: "/prayer", icon: Clock },
     { name: "Learn Quran", href: "/learn", icon: GraduationCap },
     { name: "Dedicated Player", href: "/player", icon: Play }
   ];

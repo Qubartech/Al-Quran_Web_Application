@@ -189,7 +189,7 @@ export default function HomeWelcome() {
       </div>
 
       {/* Row 2: Quick Access & Namaz Timings (2 Columns) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
         {/* Quick Access Card */}
         <QuickAccessCard />
 
