@@ -421,6 +421,12 @@ export default function PrayerPage() {
                 <Sparkles size={14} className="text-amber-300" /> Daily Salah Companion
               </span>
 
+              {tracker?.isSyncedWithAccount && (
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sky-500/20 text-sky-200 text-xs font-extrabold backdrop-blur-md border border-sky-400/30" title="Prayer logs synced with your account">
+                  Cloud Synced
+                </span>
+              )}
+
               {/* Location Badge */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-medium backdrop-blur-md border border-white/15">
                 <MapPin size={13} className="text-emerald-300" />

@@ -10,8 +10,17 @@ export function usePrayerTracker() {
   return useContext(PrayerTrackerContext);
 }
 
-const STORAGE_KEY_SETTINGS = "quran_namaz_reminder_settings";
-const STORAGE_KEY_LOGS = "quran_namaz_tracker_logs";
+const LEGACY_STORAGE_KEY_SETTINGS = "quran_namaz_reminder_settings";
+const LEGACY_STORAGE_KEY_LOGS = "quran_namaz_tracker_logs";
+
+function getStorageKeys(userId) {
+  const suffix = userId ? `_${userId}` : "_guest";
+  return {
+    settingsKey: `quran_namaz_reminder_settings${suffix}`,
+    logsKey: `quran_namaz_tracker_logs${suffix}`,
+    guestLogsKey: "quran_namaz_tracker_logs_guest",
+  };
+}
 
 export function PrayerTrackerProvider({ children }) {
   const { user, session } = useUser();
@@ -34,37 +43,85 @@ export function PrayerTrackerProvider({ children }) {
   // 3. Track last notified prayer to avoid duplicate alerts: { "2026-08-03_Fajr": true }
   const [notifiedMap, setNotifiedMap] = useState({});
 
-  // Load saved settings & logs on mount
-  useEffect(() => {
+  // Helper to load settings from storage
+  const loadLocalSettings = useCallback((userId) => {
     if (typeof window === "undefined") return;
     try {
-      const savedSettings = localStorage.getItem(STORAGE_KEY_SETTINGS);
+      const keys = getStorageKeys(userId);
+      let savedSettings = localStorage.getItem(keys.settingsKey);
+      if (!savedSettings && !userId) {
+        savedSettings = localStorage.getItem(LEGACY_STORAGE_KEY_SETTINGS);
+      }
       if (savedSettings) {
         const parsed = JSON.parse(savedSettings);
         if (typeof parsed.remindersEnabled === "boolean") setRemindersEnabled(parsed.remindersEnabled);
         if (parsed.prayerReminders) setPrayerReminders(parsed.prayerReminders);
         if (typeof parsed.reminderSound === "boolean") setReminderSound(parsed.reminderSound);
       }
-
-      const savedLogs = localStorage.getItem(STORAGE_KEY_LOGS);
-      if (savedLogs) {
-        setCompletedLogs(JSON.parse(savedLogs));
-      }
     } catch (e) {
-      console.error("Failed to load prayer tracker data from localStorage:", e);
+      console.error("Failed to load settings from localStorage:", e);
     }
   }, []);
 
-  // Account Sync: Fetch & merge remote logs when user logs in
-  useEffect(() => {
-    if (!session?.access_token || !user) {
-      setIsSyncedWithAccount(false);
-      return;
+  // Helper to save settings to storage
+  const saveSettings = useCallback((newRemindersEnabled, newPrayerReminders, newSound) => {
+    if (typeof window === "undefined") return;
+    try {
+      const keys = getStorageKeys(user?.id);
+      const payload = JSON.stringify({
+        remindersEnabled: newRemindersEnabled,
+        prayerReminders: newPrayerReminders,
+        reminderSound: newSound,
+      });
+      localStorage.setItem(keys.settingsKey, payload);
+    } catch (e) {
+      console.error("Failed to save reminder settings:", e);
     }
+  }, [user?.id]);
+
+  // Load logs & sync with user account when session or user changes
+  useEffect(() => {
+    if (typeof window === "undefined") return;
 
     let isMounted = true;
 
-    async function syncWithAccount() {
+    // First load settings for current state
+    loadLocalSettings(user?.id);
+
+    async function handleSyncAndLoad() {
+      const keys = getStorageKeys(user?.id);
+
+      // Read local user logs & guest logs
+      let localUserLogs = {};
+      try {
+        const rawUserLogs = localStorage.getItem(keys.logsKey) || (!user ? localStorage.getItem(LEGACY_STORAGE_KEY_LOGS) : null);
+        if (rawUserLogs) {
+          localUserLogs = JSON.parse(rawUserLogs) || {};
+        }
+      } catch (e) {
+        console.error("Error parsing local user logs:", e);
+      }
+
+      let guestLogs = {};
+      try {
+        const rawGuestLogs = localStorage.getItem(keys.guestLogsKey);
+        if (rawGuestLogs) {
+          guestLogs = JSON.parse(rawGuestLogs) || {};
+        }
+      } catch (e) {
+        console.error("Error parsing guest logs:", e);
+      }
+
+      if (!session?.access_token || !user?.id) {
+        // Unauthenticated / Guest Mode
+        if (isMounted) {
+          setCompletedLogs(localUserLogs);
+          setIsSyncedWithAccount(false);
+        }
+        return;
+      }
+
+      // User logged in: Sync with account API
       try {
         const res = await fetch("/api/prayer-tracker", {
           headers: {
@@ -76,10 +133,12 @@ export function PrayerTrackerProvider({ children }) {
           const data = await res.json();
           const remoteLogs = data.logs || {};
 
-          // Merge local and remote logs cleanly
+          // Merge: remote + local user logs + guest logs
           const mergedLogs = { ...remoteLogs };
-          Object.keys(completedLogs).forEach((dateStr) => {
-            const localDay = completedLogs[dateStr] || {};
+          const localCombined = { ...guestLogs, ...localUserLogs };
+
+          Object.keys(localCombined).forEach((dateStr) => {
+            const localDay = localCombined[dateStr] || {};
             const remoteDay = remoteLogs[dateStr] || {};
             mergedLogs[dateStr] = {
               Fajr: !!(localDay.Fajr || remoteDay.Fajr),
@@ -93,12 +152,16 @@ export function PrayerTrackerProvider({ children }) {
           if (isMounted) {
             setCompletedLogs(mergedLogs);
             setIsSyncedWithAccount(true);
-            if (typeof window !== "undefined") {
-              localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(mergedLogs));
+            try {
+              localStorage.setItem(keys.logsKey, JSON.stringify(mergedLogs));
+              // Clear guest logs since they have been migrated
+              localStorage.removeItem(keys.guestLogsKey);
+            } catch (e) {
+              console.error("Failed to save merged logs to localStorage:", e);
             }
           }
 
-          // Push unified merged logs to server
+          // Push merged dataset back to server database to ensure full sync
           await fetch("/api/prayer-tracker", {
             method: "POST",
             headers: {
@@ -107,40 +170,33 @@ export function PrayerTrackerProvider({ children }) {
             },
             body: JSON.stringify({ logsMap: mergedLogs }),
           });
+        } else {
+          // If fetch remote failed, fallback to local user logs
+          if (isMounted) {
+            setCompletedLogs({ ...guestLogs, ...localUserLogs });
+            setIsSyncedWithAccount(false);
+          }
         }
       } catch (err) {
         console.error("Failed to sync prayer tracker with account:", err);
+        if (isMounted) {
+          setCompletedLogs({ ...guestLogs, ...localUserLogs });
+          setIsSyncedWithAccount(false);
+        }
       }
     }
 
-    syncWithAccount();
+    handleSyncAndLoad();
 
     return () => {
       isMounted = false;
     };
-  }, [user?.id, session?.access_token]);
-
-  // Save settings helper
-  const saveSettings = (newRemindersEnabled, newPrayerReminders, newSound) => {
-    if (typeof window === "undefined") return;
-    try {
-      localStorage.setItem(
-        STORAGE_KEY_SETTINGS,
-        JSON.stringify({
-          remindersEnabled: newRemindersEnabled,
-          prayerReminders: newPrayerReminders,
-          reminderSound: newSound,
-        })
-      );
-    } catch (e) {
-      console.error("Failed to save reminder settings:", e);
-    }
-  };
+  }, [user?.id, session?.access_token, loadLocalSettings]);
 
   // Toggle Global Reminders ON/OFF
   const toggleGlobalReminders = async (forcedValue) => {
     const nextVal = typeof forcedValue === "boolean" ? forcedValue : !remindersEnabled;
-    
+
     if (nextVal && typeof window !== "undefined" && "Notification" in window) {
       if (Notification.permission !== "granted" && Notification.permission !== "denied") {
         try {
@@ -195,7 +251,8 @@ export function PrayerTrackerProvider({ children }) {
 
       if (typeof window !== "undefined") {
         try {
-          localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(updatedLogs));
+          const keys = getStorageKeys(user?.id);
+          localStorage.setItem(keys.logsKey, JSON.stringify(updatedLogs));
         } catch (e) {
           console.error("Failed to save prayer logs to localStorage:", e);
         }
@@ -223,9 +280,19 @@ export function PrayerTrackerProvider({ children }) {
           prayerName,
           completed: nextStatus,
         }),
-      }).catch((err) => {
-        console.error("Failed to sync prayer completion to user account:", err);
-      });
+      })
+        .then((res) => {
+          if (res.ok) {
+            setIsSyncedWithAccount(true);
+          } else {
+            console.warn("Prayer completion sync returned non-OK status:", res.status);
+            setIsSyncedWithAccount(false);
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to sync prayer completion to user account:", err);
+          setIsSyncedWithAccount(false);
+        });
     }
   };
 
@@ -260,7 +327,7 @@ export function PrayerTrackerProvider({ children }) {
   const getStreakCount = useCallback(() => {
     let streak = 0;
     const today = new Date();
-    
+
     // Check backwards starting from today or yesterday
     for (let i = 0; i < 365; i++) {
       const d = new Date(today);
@@ -296,7 +363,7 @@ export function PrayerTrackerProvider({ children }) {
         const dayStatus = getDailyStatus(dateStr);
 
         totalCompleted += dayStatus.completedCount;
-        
+
         Object.keys(dayStatus.statusMap).forEach((p) => {
           if (dayStatus.statusMap[p]) {
             prayerBreakdown[p] = (prayerBreakdown[p] || 0) + 1;
