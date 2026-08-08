@@ -238,7 +238,7 @@ export default function PrayerCalendarPage() {
     : "Location";
 
   return (
-    <div className="min-h-screen text-slate-100 transition-colors pb-24 pt-4 px-3 sm:px-6 lg:px-8 from-emerald-950/20 via-slate-950 to-slate-950">
+    <div className="min-h-screen text-slate-100 transition-colors pb-24 pt-4 px-3 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
       <div className="max-w-7xl mx-auto flex flex-col gap-6">
 
         {/* Printable Header - Visible ONLY during print */}

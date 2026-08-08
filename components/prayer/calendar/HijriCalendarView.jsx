@@ -148,112 +148,123 @@ export default function HijriCalendarView({
       </div>
 
       {/* 2. Side-by-Side Monthly Table */}
-      <div className="w-full overflow-x-auto rounded-3xl bg-slate-900 border border-slate-800 shadow-xl">
-        <table className="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr className="bg-slate-800/80 text-slate-300 border-b border-slate-800 font-bold uppercase tracking-wider">
-              <th className="py-4 px-4 text-center">Day</th>
-              <th className="py-4 px-4">Gregorian Date</th>
-              <th className="py-4 px-4">Day of Week</th>
-              <th className="py-4 px-4 text-amber-400">Hijri Date (English)</th>
-              <th className="py-4 px-4 text-amber-400 text-right">Hijri Date (Arabic)</th>
-              <th className="py-4 px-4 text-center">Islamic Events & Badges</th>
-            </tr>
-          </thead>
+      <div className="w-full flex flex-col gap-2">
+        <div className="sm:hidden flex items-center justify-between text-[11px] font-bold text-slate-400 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-800">
+          <span className="flex items-center gap-1 text-amber-400">
+            <Moon size={13} /> Hijri & Gregorian Alignment
+          </span>
+          <span className="text-[10px] text-slate-400">↔ Scroll right for Arabic details</span>
+        </div>
 
-          <tbody className="divide-y divide-slate-800/60 font-medium">
-            {days.map((d, idx) => {
-              const greg = d.gregorian || {};
-              const hijri = d.hijri || {};
-              
-              const rawParts = (greg.date || "").split("-"); // "26-08-2026"
-              const formattedISO = partsToISO(rawParts);
-              const isToday = formattedISO === todayStr;
-              const isFriday = greg.weekday?.en === "Friday";
-              const holidays = hijri.holidays || [];
+        <div className="w-full overflow-x-auto rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl backdrop-blur-md">
+          <table className="w-full text-left text-xs border-collapse min-w-[640px] sm:min-w-full">
+            <thead>
+              <tr className="bg-slate-800/90 text-slate-200 border-b border-slate-800 font-extrabold uppercase tracking-wider sticky top-0 z-10">
+                <th className="py-4 px-4 text-center sticky left-0 bg-slate-800 z-20 shadow-md">Day</th>
+                <th className="py-4 px-4">Gregorian Date</th>
+                <th className="py-4 px-4">Day of Week</th>
+                <th className="py-4 px-4 text-amber-400">Hijri Date (English)</th>
+                <th className="py-4 px-4 text-amber-400 text-right">Hijri Date (Arabic)</th>
+                <th className="py-4 px-4 text-center">Islamic Events & Badges</th>
+              </tr>
+            </thead>
 
-              return (
-                <tr
-                  key={greg.date || idx}
-                  className={`transition-all hover:bg-emerald-500/10 ${
-                    isToday
-                      ? "bg-emerald-500/20 font-bold border-l-4 border-l-emerald-500"
-                      : isFriday
-                      ? "bg-slate-850"
-                      : idx % 2 === 1
-                      ? "bg-slate-950/40"
-                      : "bg-slate-900"
-                  }`}
-                >
-                  {/* Day Number */}
-                  <td className="py-4 px-4 text-center font-extrabold text-slate-200">
-                    <div className="flex items-center justify-center gap-1.5">
-                      {isToday && <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />}
-                      <span>{greg.day}</span>
-                    </div>
-                  </td>
+            <tbody className="divide-y divide-slate-800/60 font-medium">
+              {days.map((d, idx) => {
+                const greg = d.gregorian || {};
+                const hijri = d.hijri || {};
+                
+                const rawParts = (greg.date || "").split("-"); // "26-08-2026"
+                const formattedISO = partsToISO(rawParts);
+                const isToday = formattedISO === todayStr;
+                const isFriday = greg.weekday?.en === "Friday";
+                const holidays = hijri.holidays || [];
 
-                  {/* Gregorian Date */}
-                  <td className="py-4 px-4 whitespace-nowrap">
-                    <span className="font-extrabold text-white">
-                      {greg.month?.en} {greg.day}, {greg.year}
-                    </span>
-                  </td>
+                return (
+                  <tr
+                    key={greg.date || idx}
+                    className={`transition-all hover:bg-emerald-500/10 ${
+                      isToday
+                        ? "bg-emerald-500/20 font-bold border-l-4 border-l-emerald-500"
+                        : isFriday
+                        ? "bg-slate-850"
+                        : idx % 2 === 1
+                        ? "bg-slate-950/40"
+                        : "bg-slate-900"
+                    }`}
+                  >
+                    {/* Day Number (Sticky on scroll) */}
+                    <td className={`py-4 px-4 text-center font-black sticky left-0 z-10 shadow-sm ${
+                      isToday ? "bg-emerald-950 text-emerald-300" : isFriday ? "bg-slate-850 text-white" : "bg-slate-900 text-slate-200"
+                    }`}>
+                      <div className="flex items-center justify-center gap-1.5">
+                        {isToday && <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />}
+                        <span>{greg.day}</span>
+                      </div>
+                    </td>
 
-                  {/* Day of Week */}
-                  <td className="py-4 px-4 whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <span className={isFriday ? "text-emerald-400 font-extrabold" : "text-slate-300"}>
-                        {greg.weekday?.en}
+                    {/* Gregorian Date */}
+                    <td className="py-4 px-4 whitespace-nowrap">
+                      <span className="font-extrabold text-white">
+                        {greg.month?.en} {greg.day}, {greg.year}
                       </span>
-                      <span className="text-[11px] text-slate-500 font-arabic">
-                        ({hijri.weekday?.ar})
+                    </td>
+
+                    {/* Day of Week */}
+                    <td className="py-4 px-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <span className={isFriday ? "text-emerald-400 font-extrabold" : "text-slate-300 font-semibold"}>
+                          {greg.weekday?.en}
+                        </span>
+                        <span className="text-[11px] text-slate-500 font-arabic">
+                          ({hijri.weekday?.ar})
+                        </span>
+                      </div>
+                    </td>
+
+                    {/* Hijri Date English */}
+                    <td className="py-4 px-4 whitespace-nowrap">
+                      <span className="font-extrabold text-amber-300">
+                        {hijri.day} {hijri.month?.en} {hijri.year} AH
                       </span>
-                    </div>
-                  </td>
+                    </td>
 
-                  {/* Hijri Date English */}
-                  <td className="py-4 px-4 whitespace-nowrap">
-                    <span className="font-bold text-amber-300">
-                      {hijri.day} {hijri.month?.en} {hijri.year} AH
-                    </span>
-                  </td>
+                    {/* Hijri Date Arabic */}
+                    <td className="py-4 px-4 whitespace-nowrap text-right font-arabic font-extrabold text-amber-200 text-sm">
+                      {hijri.day} {hijri.month?.ar} {hijri.year} هـ
+                    </td>
 
-                  {/* Hijri Date Arabic */}
-                  <td className="py-4 px-4 whitespace-nowrap text-right font-arabic font-bold text-amber-200 text-sm">
-                    {hijri.day} {hijri.month?.ar} {hijri.year} هـ
-                  </td>
+                    {/* Badges & Holidays */}
+                    <td className="py-4 px-4 text-center whitespace-nowrap">
+                      <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                        {isToday && (
+                          <span className="px-2 py-0.5 rounded-md bg-emerald-500 text-white font-extrabold text-[10px] uppercase">
+                            Today
+                          </span>
+                        )}
 
-                  {/* Badges & Holidays */}
-                  <td className="py-4 px-4 text-center whitespace-nowrap">
-                    <div className="flex items-center justify-center gap-1.5 flex-wrap">
-                      {isToday && (
-                        <span className="px-2 py-0.5 rounded-md bg-emerald-500 text-white font-extrabold text-[10px] uppercase">
-                          Today
-                        </span>
-                      )}
+                        {holidays.map((h, hIdx) => (
+                          <span
+                            key={hIdx}
+                            className="px-2.5 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-extrabold"
+                          >
+                            {h}
+                          </span>
+                        ))}
 
-                      {holidays.map((h, hIdx) => (
-                        <span
-                          key={hIdx}
-                          className="px-2.5 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold"
-                        >
-                          {h}
-                        </span>
-                      ))}
-
-                      {isFriday && (
-                        <span className="px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">
-                          Jumu&apos;ah
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                        {isFriday && (
+                          <span className="px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">
+                            Jumu&apos;ah
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* 3. 12 Islamic Months Reference Guide */}
