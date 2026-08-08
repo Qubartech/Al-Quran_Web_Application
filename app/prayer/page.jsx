@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
 import useCity from "@/lib/getLocation";
 import { usePrayerTracker } from "@/context/PrayerTrackerContext";
 import { ALADHAN_API_BASE_URL } from "@/lib/api/config";
@@ -452,7 +453,15 @@ export default function PrayerPage() {
             </p>
 
             {/* Quick Action Buttons */}
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex items-center gap-3 pt-2 flex-wrap">
+              <Link
+                href="/prayer/calendar"
+                className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-extrabold shadow-lg shadow-emerald-950/30 transition-all flex items-center gap-2"
+              >
+                <Calendar size={14} />
+                Full Prayer Calendar
+              </Link>
+
               <button
                 onClick={() => setShowSettings(true)}
                 className="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-bold backdrop-blur-md border border-white/25 transition-all flex items-center gap-2 shadow-lg"

@@ -22,7 +22,8 @@ import {
   GraduationCap,
   UserCheck,
   PanelLeft,
-  Clock
+  Clock,
+  Calendar
 } from "lucide-react";
 
 function Navbar() {
@@ -71,6 +72,7 @@ function Navbar() {
     { name: "Surahs", href: "/surah", icon: BookOpen },
     { name: "Juz / Paras", href: "/juz", icon: Layers },
     { name: "Prayer & Tracker", href: "/prayer", icon: Clock },
+    { name: "Prayer Calendar", href: "/prayer/calendar", icon: Calendar },
     { name: "Learn Quran", href: "/learn", icon: GraduationCap },
     { name: "Dedicated Player", href: "/player", icon: Play }
   ];
@@ -104,7 +106,11 @@ function Navbar() {
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-1.5">
           {navLinks.map((link) => {
-            const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+            const isActive = link.href === "/"
+              ? pathname === "/"
+              : link.href === "/prayer"
+                ? pathname === "/prayer"
+                : pathname.startsWith(link.href);
             const Icon = link.icon;
             return (
               <Link
@@ -218,12 +224,12 @@ function Navbar() {
         <div className="md:hidden">
           {/* Backdrop Overlay */}
           <div
-            className="fixed inset-0 z-[9999] bg-slate-950/75 backdrop-blur-sm animate-fadeIn cursor-pointer"
+            className="fixed inset-0 z-[20000] bg-slate-950/75 backdrop-blur-sm animate-fadeIn cursor-pointer"
             onClick={() => setMobileMenuOpen(false)}
           />
 
           {/* Right Slide-in Drawer with smooth slideInRight animation */}
-          <div className="fixed top-0 right-0 bottom-0 z-[10000] w-72 sm:w-80 h-full bg-slate-950 text-slate-100 backdrop-blur-2xl border-l border-slate-800 shadow-2xl p-6 flex flex-col justify-between overflow-y-auto animate-slideInRight">
+          <div className="fixed top-0 right-0 bottom-0 z-[20000] w-72 sm:w-80 h-full bg-slate-950 text-slate-100 backdrop-blur-2xl border-l border-slate-800 shadow-2xl p-6 flex flex-col justify-between overflow-y-auto animate-slideInRight">
 
             {/* Drawer Header */}
             <div className="flex flex-col gap-6">
@@ -257,7 +263,11 @@ function Navbar() {
                 </span>
 
                 {navLinks.map((link) => {
-                  const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+                  const isActive = link.href === "/"
+                    ? pathname === "/"
+                    : link.href === "/prayer"
+                      ? pathname === "/prayer"
+                      : pathname.startsWith(link.href);
                   const Icon = link.icon;
                   return (
                     <Link
