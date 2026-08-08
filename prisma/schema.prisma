@@ -20,6 +20,24 @@ model User {
   favoriteJuzs         FavoriteJuz[]
   recentSurahs         RecentSurah[]
   learnProgress        LearnProgress[]
+  prayerLogs           PrayerLog[]
+}
+
+model PrayerLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      String   // Format: "YYYY-MM-DD"
+  fajr      Boolean  @default(false)
+  dhuhr     Boolean  @default(false)
+  asr       Boolean  @default(false)
+  maghrib   Boolean  @default(false)
+  isha      Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@unique([userId, date])
+  @@index([userId])
 }
 
 model FavoriteAyah {

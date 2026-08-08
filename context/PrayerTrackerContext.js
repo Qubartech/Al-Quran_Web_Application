@@ -1,6 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { useUser } from "@/context/UserProvider";
+import { toast } from "react-toastify";
 
 const PrayerTrackerContext = createContext(null);
 
@@ -12,6 +14,8 @@ const STORAGE_KEY_SETTINGS = "quran_namaz_reminder_settings";
 const STORAGE_KEY_LOGS = "quran_namaz_tracker_logs";
 
 export function PrayerTrackerProvider({ children }) {
+  const { user, session } = useUser();
+
   // 1. Reminder preferences state
   const [remindersEnabled, setRemindersEnabled] = useState(false);
   const [prayerReminders, setPrayerReminders] = useState({
@@ -25,6 +29,7 @@ export function PrayerTrackerProvider({ children }) {
 
   // 2. Prayer completion logs state: { "YYYY-MM-DD": { Fajr: true, Dhuhr: true, ... } }
   const [completedLogs, setCompletedLogs] = useState({});
+  const [isSyncedWithAccount, setIsSyncedWithAccount] = useState(false);
 
   // 3. Track last notified prayer to avoid duplicate alerts: { "2026-08-03_Fajr": true }
   const [notifiedMap, setNotifiedMap] = useState({});
@@ -49,6 +54,71 @@ export function PrayerTrackerProvider({ children }) {
       console.error("Failed to load prayer tracker data from localStorage:", e);
     }
   }, []);
+
+  // Account Sync: Fetch & merge remote logs when user logs in
+  useEffect(() => {
+    if (!session?.access_token || !user) {
+      setIsSyncedWithAccount(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    async function syncWithAccount() {
+      try {
+        const res = await fetch("/api/prayer-tracker", {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const remoteLogs = data.logs || {};
+
+          // Merge local and remote logs cleanly
+          const mergedLogs = { ...remoteLogs };
+          Object.keys(completedLogs).forEach((dateStr) => {
+            const localDay = completedLogs[dateStr] || {};
+            const remoteDay = remoteLogs[dateStr] || {};
+            mergedLogs[dateStr] = {
+              Fajr: !!(localDay.Fajr || remoteDay.Fajr),
+              Dhuhr: !!(localDay.Dhuhr || remoteDay.Dhuhr),
+              Asr: !!(localDay.Asr || remoteDay.Asr),
+              Maghrib: !!(localDay.Maghrib || remoteDay.Maghrib),
+              Isha: !!(localDay.Isha || remoteDay.Isha),
+            };
+          });
+
+          if (isMounted) {
+            setCompletedLogs(mergedLogs);
+            setIsSyncedWithAccount(true);
+            if (typeof window !== "undefined") {
+              localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(mergedLogs));
+            }
+          }
+
+          // Push unified merged logs to server
+          await fetch("/api/prayer-tracker", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({ logsMap: mergedLogs }),
+          });
+        }
+      } catch (err) {
+        console.error("Failed to sync prayer tracker with account:", err);
+      }
+    }
+
+    syncWithAccount();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id, session?.access_token]);
 
   // Save settings helper
   const saveSettings = (newRemindersEnabled, newPrayerReminders, newSound) => {
@@ -108,12 +178,14 @@ export function PrayerTrackerProvider({ children }) {
   // Toggle Prayer Completion Checkmark for a given date (defaults to today YYYY-MM-DD)
   const togglePrayerCompletion = (dateStr, prayerName) => {
     const targetDate = dateStr || new Date().toISOString().split("T")[0];
-    
+    let nextStatus = false;
+
     setCompletedLogs((prev) => {
       const dayData = prev[targetDate] || {};
+      nextStatus = !dayData[prayerName];
       const updatedDay = {
         ...dayData,
-        [prayerName]: !dayData[prayerName],
+        [prayerName]: nextStatus,
       };
 
       const updatedLogs = {
@@ -125,12 +197,36 @@ export function PrayerTrackerProvider({ children }) {
         try {
           localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(updatedLogs));
         } catch (e) {
-          console.error("Failed to save prayer logs:", e);
+          console.error("Failed to save prayer logs to localStorage:", e);
         }
       }
 
       return updatedLogs;
     });
+
+    if (nextStatus) {
+      toast.success(`Marked ${prayerName} as completed!`, { toastId: `toast_${targetDate}_${prayerName}` });
+    } else {
+      toast.info(`Marked ${prayerName} as incomplete.`, { toastId: `toast_${targetDate}_${prayerName}` });
+    }
+
+    // Sync toggle to user account DB if logged in
+    if (session?.access_token) {
+      fetch("/api/prayer-tracker", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          date: targetDate,
+          prayerName,
+          completed: nextStatus,
+        }),
+      }).catch((err) => {
+        console.error("Failed to sync prayer completion to user account:", err);
+      });
+    }
   };
 
   // Get daily completion status for a specific date
@@ -305,6 +401,8 @@ export function PrayerTrackerProvider({ children }) {
   );
 
   const value = {
+    user,
+    isSyncedWithAccount,
     remindersEnabled,
     prayerReminders,
     reminderSound,

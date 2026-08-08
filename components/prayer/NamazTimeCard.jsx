@@ -338,6 +338,11 @@ const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true, clas
                 GPS
               </span>
             )}
+            {tracker?.isSyncedWithAccount && (
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-500 dark:text-sky-400 border border-sky-500/30 flex items-center gap-1" title="Synced with your account">
+                Cloud Synced
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-1.5">

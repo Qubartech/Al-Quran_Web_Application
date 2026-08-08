@@ -51,8 +51,8 @@ export default function PrayerDayDetailModal({
   ];
 
   const handleTogglePrayer = (prayerName) => {
-    if (tracker?.togglePrayerStatus) {
-      tracker.togglePrayerStatus(formattedISO, prayerName);
+    if (tracker?.togglePrayerCompletion) {
+      tracker.togglePrayerCompletion(formattedISO, prayerName);
     }
   };
 
@@ -148,7 +148,7 @@ export default function PrayerDayDetailModal({
 
             {corePrayers.map((p) => {
               const IconComp = p.icon;
-              const isCompleted = dailyStatus?.[p.name.toLowerCase()] || false;
+              const isCompleted = !!dailyStatus?.statusMap?.[p.name];
 
               return (
                 <div

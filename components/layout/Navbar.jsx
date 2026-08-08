@@ -70,16 +70,16 @@ function Navbar() {
   const navLinks = [
     { name: "Home", href: "/", icon: LayoutDashboard },
     { name: "Surahs", href: "/surah", icon: BookOpen },
-    { name: "Juz / Paras", href: "/juz", icon: Layers },
+    { name: "Juz", href: "/juz", icon: Layers },
     { name: "Prayer & Tracker", href: "/prayer", icon: Clock },
-    { name: "Prayer Calendar", href: "/prayer/calendar", icon: Calendar },
-    { name: "Learn Quran", href: "/learn", icon: GraduationCap },
-    { name: "Dedicated Player", href: "/player", icon: Play }
+    { name: "Calendar", href: "/prayer/calendar", icon: Calendar },
+    { name: "Learn", href: "/learn", icon: GraduationCap },
+    { name: "Player", href: "/player", icon: Play }
   ];
 
   return (
     <nav className="px-3 sm:px-6 bg-background/80 text-foreground backdrop-blur-xl transition-all duration-300 fixed top-0 left-0 right-0 w-full z-[10000] border-b border-border/50 shadow-sm dark:shadow-slate-950/50">
-      <div className="max-w-screen-2xl mx-auto py-2.5 sm:py-3.5 flex justify-between items-center">
+      <div className="max-w-screen-2xl mx-auto py-2 sm:py-2.5 flex justify-between items-center gap-2">
         {/* Logo container */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {isReadingPage && (
@@ -103,8 +103,8 @@ function Navbar() {
           </Link>
         </div>
 
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-1.5">
+        {/* Desktop Menu - Compact Responsive Fit */}
+        <div className="hidden lg:flex items-center gap-1 min-w-0 overflow-x-auto scrollbar-none py-1">
           {navLinks.map((link) => {
             const isActive = link.href === "/"
               ? pathname === "/"
@@ -116,13 +116,13 @@ function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex items-center gap-2 text-xs font-bold transition-all duration-300 px-4 py-2 rounded-xl border border-transparent ${isActive
+                className={`flex items-center gap-1.5 text-[11px] xl:text-xs font-bold transition-all duration-200 px-2.5 xl:px-3 py-1.5 rounded-xl border border-transparent whitespace-nowrap shrink-0 ${isActive
                     ? "text-primaryColor bg-primaryColor/10 dark:text-primaryColor-light dark:bg-primaryColor-light/10 border-primaryColor/10 dark:border-primaryColor-light/10"
                     : "text-foreground/70 hover:text-foreground hover:bg-foreground/5"
                   }`}
               >
-                <Icon size={14} className={isActive ? "text-primaryColor dark:text-primaryColor-light animate-pulse" : ""} />
-                {link.name}
+                <Icon size={13} className={isActive ? "text-primaryColor dark:text-primaryColor-light" : ""} />
+                <span>{link.name}</span>
               </Link>
             );
           })}
@@ -212,7 +212,7 @@ function Navbar() {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle mobile menu"
-            className="md:hidden p-2 rounded-xl bg-foreground/5 text-foreground/70 hover:text-foreground transition-all duration-300 shrink-0"
+            className="lg:hidden p-2 rounded-xl bg-foreground/5 text-foreground/70 hover:text-foreground transition-all duration-300 shrink-0"
           >
             {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
@@ -221,7 +221,7 @@ function Navbar() {
 
       {/* Mobile Right Side Navigation Drawer (Body Portal) */}
       {mounted && mobileMenuOpen && createPortal(
-        <div className="md:hidden">
+        <div className="lg:hidden">
           {/* Backdrop Overlay */}
           <div
             className="fixed inset-0 z-[20000] bg-slate-950/75 backdrop-blur-sm animate-fadeIn cursor-pointer"

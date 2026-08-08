@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import NamazTimeWrapper from "@/components/NamazTimeWrapper";
 import QuickAccessCard from "./QuickAccessCard";
+import TodayCalendarCard from "./TodayCalendarCard";
 import { useAudio } from "@/context/AudioProvider";
 import { QURANICAUDIO_BASE_URL } from "@/lib/api/config";
 
@@ -285,7 +286,10 @@ export default function HomeWelcome() {
         </div>
       </div>
 
-      {/* 3. Equal Height Quick Access Grid & Namaz Widget */}
+      {/* 3. Today's Calendar & Prayer Habits Widget */}
+      <TodayCalendarCard />
+
+      {/* 4. Equal Height Quick Access Grid & Namaz Widget */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         <QuickAccessCard className="h-full" />
         <NamazTimeWrapper className="h-full" />
