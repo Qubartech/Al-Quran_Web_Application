@@ -17,18 +17,7 @@ import {
 } from "lucide-react";
 import { usePrayerTracker } from "@/context/PrayerTrackerContext";
 
-const CALCULATION_METHODS = [
-  { id: 3, name: "Muslim World League (MWL)" },
-  { id: 2, name: "Islamic Society of North America (ISNA)" },
-  { id: 1, name: "Univ. of Islamic Sciences, Karachi" },
-  { id: 4, name: "Umm Al-Qura University, Makkah" },
-  { id: 5, name: "Egyptian General Authority of Survey" },
-  { id: 13, name: "Diyanet İşleri Başkanlığı, Turkey" },
-  { id: 15, name: "Moonsighting Committee Worldwide" },
-  { id: 11, name: "MUIS, Singapore" },
-  { id: 9, name: "Kuwait" },
-  { id: 10, name: "Qatar" }
-];
+import { CALCULATION_METHODS } from "@/lib/api/calculationMethods";
 
 export default function PrayerSettingsModal({
   isOpen,

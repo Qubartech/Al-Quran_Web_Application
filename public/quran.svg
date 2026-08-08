@@ -1,35 +1,174 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" enable-background="new 0 0 200 200" viewBox="0 0 200 200" id="quran">
-	<style>
-		:root { color-scheme: light dark; }
-		#quran path { fill: #22c55e !important; }
-		@media (prefers-color-scheme: dark) {
-			#quran path { fill: #ffffffff !important; }
-		}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%" id="quran">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="50%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    
+    <linearGradient id="emeraldDarkGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#065F46" />
+      <stop offset="100%" stop-color="#022C22" />
+    </linearGradient>
 
-		@media (prefers-color-scheme: light) {
-			#quran path { fill: #171717ff !important; }
-		}
-	</style>
-  <g>
-		<path d="M11.879,83.638l52.538,30.406L31.931,132.84c-0.448,0.26-0.806,0.654-1.019,1.127l-13.527,29.973
-		l0.012,0.005c-0.23,0.509-0.299,1.09-0.146,1.66c0.29,1.084,1.273,1.839,2.396,1.839h22.999c0.438,0,0.866-0.116,1.244-0.334
-		L100,134.637l56.11,32.474c0.378,0.218,0.807,0.334,1.244,0.334h22.998c1.122,0,2.106-0.755,2.396-1.839
-		c0.153-0.569,0.085-1.15-0.146-1.66l0.012-0.005l-13.525-29.973c-0.214-0.473-0.57-0.868-1.02-1.127l-32.487-18.797l52.538-30.405
-		c1.185-0.686,1.59-2.204,0.906-3.39l-5.749-9.958c-0.329-0.571-0.871-0.987-1.508-1.157c-0.639-0.169-1.314-0.082-1.886,0.25
-		l-2.969,1.719l-6.887-11.926c-0.098-0.166-0.21-0.318-0.34-0.455h0.002l-23.752-25.377c-0.784-0.84-2.047-1.03-3.041-0.46
-		c-7.759,4.425-15.644,7.438-21.402,9.638l-1.722,0.659c-10.405,4.011-16.352,8.846-19.331,16.839
-		c-2.97-7.93-8.892-12.815-19.332-16.84l-1.71-0.655c-5.76-2.201-13.649-5.213-21.412-9.642c-0.997-0.568-2.257-0.379-3.042,0.46
-		L31.194,58.72h0.002c-0.13,0.137-0.242,0.289-0.339,0.455l-7.107,12.31l-3.634-2.103c-0.573-0.331-1.249-0.418-1.884-0.25
-		c-0.637,0.17-1.181,0.586-1.51,1.157l-5.75,9.958C10.289,81.435,10.694,82.952,11.879,83.638z M35.107,136.737l34.268-19.825
-		l14.178,8.206l-58.469,33.83L35.107,136.737z M41.98,162.479H28.894l59.614-34.493l6.536,3.782L41.98,162.479z M164.894,136.737
-		l10.022,22.21l-58.469-33.83l14.18-8.207L164.894,136.737z M180.222,74.924l3.267,5.66l-71.999,41.667l-6.533-3.78L180.222,74.924z
-		 M172.619,73.587l-69.606,40.272c0.619-14.917,5.069-20.828,18.548-26.022l2.571-0.983c10.636-4.048,29.91-11.386,43.121-22.56
-		L172.619,73.587z M121.561,47.812l1.707-0.654c5.182-1.979,12.824-4.9,20.374-9.006l20.681,22.097
-		c-12.551,10.758-31.524,17.995-41.956,21.967l-2.592,0.99c-8.068,3.11-13.444,6.723-16.85,11.91V77.836
-		C102.925,59.905,106.93,53.451,121.561,47.812z M57.246,38.151c7.554,4.109,15.199,7.03,20.384,9.01l1.696,0.65
-		c13.999,5.396,18.17,11.512,18.599,27.259c0.015,0.559,0.026,1.128,0.032,1.708h0.023c-0.005,0.358-0.02,0.692-0.02,1.057v17.279
-		c-3.403-5.188-8.781-8.8-16.849-11.91l-2.588-0.989c-10.434-3.972-29.409-11.208-41.961-21.968L57.246,38.151z M33.633,64.294
-		c13.213,11.176,32.49,18.513,43.125,22.562l2.568,0.981c13.64,5.258,18.041,11.233,18.574,26.55L28.047,73.971L33.633,64.294z
-		 M19.78,74.924l151.326,87.555h-13.085L16.512,80.583L19.78,74.924z"></path>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF176" />
+      <stop offset="30%" stop-color="#F59E0B" />
+      <stop offset="70%" stop-color="#D97706" />
+      <stop offset="100%" stop-color="#B45309" />
+    </linearGradient>
+
+    <linearGradient id="goldLightGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+
+    <linearGradient id="parchmentGradLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F5E6D3" />
+      <stop offset="75%" stop-color="#FFFDF9" />
+      <stop offset="100%" stop-color="#E6D2B8" />
+    </linearGradient>
+
+    <linearGradient id="parchmentGradRight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E6D2B8" />
+      <stop offset="25%" stop-color="#FFFDF9" />
+      <stop offset="100%" stop-color="#F5E6D3" />
+    </linearGradient>
+
+    <linearGradient id="rehalGradLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#78350F" />
+      <stop offset="50%" stop-color="#451A03" />
+      <stop offset="100%" stop-color="#292524" />
+    </linearGradient>
+
+    <linearGradient id="rehalGradRight" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#92400E" />
+      <stop offset="50%" stop-color="#451A03" />
+      <stop offset="100%" stop-color="#1C1917" />
+    </linearGradient>
+
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#10B981" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#10B981" stop-opacity="0" />
+    </radialGradient>
+
+    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#022C22" flood-opacity="0.45" />
+    </filter>
+
+    <filter id="glowShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Halo Glow -->
+  <circle cx="256" cy="256" r="230" fill="url(#glow)" />
+
+  <!-- Rub el Hizb / Islamic Geometric Background Emblem -->
+  <g opacity="0.14" stroke="url(#goldGrad)" stroke-width="2.5" fill="none" transform="translate(256, 240) scale(1.65)">
+    <rect x="-60" y="-60" width="120" height="120" rx="8" />
+    <rect x="-60" y="-60" width="120" height="120" rx="8" transform="rotate(45)" />
+    <circle cx="0" cy="0" r="45" />
+    <circle cx="0" cy="0" r="25" />
+  </g>
+
+  <!-- Main Quran Composite Group -->
+  <g filter="url(#dropShadow)">
+
+    <!-- Rehal Stand (Wood X-Base) -->
+    <!-- Left Leg -->
+    <path d="M 120,380 L 210,290 L 230,310 L 140,420 C 120,440 90,420 100,395 Z" fill="url(#rehalGradLeft)" />
+    <path d="M 110,400 L 70,445 C 60,455 75,470 90,465 L 180,390 L 160,365 Z" fill="url(#rehalGradLeft)" opacity="0.9" />
+
+    <!-- Right Leg -->
+    <path d="M 392,380 L 302,290 L 282,310 L 372,420 C 392,440 422,420 412,395 Z" fill="url(#rehalGradRight)" />
+    <path d="M 402,400 L 442,445 C 452,455 437,470 422,465 L 332,390 L 352,365 Z" fill="url(#rehalGradRight)" opacity="0.9" />
+    
+    <!-- Rehal Center Joint & Carved Accents -->
+    <ellipse cx="256" cy="305" rx="28" ry="14" fill="#292524" />
+    <path d="M 230,305 C 230,295 282,295 282,305 C 282,315 230,315 230,305 Z" fill="url(#goldGrad)" opacity="0.85" />
+
+    <!-- Book Covers (Deep Emerald Outer Hardcovers) -->
+    <!-- Left Cover -->
+    <path d="M 46,260 C 46,240 140,210 248,225 L 248,345 C 140,330 46,355 46,335 Z" fill="url(#emeraldDarkGrad)" />
+    <!-- Right Cover -->
+    <path d="M 466,260 C 466,240 372,210 264,225 L 264,345 C 372,330 466,355 466,335 Z" fill="url(#emeraldDarkGrad)" />
+
+    <!-- Gold Foil Book Spine & Cover Edges -->
+    <path d="M 44,262 C 44,242 140,212 248,227 L 248,232 C 142,217 48,247 48,267 Z" fill="url(#goldGrad)" />
+    <path d="M 468,262 C 468,242 372,212 264,227 L 264,232 C 370,217 464,247 464,267 Z" fill="url(#goldGrad)" />
+    <path d="M 44,337 C 44,357 140,332 248,347 L 248,342 C 142,327 48,352 48,332 Z" fill="url(#goldGrad)" />
+    <path d="M 468,337 C 468,357 372,332 264,347 L 264,342 C 370,327 464,352 464,332 Z" fill="url(#goldGrad)" />
+
+    <!-- Stacked Page Thickness (3D Layered Pages Effect) -->
+    <!-- Left Page Block Base -->
+    <path d="M 52,255 C 52,238 142,212 250,224 L 250,334 C 142,322 52,345 52,328 Z" fill="#D4C3AB" />
+    <path d="M 55,253 C 55,236 143,210 250,222 L 250,332 C 143,320 55,343 55,326 Z" fill="#E6D5BD" />
+
+    <!-- Right Page Block Base -->
+    <path d="M 460,255 C 460,238 370,212 262,224 L 262,334 C 370,322 460,345 460,328 Z" fill="#D4C3AB" />
+    <path d="M 457,253 C 457,236 369,210 262,222 L 262,332 C 369,320 457,343 457,326 Z" fill="#E6D5BD" />
+
+    <!-- Top Open Pages (Cream Parchment) -->
+    <!-- Left Open Page -->
+    <path d="M 58,250 C 58,232 145,206 252,218 L 252,328 C 145,316 58,340 58,322 Z" fill="url(#parchmentGradLeft)" />
+    <!-- Right Open Page -->
+    <path d="M 454,250 C 454,232 367,206 260,218 L 260,328 C 367,316 454,340 454,322 Z" fill="url(#parchmentGradRight)" />
+
+    <!-- Book Center Spine Shadow -->
+    <path d="M 252,218 C 254,218 258,218 260,218 L 260,328 C 258,328 254,328 252,328 Z" fill="#B39C82" opacity="0.6" />
+
+    <!-- Gold Foil Decorative Page Borders & Illuminations (Unwan / Arch Frame) -->
+    <!-- Left Page Frame -->
+    <path d="M 78,248 C 120,234 180,222 236,226 L 236,316 C 180,312 120,322 78,334 Z" fill="none" stroke="url(#goldGrad)" stroke-width="2" />
+    <path d="M 84,252 C 122,240 178,228 230,232 L 230,310 C 178,306 122,316 84,328 Z" fill="none" stroke="url(#goldGrad)" stroke-width="1" stroke-dasharray="4,2" />
+
+    <!-- Right Page Frame -->
+    <path d="M 434,248 C 392,234 332,222 276,226 L 276,316 C 332,312 392,322 434,334 Z" fill="none" stroke="url(#goldGrad)" stroke-width="2" />
+    <path d="M 428,252 C 390,240 334,228 282,232 L 282,310 C 334,306 390,316 428,328 Z" fill="none" stroke="url(#goldGrad)" stroke-width="1" stroke-dasharray="4,2" />
+
+    <!-- Decorative Arch & Mihrab Motif on Pages -->
+    <!-- Left Page Ornament -->
+    <path d="M 130,242 C 130,242 157,226 184,242" fill="none" stroke="url(#goldGrad)" stroke-width="2" />
+    <circle cx="157" cy="235" r="4" fill="url(#goldGrad)" />
+
+    <!-- Right Page Ornament -->
+    <path d="M 382,242 C 382,242 355,226 328,242" fill="none" stroke="url(#goldGrad)" stroke-width="2" />
+    <circle cx="355" cy="235" r="4" fill="url(#goldGrad)" />
+
+    <!-- Text Lines Simulation (Elegant Script Lines) -->
+    <!-- Left Page Lines -->
+    <line x1="94" y1="266" x2="220" y2="252" stroke="#B49A7B" stroke-width="2.5" stroke-linecap="round" opacity="0.75" />
+    <line x1="94" y1="280" x2="220" y2="266" stroke="#B49A7B" stroke-width="2.5" stroke-linecap="round" opacity="0.75" />
+    <line x1="94" y1="294" x2="220" y2="280" stroke="#B49A7B" stroke-width="2.5" stroke-linecap="round" opacity="0.75" />
+    <line x1="94" y1="308" x2="220" y2="294" stroke="#B49A7B" stroke-width="2.5" stroke-linecap="round" opacity="0.75" />
+
+    <!-- Right Page Lines -->
+    <line x1="292" y1="252" x2="418" y2="266" stroke="#B49A7B" stroke-width="2.5" stroke-linecap="round" opacity="0.75" />
+    <line x1="292" y1="266" x2="418" y2="280" stroke="#B49A7B" stroke-width="2.5" stroke-linecap="round" opacity="0.75" />
+    <line x1="292" y1="280" x2="418" y2="294" stroke="#B49A7B" stroke-width="2.5" stroke-linecap="round" opacity="0.75" />
+    <line x1="292" y1="294" x2="418" y2="308" stroke="#B49A7B" stroke-width="2.5" stroke-linecap="round" opacity="0.75" />
+
+    <!-- Book Center Silk Ribbon Bookmark (Tajweed Bookmark Tassel) -->
+    <path d="M 256,215 C 254,230 250,300 242,370 C 240,385 248,395 252,385 C 258,370 258,230 256,215 Z" fill="url(#emeraldGrad)" />
+    <path d="M 256,215 C 256,230 256,300 258,370" stroke="url(#goldGrad)" stroke-width="1.5" fill="none" />
+    <!-- Gold Tassel -->
+    <path d="M 238,368 L 246,395 L 234,395 Z" fill="url(#goldGrad)" />
+    <circle cx="242" cy="368" r="3" fill="url(#goldGrad)" />
+
+    <!-- Floating Crescent & Star Radiance (Top Center Emblem) -->
+    <g transform="translate(256, 135)" filter="url(#glowShadow)">
+      <!-- Radiant Gold Starburst Ring -->
+      <circle cx="0" cy="0" r="42" fill="url(#emeraldGrad)" stroke="url(#goldGrad)" stroke-width="3" />
+      <circle cx="0" cy="0" r="36" fill="none" stroke="url(#goldGrad)" stroke-width="1" stroke-dasharray="3,3" />
+
+      <!-- Crescent Moon -->
+      <path d="M 6,-18 A 20,20 0 1,0 18,10 A 15,15 0 1,1 6,-18 Z" fill="url(#goldGrad)" />
+      <!-- 5-Point Star -->
+      <polygon points="12,-8 15,-1 22,-1 16,3 18,10 12,6 6,10 8,3 2,-1 9,-1" fill="url(#goldLightGrad)" />
+    </g>
+
   </g>
 </svg>

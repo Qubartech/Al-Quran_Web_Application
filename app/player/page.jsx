@@ -258,23 +258,24 @@ export default function AudioPlayerPage() {
   };
 
   return (
-    <div className="px-5 py-8 min-h-[calc(100vh-100px)] max-w-screen-2xl mx-auto flex flex-col lg:flex-row gap-8 relative overflow-hidden transition-colors">
+    <div className="px-3 sm:px-6 py-4 sm:py-8 w-full min-h-[calc(100vh-100px)] max-w-screen-2xl mx-auto flex flex-col lg:flex-row gap-6 lg:gap-8 relative overflow-hidden transition-colors">
       
       {/* 1. Left Side: Spinning Disc / Reciter Visualizer Card */}
       <div className="w-full lg:w-[40%] flex flex-col items-center">
-        <div className="w-full p-8 rounded-2xl glass border border-white/20 dark:border-slate-800/80 shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+        <div className="w-full p-4 sm:p-6 md:p-8 rounded-2xl glass border border-white/20 dark:border-slate-800/80 shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primaryColor/5 to-emerald-500/5 dark:from-primaryColor/10 dark:to-emerald-500/5 pointer-events-none"></div>
 
           {/* Glowing spinning Quran disc placeholder */}
-          <div className="relative my-8">
+          <div className="relative my-4 sm:my-8">
             <div className={`absolute inset-0 rounded-full bg-primaryColor/10 dark:bg-emerald-500/10 blur-xl ${isPlaying ? "animate-pulse" : ""}`}></div>
-            <div className={`w-52 h-52 md:w-60 md:h-60 rounded-full border-4 border-emerald-500/20 dark:border-emerald-500/10 flex items-center justify-center relative shadow-2xl bg-white/25 dark:bg-slate-900/40 backdrop-blur-md ${
+            <div className={`w-44 h-44 sm:w-52 sm:h-52 md:w-60 md:h-60 rounded-full border-4 border-emerald-500/20 dark:border-emerald-500/10 flex items-center justify-center relative shadow-2xl bg-white/25 dark:bg-slate-900/40 backdrop-blur-md ${
               isPlaying ? "animate-[spin_20s_linear_infinite]" : ""
             }`}>
-              <div className="w-40 h-40 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-emerald-500/20 to-teal-500/30 flex items-center justify-center">
-                <Music size={48} className="text-primaryColor dark:text-primaryColor-light animate-bounce" style={{ animationDuration: isPlaying ? "2.5s" : "0s" }} />
+              <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-emerald-500/20 to-teal-500/30 flex items-center justify-center">
+                <Music size={38} className="text-primaryColor dark:text-primaryColor-light animate-bounce md:hidden" style={{ animationDuration: isPlaying ? "2.5s" : "0s" }} />
+                <Music size={48} className="text-primaryColor dark:text-primaryColor-light animate-bounce hidden md:block" style={{ animationDuration: isPlaying ? "2.5s" : "0s" }} />
               </div>
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white dark:bg-slate-900 border-2 border-primaryColor shadow"></div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-white dark:bg-slate-900 border-2 border-primaryColor shadow"></div>
             </div>
           </div>
 
@@ -282,7 +283,7 @@ export default function AudioPlayerPage() {
             <span className="text-[10px] font-bold tracking-widest text-primaryColor dark:text-primaryColor-light uppercase">
               Now Playing Recitation
             </span>
-            <h2 className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 mt-1 leading-snug">
+            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-800 dark:text-slate-100 mt-1 leading-snug">
               {activeSurahInfo ? `${activeSurahInfo.englishName}` : "Surah Recitation"}
             </h2>
             <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold mt-1">
@@ -294,14 +295,14 @@ export default function AudioPlayerPage() {
           </div>
 
           {/* Quick Dropdown selector */}
-          <div className="w-full mt-8 relative z-20">
+          <div className="w-full mt-6 sm:mt-8 relative z-20">
             <label className="block text-left text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 pl-1">
               Select Surah
             </label>
             <select
               value={activeSurahNum}
               onChange={(e) => selectSurah(parseInt(e.target.value, 10))}
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-250/20 dark:border-slate-800/80 bg-white/40 dark:bg-slate-950/40 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-primaryColor text-xs font-bold shadow-sm"
+              className="w-full px-3.5 sm:px-4 py-2.5 rounded-xl border border-gray-250/20 dark:border-slate-800/80 bg-white/40 dark:bg-slate-950/40 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-primaryColor text-xs font-bold shadow-sm"
             >
               {surahs.map((s) => (
                 <option key={s.number} value={s.number} className="bg-white dark:bg-slate-900">
@@ -314,11 +315,11 @@ export default function AudioPlayerPage() {
       </div>
 
       {/* 2. Right Side: Immersive Verse Reader & Big Playback controls */}
-      <div className="w-full lg:w-[60%] flex flex-col gap-6">
+      <div className="w-full lg:w-[60%] flex flex-col gap-4 sm:gap-6">
         
         {/* Dynamic Verse Reader */}
-        <div className="flex-1 p-8 rounded-2xl glass border border-white/20 dark:border-slate-800/80 shadow-2xl flex flex-col justify-center min-h-[300px] relative overflow-hidden">
-          <div className="absolute top-4 left-4 flex items-center gap-1.5 text-xs text-primaryColor dark:text-primaryColor-light font-bold">
+        <div className="flex-1 p-4 sm:p-6 md:p-8 rounded-2xl glass border border-white/20 dark:border-slate-800/80 shadow-2xl flex flex-col justify-center min-h-[250px] sm:min-h-[300px] relative overflow-hidden">
+          <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex items-center gap-1.5 text-xs text-primaryColor dark:text-primaryColor-light font-bold">
             <BookOpen size={14} />
             <span>Verse {activeAyah ? activeAyah.number : "1"}</span>
           </div>
@@ -329,7 +330,7 @@ export default function AudioPlayerPage() {
               <span className="text-xs font-bold">Loading Surah Verses...</span>
             </div>
           ) : (
-            <div className="flex flex-col gap-6 py-6 text-center">
+            <div className="flex flex-col gap-4 sm:gap-6 py-4 sm:py-6 text-center">
               {activeAyah ? (
                 (() => {
                   const ayahData = arabicAyahs[activeAyah.index];
@@ -339,7 +340,7 @@ export default function AudioPlayerPage() {
                     <>
                       {/* Arabic Words */}
                       {ayahData?.words && ayahData.words.length > 0 ? (
-                        <div className="flex flex-wrap gap-x-3 gap-y-5 justify-center w-full pb-7" dir="rtl">
+                        <div className="flex flex-wrap gap-x-2 sm:gap-x-3 gap-y-3 sm:gap-y-5 justify-center w-full pb-5 sm:pb-7" dir="rtl">
                           {ayahData.words.map((word, wIdx) => {
                             const wordText = word.text_qpc_hafs || word.text_uthmani || word.text;
                             const isWord = word.char_type_name === "word";
@@ -352,10 +353,10 @@ export default function AudioPlayerPage() {
                             return (
                               <div
                                 key={wIdx}
-                                className="relative flex flex-col items-center justify-center p-1 rounded-md hover:bg-gray-100/50 dark:hover:bg-gray-800/30 transition-all duration-200 group cursor-pointer border border-transparent"
+                                className="relative flex flex-col items-center justify-center p-0.5 sm:p-1 rounded-md hover:bg-gray-100/50 dark:hover:bg-gray-800/30 transition-all duration-200 group cursor-pointer border border-transparent"
                               >
                                 <span
-                                  className={`font-arabic ayah-arabic-text select-none transition-all duration-150 ${
+                                  className={`font-arabic ayah-arabic-text select-none transition-all duration-150 text-2xl sm:text-3xl md:text-4xl ${
                                     isHighlightStyle
                                       ? "text-primaryColor dark:text-primaryColor-light scale-110 font-bold"
                                       : isDimmedStyle
@@ -387,13 +388,13 @@ export default function AudioPlayerPage() {
                           })}
                         </div>
                       ) : (
-                        <p className="font-arabic ayah-arabic-text text-right leading-loose text-slate-950 dark:text-slate-100 font-medium select-none animate-fadeIn">
+                        <p className="font-arabic ayah-arabic-text text-right leading-loose text-slate-950 dark:text-slate-100 font-medium select-none animate-fadeIn text-2xl sm:text-3xl md:text-4xl">
                           {activeAyah.arabic}
                         </p>
                       )}
 
                       {/* Translation */}
-                      <p className="ayah-text text-left italic text-gray-750 dark:text-gray-300 leading-relaxed pt-4 border-t border-gray-150/40 dark:border-slate-800/60 font-sans animate-fadeIn">
+                      <p className="ayah-text text-left italic text-gray-750 dark:text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed pt-3 sm:pt-4 border-t border-gray-150/40 dark:border-slate-800/60 font-sans animate-fadeIn">
                         {activeAyah.translation}
                       </p>
                     </>
@@ -407,16 +408,16 @@ export default function AudioPlayerPage() {
         </div>
 
         {/* Dashboard player row control center */}
-        <div className="p-6 rounded-2xl glass border border-white/20 dark:border-slate-800/80 shadow-2xl flex flex-col gap-4">
+        <div className="p-4 sm:p-6 rounded-2xl glass border border-white/20 dark:border-slate-800/80 shadow-2xl flex flex-col gap-4">
           
           {/* Main Controls row */}
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-center">
+            <span className="text-xs font-mono text-gray-500 dark:text-gray-400 order-2 sm:order-1">
               {activeSurahInfo ? `${activeSurahInfo.revelationType} • ${activeSurahInfo.numberOfAyahs} Verses` : ""}
             </span>
             
             {/* Quick buttons */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4 order-1 sm:order-2">
               <button
                 onClick={() => selectSurah(Math.max(1, activeSurahNum - 1))}
                 className="p-2.5 rounded-xl bg-gray-100/50 dark:bg-slate-800/40 text-gray-600 dark:text-gray-300 hover:text-primaryColor dark:hover:text-primaryColor transition-all border border-transparent"
@@ -427,7 +428,7 @@ export default function AudioPlayerPage() {
 
               <button
                 onClick={togglePlay}
-                className="w-14 h-14 flex items-center justify-center rounded-full text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all duration-200"
+                className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all duration-200"
               >
                 {isPlaying ? <Pause size={22} fill="currentColor" /> : <Play size={22} fill="currentColor" />}
               </button>
@@ -441,7 +442,7 @@ export default function AudioPlayerPage() {
               </button>
             </div>
 
-            <span className="text-xs font-bold text-primaryColor dark:text-emerald-400 select-none">
+            <span className="text-xs font-bold text-primaryColor dark:text-emerald-400 select-none order-3">
               Playing Surah #{activeSurahNum}
             </span>
           </div>

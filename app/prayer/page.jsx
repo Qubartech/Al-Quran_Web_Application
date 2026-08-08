@@ -405,8 +405,8 @@ export default function PrayerPage() {
   return (
     <div className="min-h-screen pb-20 pt-6 px-4 md:px-6 w-full max-w-screen-2xl mx-auto flex flex-col gap-8">
       
-      {/* 1. Dynamic Hero Dashboard Header Card */}
-      <div className={`relative overflow-hidden p-6 md:p-10 rounded-3xl bg-gradient-to-br ${activeHeroGradient} text-white shadow-2xl shadow-emerald-500/10 transition-all duration-700`}>
+      {/* 1. Hero Dashboard Header Card */}
+      <div className="relative overflow-hidden p-6 md:p-10 rounded-3xl bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-950 text-white shadow-2xl shadow-emerald-950/40 border border-emerald-500/25 transition-all duration-700">
         
         {/* Background Islamic Arch / Decorative Glow */}
         <div className="absolute right-0 top-0 translate-x-12 -translate-y-12 w-96 h-96 rounded-full bg-white/10 blur-3xl pointer-events-none"></div>
