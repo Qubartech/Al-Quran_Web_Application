@@ -61,7 +61,7 @@ export default function PrayerCalendarGrid({
                 key={w.en}
                 className={`py-1.5 sm:py-2.5 rounded-xl border transition-all ${
                   idx === 5
-                    ? "bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/30 text-emerald-650 dark:text-emerald-400 font-extrabold"
+                    ? "bg-emerald-50 dark:bg-slate-900/90 border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-extrabold"
                     : "bg-white dark:bg-slate-900/90 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold"
                 }`}
               >
