@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import useCity from "@/lib/getLocation";
@@ -403,8 +405,8 @@ export default function PrayerPage() {
   return (
     <div className="min-h-screen pb-20 pt-6 px-4 md:px-6 w-full max-w-screen-2xl mx-auto flex flex-col gap-8">
       
-      {/* 1. Dynamic Hero Dashboard Header Card */}
-      <div className={`relative overflow-hidden p-6 md:p-10 rounded-3xl bg-gradient-to-br ${activeHeroGradient} text-white shadow-2xl shadow-emerald-500/10 transition-all duration-700`}>
+      {/* 1. Hero Dashboard Header Card */}
+      <div className="relative overflow-hidden p-6 md:p-10 rounded-3xl bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-950 text-white shadow-2xl shadow-emerald-950/40 border border-emerald-500/25 transition-all duration-700">
         
         {/* Background Islamic Arch / Decorative Glow */}
         <div className="absolute right-0 top-0 translate-x-12 -translate-y-12 w-96 h-96 rounded-full bg-white/10 blur-3xl pointer-events-none"></div>
@@ -420,6 +422,22 @@ export default function PrayerPage() {
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-white text-xs font-bold backdrop-blur-md border border-white/20">
                 <Sparkles size={14} className="text-amber-300" /> Daily Salah Companion
               </span>
+
+              {tracker?.user ? (
+                tracker?.isSyncedWithAccount ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-200 text-xs font-extrabold backdrop-blur-md border border-emerald-400/40 shadow-sm" title="Prayer tracker synced with your account database">
+                    <CheckCircle2 size={13} className="text-emerald-300" /> Account Synced
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-200 text-xs font-extrabold backdrop-blur-md border border-amber-400/40 animate-pulse" title="Syncing prayer logs with your account database...">
+                    <Sparkles size={13} className="text-amber-300" /> Syncing Account...
+                  </span>
+                )
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-500/20 text-slate-200 text-xs font-bold backdrop-blur-md border border-white/20" title="Guest mode: logs stored in browser local storage. Log in to sync to cloud.">
+                  Local Storage (Guest)
+                </span>
+              )}
 
               {/* Location Badge */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-medium backdrop-blur-md border border-white/15">

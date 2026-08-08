@@ -66,17 +66,17 @@ export default function HijriCalendarView({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Converter Box */}
-        <div className="lg:col-span-2 p-6 rounded-3xl bg-slate-900/80 border border-slate-800 backdrop-blur-md shadow-xl flex flex-col justify-between gap-4">
+        <div className="lg:col-span-2 p-6 rounded-3xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 backdrop-blur-md shadow-xl flex flex-col justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                 <ArrowRightLeft size={18} />
               </span>
-              <h3 className="text-lg font-extrabold text-white">
+              <h3 className="text-lg font-extrabold text-slate-850 dark:text-white">
                 Gregorian &lt;–&gt; Hijri Date Converter
               </h3>
             </div>
-            <p className="text-xs text-slate-300">
+            <p className="text-xs text-slate-600 dark:text-slate-300">
               Convert any Gregorian date to its exact Islamic lunar Hijri date according to Umm al-Qura calculation.
             </p>
           </div>
@@ -86,7 +86,7 @@ export default function HijriCalendarView({
               type="date"
               value={gDateInput}
               onChange={(e) => setGDateInput(e.target.value)}
-              className="px-4 py-2.5 rounded-2xl bg-slate-800 text-white text-xs font-bold border border-slate-700 focus:border-emerald-500 focus:outline-none"
+              className="px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white text-xs font-bold border border-slate-200 dark:border-slate-700 focus:border-emerald-500 focus:outline-none"
             />
             
             <button
@@ -101,11 +101,11 @@ export default function HijriCalendarView({
 
           {/* Converted Result */}
           {convertedHijri && (
-            <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-200 text-xs flex flex-col gap-1 animate-in fade-in">
-              <span className="font-extrabold text-sm text-white">
+            <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-200 text-xs flex flex-col gap-1 animate-in fade-in">
+              <span className="font-extrabold text-sm text-slate-900 dark:text-white">
                 Hijri Date: {convertedHijri.hijri?.day} {convertedHijri.hijri?.month?.en} ({convertedHijri.hijri?.month?.ar}) {convertedHijri.hijri?.year} AH
               </span>
-              <span className="text-[11px] text-emerald-300/80">
+              <span className="text-[11px] text-emerald-650 dark:text-emerald-300/80">
                 Day: {convertedHijri.hijri?.weekday?.en} ({convertedHijri.hijri?.weekday?.ar}) | Gregorian: {convertedHijri.gregorian?.readable}
               </span>
             </div>
@@ -113,17 +113,17 @@ export default function HijriCalendarView({
         </div>
 
         {/* Hijri Adjustment Selector */}
-        <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 backdrop-blur-md shadow-xl flex flex-col justify-between gap-4">
+        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 backdrop-blur-md shadow-xl flex flex-col justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              <span className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                 <Moon size={18} />
               </span>
-              <h3 className="text-lg font-extrabold text-white">
+              <h3 className="text-lg font-extrabold text-slate-850 dark:text-white">
                 Moonsighting Offset
               </h3>
             </div>
-            <p className="text-xs text-slate-300">
+            <p className="text-xs text-slate-600 dark:text-slate-300">
               Adjust Hijri date by +/- days based on your local country&apos;s official moonsighting committee.
             </p>
           </div>
@@ -135,8 +135,8 @@ export default function HijriCalendarView({
                 onClick={() => onAdjustmentChange(offset)}
                 className={`flex-1 py-2 rounded-xl text-xs font-extrabold transition-all border ${
                   adjustment === offset
-                    ? "bg-amber-500 text-slate-950 border-amber-400 shadow-lg shadow-amber-950/40"
-                    : "bg-slate-800 text-slate-300 border-slate-700 hover:border-amber-500/40"
+                    ? "bg-amber-500 text-white dark:text-slate-950 border-amber-400 shadow-lg shadow-amber-950/20"
+                    : "bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-amber-500/40"
                 }`}
               >
                 {offset > 0 ? `+${offset}` : offset} d
@@ -149,27 +149,27 @@ export default function HijriCalendarView({
 
       {/* 2. Side-by-Side Monthly Table */}
       <div className="w-full flex flex-col gap-2">
-        <div className="sm:hidden flex items-center justify-between text-[11px] font-bold text-slate-400 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-800">
-          <span className="flex items-center gap-1 text-amber-400">
+        <div className="sm:hidden flex items-center justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
+          <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
             <Moon size={13} /> Hijri & Gregorian Alignment
           </span>
-          <span className="text-[10px] text-slate-400">↔ Scroll right for Arabic details</span>
+          <span className="text-[10px] text-slate-500 dark:text-slate-400">↔ Scroll right for Arabic details</span>
         </div>
 
-        <div className="w-full overflow-x-auto rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl backdrop-blur-md">
+        <div className="w-full overflow-x-auto rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl backdrop-blur-md">
           <table className="w-full text-left text-xs border-collapse min-w-[640px] sm:min-w-full">
             <thead>
-              <tr className="bg-slate-800/90 text-slate-200 border-b border-slate-800 font-extrabold uppercase tracking-wider sticky top-0 z-10">
-                <th className="py-4 px-4 text-center sticky left-0 bg-slate-800 z-20 shadow-md">Day</th>
+              <tr className="bg-slate-50 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 border-b border-slate-200 dark:border-slate-800 font-extrabold uppercase tracking-wider sticky top-0 z-10">
+                <th className="py-4 px-4 text-center sticky left-0 bg-slate-50 dark:bg-slate-800 z-20 shadow-md">Day</th>
                 <th className="py-4 px-4">Gregorian Date</th>
                 <th className="py-4 px-4">Day of Week</th>
-                <th className="py-4 px-4 text-amber-400">Hijri Date (English)</th>
-                <th className="py-4 px-4 text-amber-400 text-right">Hijri Date (Arabic)</th>
+                <th className="py-4 px-4 text-amber-600 dark:text-amber-400">Hijri Date (English)</th>
+                <th className="py-4 px-4 text-amber-600 dark:text-amber-400 text-right">Hijri Date (Arabic)</th>
                 <th className="py-4 px-4 text-center">Islamic Events & Badges</th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-slate-800/60 font-medium">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
               {days.map((d, idx) => {
                 const greg = d.gregorian || {};
                 const hijri = d.hijri || {};
@@ -185,27 +185,27 @@ export default function HijriCalendarView({
                     key={greg.date || idx}
                     className={`transition-all hover:bg-emerald-500/10 ${
                       isToday
-                        ? "bg-emerald-500/20 font-bold border-l-4 border-l-emerald-500"
+                        ? "bg-emerald-500/10 dark:bg-emerald-500/20 font-bold border-l-4 border-l-emerald-500"
                         : isFriday
-                        ? "bg-slate-850"
+                        ? "bg-slate-50 dark:bg-slate-850"
                         : idx % 2 === 1
-                        ? "bg-slate-950/40"
-                        : "bg-slate-900"
+                        ? "bg-slate-100/50 dark:bg-slate-950/40"
+                        : "bg-white dark:bg-slate-900"
                     }`}
                   >
                     {/* Day Number (Sticky on scroll) */}
                     <td className={`py-4 px-4 text-center font-black sticky left-0 z-10 shadow-sm ${
-                      isToday ? "bg-emerald-950 text-emerald-300" : isFriday ? "bg-slate-850 text-white" : "bg-slate-900 text-slate-200"
+                      isToday ? "bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-300" : isFriday ? "bg-slate-50 dark:bg-slate-850 text-slate-800 dark:text-white" : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200"
                     }`}>
                       <div className="flex items-center justify-center gap-1.5">
-                        {isToday && <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />}
+                        {isToday && <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-ping" />}
                         <span>{greg.day}</span>
                       </div>
                     </td>
 
                     {/* Gregorian Date */}
                     <td className="py-4 px-4 whitespace-nowrap">
-                      <span className="font-extrabold text-white">
+                      <span className="font-extrabold text-slate-800 dark:text-white">
                         {greg.month?.en} {greg.day}, {greg.year}
                       </span>
                     </td>
@@ -213,7 +213,7 @@ export default function HijriCalendarView({
                     {/* Day of Week */}
                     <td className="py-4 px-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <span className={isFriday ? "text-emerald-400 font-extrabold" : "text-slate-300 font-semibold"}>
+                        <span className={isFriday ? "text-emerald-600 dark:text-emerald-400 font-extrabold" : "text-slate-700 dark:text-slate-300 font-semibold"}>
                           {greg.weekday?.en}
                         </span>
                         <span className="text-[11px] text-slate-500 font-arabic">
@@ -224,13 +224,13 @@ export default function HijriCalendarView({
 
                     {/* Hijri Date English */}
                     <td className="py-4 px-4 whitespace-nowrap">
-                      <span className="font-extrabold text-amber-300">
+                      <span className="font-extrabold text-amber-600 dark:text-amber-300">
                         {hijri.day} {hijri.month?.en} {hijri.year} AH
                       </span>
                     </td>
 
                     {/* Hijri Date Arabic */}
-                    <td className="py-4 px-4 whitespace-nowrap text-right font-arabic font-extrabold text-amber-200 text-sm">
+                    <td className="py-4 px-4 whitespace-nowrap text-right font-arabic font-extrabold text-amber-700 dark:text-amber-200 text-sm">
                       {hijri.day} {hijri.month?.ar} {hijri.year} هـ
                     </td>
 
@@ -246,14 +246,14 @@ export default function HijriCalendarView({
                         {holidays.map((h, hIdx) => (
                           <span
                             key={hIdx}
-                            className="px-2.5 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-extrabold"
+                            className="px-2.5 py-0.5 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/20 dark:border-amber-500/30 text-[10px] font-extrabold"
                           >
                             {h}
                           </span>
                         ))}
 
                         {isFriday && (
-                          <span className="px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">
+                          <span className="px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">
                             Jumu&apos;ah
                           </span>
                         )}
@@ -268,10 +268,10 @@ export default function HijriCalendarView({
       </div>
 
       {/* 3. 12 Islamic Months Reference Guide */}
-      <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl flex flex-col gap-4">
+      <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col gap-4">
         <div className="flex items-center gap-2">
-          <Sparkles className="text-amber-400" size={20} />
-          <h3 className="text-lg font-extrabold text-white">
+          <Sparkles className="text-amber-500 dark:text-amber-400" size={20} />
+          <h3 className="text-lg font-extrabold text-slate-850 dark:text-white">
             The 12 Hijri Months of the Islamic Calendar
           </h3>
         </div>
@@ -280,17 +280,17 @@ export default function HijriCalendarView({
           {HIJRI_MONTHS.map((hm) => (
             <div
               key={hm.id}
-              className="p-4 rounded-2xl bg-slate-800/60 border border-slate-700/60 flex flex-col justify-between gap-2"
+              className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 flex flex-col justify-between gap-2"
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-emerald-400">
+                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
                   {hm.id}. {hm.nameEn}
                 </span>
-                <span className="font-arabic font-bold text-amber-300 text-sm">
+                <span className="font-arabic font-bold text-amber-600 dark:text-amber-300 text-sm">
                   {hm.nameAr}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 leading-tight">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
                 {hm.desc}
               </p>
             </div>

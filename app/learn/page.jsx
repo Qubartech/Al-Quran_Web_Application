@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { learnLevels } from "@/lib/learnData";
@@ -40,6 +42,7 @@ export default function LearnPage() {
   const [completedModules, setCompletedModules] = useState([]);
   const [quizScores, setQuizScores] = useState({});
   const [loading, setLoading] = useState(false);
+  const [isSyncedWithAccount, setIsSyncedWithAccount] = useState(false);
   const [activeLessonModule, setActiveLessonModule] = useState(null);
   const [activeQuizModule, setActiveQuizModule] = useState(null);
   const [selectedLevelId, setSelectedLevelId] = useState("level-1");
@@ -55,7 +58,7 @@ export default function LearnPage() {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
         .then((res) => res.json())
-        .then((data) => {
+        .then(async (data) => {
           if (Array.isArray(data)) {
             const completed = data.filter((item) => item.completed).map((item) => item.moduleId);
             const scores = {};
@@ -64,13 +67,47 @@ export default function LearnPage() {
                 scores[item.moduleId] = item.quizScore;
               }
             });
-            setCompletedModules(completed);
+
+            // Read guest completed modules from localStorage and merge
+            let localCompleted = [];
+            try {
+              const saved = localStorage.getItem("quran_learn_completed");
+              if (saved) localCompleted = JSON.parse(saved) || [];
+            } catch (e) {}
+
+            const mergedCompleted = Array.from(new Set([...completed, ...localCompleted]));
+            setCompletedModules(mergedCompleted);
             setQuizScores(scores);
+            setIsSyncedWithAccount(true);
+
+            // Sync any local guest modules up to database
+            if (localCompleted.length > 0) {
+              const pending = localCompleted.filter((mId) => !completed.includes(mId));
+              for (const mId of pending) {
+                try {
+                  await fetch("/api/learn", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${session.access_token}`,
+                    },
+                    body: JSON.stringify({ moduleId: mId, completed: true }),
+                  });
+                } catch (e) {}
+              }
+              try {
+                localStorage.removeItem("quran_learn_completed");
+              } catch (e) {}
+            }
           }
         })
-        .catch((err) => console.error("Error fetching learn progress:", err))
+        .catch((err) => {
+          console.error("Error fetching learn progress:", err);
+          setIsSyncedWithAccount(false);
+        })
         .finally(() => setLoading(false));
     } else {
+      setIsSyncedWithAccount(false);
       try {
         const saved = localStorage.getItem("quran_learn_completed");
         if (saved) {
@@ -201,10 +238,28 @@ export default function LearnPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10 dark:from-emerald-500/15 dark:via-teal-500/15 dark:to-cyan-500/15 z-0"></div>
         <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div className="flex-1 min-w-0 flex flex-col gap-2">
-            <span className="text-xs font-black uppercase tracking-widest text-primaryColor dark:text-primaryColor-light flex items-center gap-2">
-              <GraduationCap size={18} />
-              Quranic Academy & Interactive Quizzes
-            </span>
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <span className="text-xs font-black uppercase tracking-widest text-primaryColor dark:text-primaryColor-light flex items-center gap-2">
+                <GraduationCap size={18} />
+                Quranic Academy & Interactive Quizzes
+              </span>
+
+              {user ? (
+                isSyncedWithAccount ? (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-black border border-emerald-500/20" title="Academy progress synced with your account">
+                    <CheckCircle2 size={12} /> Account Synced
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[11px] font-black border border-amber-500/20 animate-pulse" title="Syncing academy progress with your account database...">
+                    <Sparkles size={12} /> Syncing Account...
+                  </span>
+                )
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-500/10 text-slate-500 dark:text-slate-400 text-[11px] font-bold border border-slate-500/20" title="Guest mode: progress stored in local storage. Log in to sync to cloud.">
+                  Local Storage (Guest)
+                </span>
+              )}
+            </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight leading-tight">
               Master Arabic, Tajweed & Quranic Grammar
             </h1>

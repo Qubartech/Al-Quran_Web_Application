@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { toast } from "react-toastify";
 import useCity from "@/lib/getLocation";
@@ -166,16 +168,16 @@ export default function PrayerCalendarPage() {
     setError(null);
     try {
       const response = await fetch(
-        `https://api.aladhan.com/v1/calendarByCity/${year}/${month}?city=${encodeURIComponent(queryStr)}`
+        `https://api.aladhan.com/v1/timingsByAddress?address=${encodeURIComponent(queryStr)}`
       );
       const json = await response.json();
 
-      if (json.code === 200 && Array.isArray(json.data) && json.data.length > 0) {
+      if (json.code === 200 && json.data) {
         const newLoc = {
           city: queryStr,
-          country: json.data[0]?.meta?.timezone?.split("/")[1] || "",
-          latitude: json.data[0]?.meta?.latitude,
-          longitude: json.data[0]?.meta?.longitude,
+          country: json.data.meta?.timezone?.split("/")[1] || "",
+          latitude: json.data.meta?.latitude,
+          longitude: json.data.meta?.longitude,
           isGps: false
         };
         setIsManual(true);
@@ -244,7 +246,7 @@ export default function PrayerCalendarPage() {
     : "Location";
 
   return (
-    <div className="min-h-screen text-slate-100 transition-colors pb-24 pt-4 px-3 sm:px-6 lg:px-8">
+    <div className="min-h-screen text-slate-800 dark:text-slate-100 transition-colors pb-24 pt-4 px-3 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto flex flex-col gap-6">
 
         {/* Printable Header - Visible ONLY during print */}
@@ -275,9 +277,9 @@ export default function PrayerCalendarPage() {
 
         {/* Loading Spinner */}
         {loading && (
-          <div className="w-full py-28 rounded-3xl bg-slate-900/60 border border-slate-800 backdrop-blur-md flex flex-col items-center justify-center gap-3">
+          <div className="w-full py-28 rounded-3xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 backdrop-blur-md flex flex-col items-center justify-center gap-3">
             <Loader2 size={40} className="text-emerald-500 animate-spin" />
-            <span className="text-sm font-bold text-slate-300 animate-pulse">
+            <span className="text-sm font-bold text-slate-600 dark:text-slate-300 animate-pulse">
               Calculating AlAdhan monthly prayer timetable...
             </span>
           </div>
@@ -285,11 +287,11 @@ export default function PrayerCalendarPage() {
 
         {/* Error View */}
         {!loading && error && (
-          <div className="p-10 rounded-3xl bg-rose-500/10 border border-rose-500/20 text-rose-300 flex flex-col items-center gap-4 text-center">
+          <div className="p-10 rounded-3xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-300 flex flex-col items-center gap-4 text-center">
             <AlertTriangle size={36} />
             <div>
-              <h3 className="text-lg font-extrabold text-rose-200">Failed to load prayer calendar</h3>
-              <p className="text-xs text-rose-300/80 max-w-md mt-1">{error}</p>
+              <h3 className="text-lg font-extrabold text-rose-500 dark:text-rose-200">Failed to load prayer calendar</h3>
+              <p className="text-xs text-rose-600/80 dark:text-rose-300/80 max-w-md mt-1">{error}</p>
             </div>
             <button
               onClick={() => {
@@ -322,7 +324,7 @@ export default function PrayerCalendarPage() {
                 days={calendarDays}
                 todayStr={todayStr}
                 onSelectDay={(day) => setSelectedDayModal(day)}
-                trackerStatusMap={tracker?.prayerLog || {}}
+                trackerStatusMap={tracker?.completedLogs || {}}
               />
             )}
 
@@ -331,7 +333,7 @@ export default function PrayerCalendarPage() {
                 days={calendarDays}
                 todayStr={todayStr}
                 onSelectDay={(day) => setSelectedDayModal(day)}
-                trackerStatusMap={tracker?.prayerLog || {}}
+                trackerStatusMap={tracker?.completedLogs || {}}
               />
             )}
 
@@ -341,7 +343,7 @@ export default function PrayerCalendarPage() {
                 currentMonth={month}
                 onSelectMonth={(selectedM) => {
                   setMonth(selectedM);
-                  setViewMode("table");
+                  setViewMode("grid");
                 }}
               />
             )}

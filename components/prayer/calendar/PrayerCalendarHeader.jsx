@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { usePrayerTracker } from "@/context/PrayerTrackerContext";
 import {
   Calendar as CalendarIcon,
   ChevronLeft,
@@ -54,6 +55,7 @@ export default function PrayerCalendarHeader({
   onPrint,
   loading
 }) {
+  const tracker = usePrayerTracker();
   const [searchInput, setSearchInput] = useState("");
   const [showExportMenu, setShowExportMenu] = useState(false);
 
@@ -102,9 +104,26 @@ export default function PrayerCalendarHeader({
               <span>AlAdhan Calculation Engine</span>
             </div>
             
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight bg-gradient-to-r from-white via-slate-100 to-emerald-200 bg-clip-text text-transparent">
-              Prayer Times Calendar
-            </h1>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight bg-gradient-to-r from-white via-slate-100 to-emerald-200 bg-clip-text text-transparent">
+                Prayer Times Calendar
+              </h1>
+              {tracker?.user ? (
+                tracker?.isSyncedWithAccount ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/25 text-emerald-200 text-[10px] font-black border border-emerald-400/40 backdrop-blur-md shadow-sm" title="Calendar is synced with your account">
+                    Account Synced
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/25 text-amber-200 text-[10px] font-black border border-amber-400/40 backdrop-blur-md animate-pulse" title="Syncing calendar with your account...">
+                    Syncing...
+                  </span>
+                )
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-slate-300 text-[10px] font-bold border border-white/15 backdrop-blur-md" title="Guest mode: logs saved in local storage. Log in to sync to cloud.">
+                  Local Storage (Guest)
+                </span>
+              )}
+            </div>
             
             <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
               Comprehensive monthly timetable with accurate Fajr, Dhuhr, Asr, Maghrib, Isha, Tahajjud times, and Hijri dates.
@@ -162,7 +181,7 @@ export default function PrayerCalendarHeader({
       </div>
 
       {/* Main Control Strip Panel - Compact & Sleek */}
-      <div className="flex flex-col gap-3 p-3 sm:p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl backdrop-blur-xl">
+      <div className="flex flex-col gap-3 p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-xl backdrop-blur-xl">
         
         {/* Row 1: Month/Year Controls + Hijri Summary Pill */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 w-full">
@@ -171,7 +190,7 @@ export default function PrayerCalendarHeader({
           <div className="flex items-center justify-between sm:justify-start gap-1.5 w-full sm:w-auto overflow-x-auto pb-0.5 scrollbar-none">
             <button
               onClick={handlePrevMonth}
-              className="p-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-slate-300 hover:bg-slate-700 hover:text-white transition-all shrink-0 cursor-pointer shadow-sm"
+              className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-white transition-all shrink-0 cursor-pointer shadow-sm"
               title="Previous Month"
             >
               <ChevronLeft size={16} />
@@ -181,7 +200,7 @@ export default function PrayerCalendarHeader({
             <select
               value={month}
               onChange={(e) => setMonth(parseInt(e.target.value, 10))}
-              className="px-2.5 py-1.5 rounded-xl bg-slate-800/90 text-white font-extrabold text-xs border border-slate-700/90 hover:border-emerald-500 focus:border-emerald-500 focus:outline-none transition-all cursor-pointer shrink-0 shadow-sm"
+              className="px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/90 text-slate-800 dark:text-white font-extrabold text-xs border border-slate-200 dark:border-slate-700/90 hover:border-emerald-500 focus:border-emerald-500 focus:outline-none transition-all cursor-pointer shrink-0 shadow-sm"
             >
               {MONTHS.map((m, idx) => (
                 <option key={m} value={idx + 1}>
@@ -194,7 +213,7 @@ export default function PrayerCalendarHeader({
             <select
               value={year}
               onChange={(e) => setYear(parseInt(e.target.value, 10))}
-              className="px-2.5 py-1.5 rounded-xl bg-slate-800/90 text-white font-extrabold text-xs border border-slate-700/90 hover:border-emerald-500 focus:border-emerald-500 focus:outline-none transition-all cursor-pointer shrink-0 shadow-sm"
+              className="px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/90 text-slate-800 dark:text-white font-extrabold text-xs border border-slate-200 dark:border-slate-700/90 hover:border-emerald-500 focus:border-emerald-500 focus:outline-none transition-all cursor-pointer shrink-0 shadow-sm"
             >
               {Array.from({ length: 11 }, (_, i) => 2024 + i).map((y) => (
                 <option key={y} value={y}>
@@ -205,15 +224,15 @@ export default function PrayerCalendarHeader({
 
             <button
               onClick={handleNextMonth}
-              className="p-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-slate-300 hover:bg-slate-700 hover:text-white transition-all shrink-0 cursor-pointer shadow-sm"
+              className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-white transition-all shrink-0 cursor-pointer shadow-sm"
               title="Next Month"
             >
               <ChevronRight size={16} />
             </button>
 
-            <button
+             <button
               onClick={handleToday}
-              className="px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 font-extrabold text-xs hover:bg-emerald-500/30 transition-all border border-emerald-500/35 shrink-0 cursor-pointer shadow-sm"
+              className="px-3 py-1.5 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 font-extrabold text-xs hover:bg-emerald-500/20 dark:hover:bg-emerald-500/30 transition-all border border-emerald-500/20 dark:border-emerald-500/35 shrink-0 cursor-pointer shadow-sm"
             >
               Today
             </button>
@@ -238,23 +257,23 @@ export default function PrayerCalendarHeader({
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search city (e.g. Makkah, London, Cairo)..."
-              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-800/90 text-white placeholder-slate-400 border border-slate-700/80 focus:border-emerald-500 focus:outline-none transition-colors shadow-inner"
+              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800/90 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 border border-slate-200 dark:border-slate-700/80 focus:border-emerald-500 focus:outline-none transition-colors shadow-inner"
             />
-            <Search size={14} className="absolute left-2.5 top-2.5 text-slate-400 pointer-events-none" />
+            <Search size={14} className="absolute left-2.5 top-2.5 text-slate-500 dark:text-slate-400 pointer-events-none" />
           </form>
 
           {/* Right Side: View Mode Tabs + Export Button */}
           <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap justify-between sm:justify-end">
             
             {/* View Mode Segmented Controls */}
-            <div className="inline-flex items-center p-1 rounded-xl bg-slate-950/80 border border-slate-800/80 shrink-0 gap-1 shadow-inner overflow-x-auto scrollbar-none">
+            <div className="inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 shrink-0 gap-1 shadow-inner overflow-x-auto scrollbar-none">
               <button
                 onClick={() => setViewMode("table")}
                 title="Table View"
                 className={`py-1.5 px-3 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   viewMode === "table"
                     ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25 ring-1 ring-emerald-400/40"
-                    : "text-slate-400 hover:text-white hover:bg-slate-800/70"
+                    : "text-slate-550 dark:text-slate-400 hover:text-slate-850 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800/70"
                 }`}
               >
                 <List size={13} />
@@ -267,7 +286,7 @@ export default function PrayerCalendarHeader({
                 className={`py-1.5 px-3 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   viewMode === "grid"
                     ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25 ring-1 ring-emerald-400/40"
-                    : "text-slate-400 hover:text-white hover:bg-slate-800/70"
+                    : "text-slate-550 dark:text-slate-400 hover:text-slate-850 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800/70"
                 }`}
               >
                 <LayoutGrid size={13} />
@@ -280,7 +299,7 @@ export default function PrayerCalendarHeader({
                 className={`py-1.5 px-3 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   viewMode === "year"
                     ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25 ring-1 ring-emerald-400/40"
-                    : "text-slate-400 hover:text-white hover:bg-slate-800/70"
+                    : "text-slate-550 dark:text-slate-400 hover:text-slate-850 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800/70"
                 }`}
               >
                 <CalendarDays size={13} />
@@ -293,10 +312,10 @@ export default function PrayerCalendarHeader({
                 className={`py-1.5 px-3 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   viewMode === "hijri"
                     ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/25 ring-1 ring-amber-400/40"
-                    : "text-slate-400 hover:text-white hover:bg-slate-800/70"
+                    : "text-slate-550 dark:text-slate-400 hover:text-slate-850 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800/70"
                 }`}
               >
-                <Moon size={13} className={viewMode === "hijri" ? "text-slate-950" : "text-amber-400"} />
+                <Moon size={13} className={viewMode === "hijri" ? "text-slate-950" : "text-amber-500"} />
                 <span>Hijri</span>
               </button>
             </div>
@@ -313,30 +332,30 @@ export default function PrayerCalendarHeader({
 
               {showExportMenu && (
                 <div
-                  className="absolute right-0 mt-2 w-48 rounded-xl bg-slate-900 border border-slate-800 shadow-2xl z-50 p-1.5 text-xs flex flex-col gap-1 animate-in fade-in zoom-in-95 duration-150"
+                  className="absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl z-50 p-1.5 text-xs flex flex-col gap-1 animate-in fade-in zoom-in-95 duration-150"
                   onClick={() => setShowExportMenu(false)}
                 >
                   <button
                     onClick={onPrint}
-                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-200 font-bold text-left transition-colors cursor-pointer"
+                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-left transition-colors cursor-pointer"
                   >
-                    <Printer size={14} className="text-emerald-400" />
+                    <Printer size={14} className="text-emerald-500 dark:text-emerald-400" />
                     <span>Print / Save PDF</span>
                   </button>
 
                   <button
                     onClick={onExportCSV}
-                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-200 font-bold text-left transition-colors cursor-pointer"
+                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-left transition-colors cursor-pointer"
                   >
-                    <FileSpreadsheet size={14} className="text-teal-400" />
+                    <FileSpreadsheet size={14} className="text-teal-500 dark:text-teal-400" />
                     <span>Export CSV</span>
                   </button>
 
                   <button
                     onClick={onExportICS}
-                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-200 font-bold text-left transition-colors cursor-pointer"
+                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-left transition-colors cursor-pointer"
                   >
-                    <CalendarIcon size={14} className="text-sky-400" />
+                    <CalendarIcon size={14} className="text-sky-500 dark:text-sky-400" />
                     <span>Export iCal (.ics)</span>
                   </button>
                 </div>

@@ -157,7 +157,7 @@ export default function HomeWelcome() {
     <div className="flex flex-col gap-6 w-full mb-8">
       
       {/* 1. Hero Welcome Banner */}
-      <div className="relative overflow-hidden p-6 md:p-8 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white shadow-xl shadow-emerald-500/10 flex flex-col justify-between min-h-[140px] transition-all duration-300">
+      <div className="relative overflow-hidden p-6 md:p-8 rounded-3xl bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-950 text-white shadow-2xl shadow-emerald-950/40 border border-emerald-500/25 flex flex-col justify-between min-h-[140px] transition-all duration-300">
         
         {/* Decorative Glow */}
         <div className="absolute right-0 top-0 translate-x-10 -translate-y-10 w-72 h-72 rounded-full bg-white/10 blur-3xl pointer-events-none"></div>
@@ -169,8 +169,8 @@ export default function HomeWelcome() {
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-white text-xs font-extrabold backdrop-blur-md border border-white/20">
                 <GreetingIcon size={14} className="text-amber-300 animate-pulse" /> {greetingInfo.text}
               </span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/10 text-emerald-100 text-[11px] font-bold border border-white/15">
-                <Sparkles size={12} className="text-amber-300" /> Al-Quran Divine Portal
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-emerald-100 text-xs font-extrabold backdrop-blur-md border border-white/15">
+                <Sparkles size={14} className="text-amber-300" /> Al-Quran Divine Portal
               </span>
             </div>
 

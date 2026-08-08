@@ -1,35 +1,322 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" enable-background="new 0 0 200 200" viewBox="0 0 200 200" id="quran">
-	<style>
-		:root { color-scheme: light dark; }
-		#quran path { fill: #22c55e !important; }
-		@media (prefers-color-scheme: dark) {
-			#quran path { fill: #ffffffff !important; }
-		}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%" id="quran">
+  <defs>
+    <!-- Dark Obsidian Emerald Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06261C" />
+      <stop offset="50%" stop-color="#031912" />
+      <stop offset="100%" stop-color="#010D09" />
+    </linearGradient>
 
-		@media (prefers-color-scheme: light) {
-			#quran path { fill: #171717ff !important; }
-		}
-	</style>
-  <g>
-		<path d="M11.879,83.638l52.538,30.406L31.931,132.84c-0.448,0.26-0.806,0.654-1.019,1.127l-13.527,29.973
-		l0.012,0.005c-0.23,0.509-0.299,1.09-0.146,1.66c0.29,1.084,1.273,1.839,2.396,1.839h22.999c0.438,0,0.866-0.116,1.244-0.334
-		L100,134.637l56.11,32.474c0.378,0.218,0.807,0.334,1.244,0.334h22.998c1.122,0,2.106-0.755,2.396-1.839
-		c0.153-0.569,0.085-1.15-0.146-1.66l0.012-0.005l-13.525-29.973c-0.214-0.473-0.57-0.868-1.02-1.127l-32.487-18.797l52.538-30.405
-		c1.185-0.686,1.59-2.204,0.906-3.39l-5.749-9.958c-0.329-0.571-0.871-0.987-1.508-1.157c-0.639-0.169-1.314-0.082-1.886,0.25
-		l-2.969,1.719l-6.887-11.926c-0.098-0.166-0.21-0.318-0.34-0.455h0.002l-23.752-25.377c-0.784-0.84-2.047-1.03-3.041-0.46
-		c-7.759,4.425-15.644,7.438-21.402,9.638l-1.722,0.659c-10.405,4.011-16.352,8.846-19.331,16.839
-		c-2.97-7.93-8.892-12.815-19.332-16.84l-1.71-0.655c-5.76-2.201-13.649-5.213-21.412-9.642c-0.997-0.568-2.257-0.379-3.042,0.46
-		L31.194,58.72h0.002c-0.13,0.137-0.242,0.289-0.339,0.455l-7.107,12.31l-3.634-2.103c-0.573-0.331-1.249-0.418-1.884-0.25
-		c-0.637,0.17-1.181,0.586-1.51,1.157l-5.75,9.958C10.289,81.435,10.694,82.952,11.879,83.638z M35.107,136.737l34.268-19.825
-		l14.178,8.206l-58.469,33.83L35.107,136.737z M41.98,162.479H28.894l59.614-34.493l6.536,3.782L41.98,162.479z M164.894,136.737
-		l10.022,22.21l-58.469-33.83l14.18-8.207L164.894,136.737z M180.222,74.924l3.267,5.66l-71.999,41.667l-6.533-3.78L180.222,74.924z
-		 M172.619,73.587l-69.606,40.272c0.619-14.917,5.069-20.828,18.548-26.022l2.571-0.983c10.636-4.048,29.91-11.386,43.121-22.56
-		L172.619,73.587z M121.561,47.812l1.707-0.654c5.182-1.979,12.824-4.9,20.374-9.006l20.681,22.097
-		c-12.551,10.758-31.524,17.995-41.956,21.967l-2.592,0.99c-8.068,3.11-13.444,6.723-16.85,11.91V77.836
-		C102.925,59.905,106.93,53.451,121.561,47.812z M57.246,38.151c7.554,4.109,15.199,7.03,20.384,9.01l1.696,0.65
-		c13.999,5.396,18.17,11.512,18.599,27.259c0.015,0.559,0.026,1.128,0.032,1.708h0.023c-0.005,0.358-0.02,0.692-0.02,1.057v17.279
-		c-3.403-5.188-8.781-8.8-16.849-11.91l-2.588-0.989c-10.434-3.972-29.409-11.208-41.961-21.968L57.246,38.151z M33.633,64.294
-		c13.213,11.176,32.49,18.513,43.125,22.562l2.568,0.981c13.64,5.258,18.041,11.233,18.574,26.55L28.047,73.971L33.633,64.294z
-		 M19.78,74.924l151.326,87.555h-13.085L16.512,80.583L19.78,74.924z"></path>
+    <!-- App Icon Gold Rim Metallic Gradient -->
+    <linearGradient id="rimGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFBEB" />
+      <stop offset="25%" stop-color="#FCD34D" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="75%" stop-color="#B45309" />
+      <stop offset="100%" stop-color="#78350F" />
+    </linearGradient>
+
+    <!-- Metallic Gold Foil Gradient -->
+    <linearGradient id="goldMetallic" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8DB" />
+      <stop offset="20%" stop-color="#FBBF24" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="80%" stop-color="#D97706" />
+      <stop offset="100%" stop-color="#92400E" />
+    </linearGradient>
+
+    <linearGradient id="goldLight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="50%" stop-color="#FBBF24" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+
+    <!-- Deep Emerald Cover Gradient -->
+    <linearGradient id="emeraldCover" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="35%" stop-color="#059669" />
+      <stop offset="70%" stop-color="#047857" />
+      <stop offset="100%" stop-color="#022C22" />
+    </linearGradient>
+
+    <linearGradient id="emeraldDark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#064E3B" />
+      <stop offset="100%" stop-color="#011812" />
+    </linearGradient>
+
+    <!-- Aged Parchment Page Gradients -->
+    <linearGradient id="parchmentLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#EBE0C5" />
+      <stop offset="20%" stop-color="#FFFDF7" />
+      <stop offset="85%" stop-color="#F5E8CB" />
+      <stop offset="100%" stop-color="#D6C29E" />
+    </linearGradient>
+
+    <linearGradient id="parchmentRight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D6C29E" />
+      <stop offset="15%" stop-color="#F5E8CB" />
+      <stop offset="80%" stop-color="#FFFDF7" />
+      <stop offset="100%" stop-color="#EBE0C5" />
+    </linearGradient>
+
+    <!-- Wood Rehal Stand Gradient -->
+    <linearGradient id="woodLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9A3412" />
+      <stop offset="40%" stop-color="#7C2D12" />
+      <stop offset="80%" stop-color="#451A03" />
+      <stop offset="100%" stop-color="#1C1917" />
+    </linearGradient>
+
+    <linearGradient id="woodRight" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#C2410C" />
+      <stop offset="40%" stop-color="#7C2D12" />
+      <stop offset="80%" stop-color="#451A03" />
+      <stop offset="100%" stop-color="#1C1917" />
+    </linearGradient>
+
+    <!-- Divine Light Beam Cone Gradient ("Nūr") -->
+    <linearGradient id="lightRayGrad" x1="50%" y1="100%" x2="50%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.45" />
+      <stop offset="40%" stop-color="#34D399" stop-opacity="0.25" />
+      <stop offset="80%" stop-color="#10B981" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#10B981" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Central Radial Light Aura -->
+    <radialGradient id="centerLight" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FDE047" stop-opacity="0.4" />
+      <stop offset="35%" stop-color="#10B981" stop-opacity="0.2" />
+      <stop offset="70%" stop-color="#059669" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#010D09" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Shadow & Glow Filters -->
+    <filter id="iconShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000000" flood-opacity="0.75" />
+    </filter>
+
+    <filter id="bookShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#011812" flood-opacity="0.8" />
+    </filter>
+
+    <filter id="goldGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#F59E0B" flood-opacity="0.6" />
+    </filter>
+
+    <filter id="lightGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- 1. ICON CONTAINER: SLEEK LUXURY SQUIRCLE BADGE -->
+  <g filter="url(#iconShadow)">
+    <!-- Outer Metallic Gold Rim Frame -->
+    <rect x="24" y="24" width="464" height="464" rx="92" fill="url(#rimGoldGrad)" />
+    <!-- Inner Dark Obsidian Emerald Screen -->
+    <rect x="28" y="28" width="456" height="456" rx="88" fill="url(#bgGrad)" />
+    <!-- Inner Gold Bevel Accent Line -->
+    <rect x="34" y="34" width="444" height="444" rx="82" fill="none" stroke="url(#goldMetallic)" stroke-width="1.5" opacity="0.4" />
+  </g>
+
+  <!-- 2. SACRED ISLAMIC GEOMETRIC BACKGROUND LATTICE (Rub El Hizb Portal) -->
+  <g transform="translate(256, 256)" opacity="0.12" fill="none" stroke="url(#goldMetallic)" stroke-width="1.5">
+    <!-- Concentric Star Rosettes -->
+    <circle cx="0" cy="0" r="210" stroke-dasharray="4 8" />
+    <circle cx="0" cy="0" r="170" />
+    <rect x="-115" y="-115" width="230" height="230" rx="16" />
+    <rect x="-115" y="-115" width="230" height="230" rx="16" transform="rotate(45)" />
+    <rect x="-115" y="-115" width="230" height="230" rx="16" transform="rotate(22.5)" />
+    <rect x="-115" y="-115" width="230" height="230" rx="16" transform="rotate(67.5)" />
+    <circle cx="0" cy="0" r="90" stroke-dasharray="3 3" />
+  </g>
+
+  <!-- 3. DIVINE LIGHT ATMOSPHERE ("NŪR" BEAMS & PARTICLES) -->
+  <!-- Central Radial Glow -->
+  <circle cx="256" cy="240" r="200" fill="url(#centerLight)" />
+
+  <!-- Upward Beaming Light Pyramid / Cone -->
+  <polygon points="256,280 100,50 412,50" fill="url(#lightRayGrad)" />
+
+  <!-- Light Rays / Beams -->
+  <g opacity="0.3" stroke="url(#goldLight)" stroke-width="1.5">
+    <line x1="256" y1="270" x2="160" y2="60" stroke-dasharray="8 6" />
+    <line x1="256" y1="270" x2="210" y2="50" stroke-dasharray="12 4" />
+    <line x1="256" y1="270" x2="256" y2="40" stroke-dasharray="6 4" />
+    <line x1="256" y1="270" x2="302" y2="50" stroke-dasharray="12 4" />
+    <line x1="256" y1="270" x2="352" y2="60" stroke-dasharray="8 6" />
+  </g>
+
+  <!-- Glowing Light Particles & Sparkles Rising Upwards -->
+  <g fill="url(#goldLight)">
+    <!-- Sparkle Stars -->
+    <path d="M 180,120 L 183,128 L 191,131 L 183,134 L 180,142 L 177,134 L 169,131 L 177,128 Z" opacity="0.9" />
+    <path d="M 330,100 L 332,106 L 338,108 L 332,110 L 330,116 L 328,110 L 322,108 L 328,106 Z" opacity="0.85" />
+    <path d="M 256,70 L 258,75 L 263,77 L 258,79 L 256,84 L 254,79 L 249,77 L 254,75 Z" opacity="0.95" />
+    <path d="M 140,180 L 141,184 L 145,185 L 141,186 L 140,190 L 139,186 L 135,185 L 139,184 Z" opacity="0.75" />
+    <path d="M 370,170 L 371,174 L 375,175 L 371,176 L 370,180 L 369,176 L 365,175 L 369,174 Z" opacity="0.75" />
+
+    <!-- Orbs / Glowing Dots -->
+    <circle cx="210" cy="160" r="3" opacity="0.8" />
+    <circle cx="300" cy="150" r="2.5" opacity="0.85" />
+    <circle cx="240" cy="110" r="2" opacity="0.7" />
+    <circle cx="280" cy="90" r="3.5" opacity="0.9" filter="url(#goldGlow)" />
+    <circle cx="160" cy="100" r="2" opacity="0.6" />
+    <circle cx="350" cy="120" r="2" opacity="0.6" />
+  </g>
+
+  <!-- 4. FLOATING 3D REHAL STAND (ISOMETRIC WOOD STAND) -->
+  <g filter="url(#bookShadow)">
+    <!-- Base Shadow beneath Rehal -->
+    <ellipse cx="256" cy="415" rx="140" ry="30" fill="#000000" opacity="0.6" />
+
+    <!-- Left Leg (3D Curved Wood Beam) -->
+    <path d="M 120,380 L 220,285 L 245,310 L 145,420 C 125,442 90,420 100,392 Z" fill="url(#woodLeft)" />
+    <path d="M 110,405 L 68,452 C 56,465 74,480 92,475 L 188,402 L 162,372 Z" fill="url(#woodLeft)" opacity="0.95" />
+
+    <!-- Right Leg (3D Curved Wood Beam) -->
+    <path d="M 392,380 L 292,285 L 267,310 L 367,420 C 387,442 422,420 412,392 Z" fill="url(#woodRight)" />
+    <path d="M 402,405 L 444,452 C 456,465 438,480 420,475 L 324,402 L 350,372 Z" fill="url(#woodRight)" opacity="0.95" />
+
+    <!-- Arabesque Cutout Arches on Rehal Legs -->
+    <path d="M 124,418 C 134,408 154,408 164,418 C 154,432 134,432 124,418 Z" fill="#1C1917" opacity="0.85" />
+    <path d="M 124,418 C 134,408 154,408 164,418" stroke="url(#goldMetallic)" stroke-width="1.5" fill="none" />
+
+    <path d="M 348,418 C 358,408 378,408 388,418 C 378,432 358,432 348,418 Z" fill="#1C1917" opacity="0.85" />
+    <path d="M 348,418 C 358,408 378,408 388,418" stroke="url(#goldMetallic)" stroke-width="1.5" fill="none" />
+
+    <!-- Rehal Center Joint & Gold Carved Medallion -->
+    <ellipse cx="256" cy="308" rx="32" ry="16" fill="#1C1917" />
+    <ellipse cx="256" cy="308" rx="26" ry="12" fill="url(#goldMetallic)" opacity="0.95" />
+    <ellipse cx="256" cy="308" rx="18" ry="7" fill="#451A03" />
+    <circle cx="256" cy="308" r="3.5" fill="url(#goldLight)" />
+  </g>
+
+  <!-- 5. HOVERING 3D HOLY QURAN MANUSCRIPT -->
+  <g transform="translate(0, -18)" filter="url(#bookShadow)">
+
+    <!-- A. DEEP EMERALD VELVET / LEATHER HARDCOVER -->
+    <!-- Left Cover -->
+    <path d="M 40,250 C 40,225 138,192 250,208 L 250,340 C 138,324 40,354 40,330 Z" fill="url(#emeraldDark)" />
+    <!-- Right Cover -->
+    <path d="M 472,250 C 472,225 374,192 262,208 L 262,340 C 374,324 472,354 472,330 Z" fill="url(#emeraldDark)" />
+
+    <!-- Hardcover Metallic Gold Edges -->
+    <path d="M 40,250 C 40,225 138,192 250,208" stroke="url(#goldMetallic)" stroke-width="3" fill="none" />
+    <path d="M 472,250 C 472,225 374,192 262,208" stroke="url(#goldMetallic)" stroke-width="3" fill="none" />
+    <path d="M 40,330 C 40,354 138,324 250,340" stroke="url(#goldMetallic)" stroke-width="2.5" fill="none" opacity="0.9" />
+    <path d="M 472,330 C 472,354 374,324 262,340" stroke="url(#goldMetallic)" stroke-width="2.5" fill="none" opacity="0.9" />
+
+    <!-- Gold Embossed Corner Guards -->
+    <path d="M 40,250 L 62,246 C 58,235 48,231 40,250 Z" fill="url(#goldMetallic)" />
+    <path d="M 472,250 L 450,246 C 454,235 464,231 472,250 Z" fill="url(#goldMetallic)" />
+    <path d="M 40,330 L 62,326 C 58,338 48,342 40,330 Z" fill="url(#goldMetallic)" />
+    <path d="M 472,330 L 450,326 C 454,338 464,342 472,330 Z" fill="url(#goldMetallic)" />
+
+    <!-- B. GILDED GOLD 3D PAGE STACK THICKNESS -->
+    <!-- Left Page Block -->
+    <path d="M 46,245 C 46,223 140,194 252,206 L 252,328 C 140,316 46,344 46,323 Z" fill="#78350F" />
+    <path d="M 49,243 C 49,221 141,192 252,204 L 252,326 C 141,314 49,342 49,321 Z" fill="url(#goldMetallic)" />
+    <path d="M 52,241 C 52,219 142,190 252,202 L 252,324 C 142,312 52,340 52,319 Z" fill="#D97706" />
+
+    <!-- Right Page Block -->
+    <path d="M 466,245 C 466,223 372,194 260,206 L 260,328 C 372,316 466,344 466,323 Z" fill="#78350F" />
+    <path d="M 463,243 C 463,221 371,192 260,204 L 260,326 C 371,314 463,342 463,321 Z" fill="url(#goldMetallic)" />
+    <path d="M 460,241 C 460,219 370,190 260,202 L 260,324 C 370,312 460,340 460,319 Z" fill="#D97706" />
+
+    <!-- C. TOP ILLUMINATED PARCHMENT PAGES -->
+    <!-- Left Page Surface -->
+    <path d="M 56,238 C 56,215 144,186 254,198 L 254,320 C 144,308 56,335 56,314 Z" fill="url(#parchmentLeft)" />
+    <!-- Right Page Surface -->
+    <path d="M 456,238 C 456,215 368,186 258,198 L 258,320 C 368,308 456,335 456,314 Z" fill="url(#parchmentRight)" />
+
+    <!-- Page Curvature Soft Highlight -->
+    <path d="M 254,198 C 244,199 152,212 64,238 L 56,238 C 144,215 244,198 254,198 Z" fill="#FFFBEB" opacity="0.8" />
+    <path d="M 258,198 C 268,199 360,212 448,238 L 456,238 C 368,215 268,198 258,198 Z" fill="#FFFBEB" opacity="0.8" />
+
+    <!-- Book Spine Gutter Depth Shadow -->
+    <path d="M 252,198 C 255,198 257,198 260,198 L 260,320 C 257,320 255,320 252,320 Z" fill="#78350F" opacity="0.45" />
+
+    <!-- D. GOLD ILLUMINATED UNWAN FRONTISPIECE FRAMES & CALLIGRAPHY -->
+    <!-- Left Page Gold Filigree Frame -->
+    <path d="M 74,236 C 117,222 177,210 238,212 L 238,306 C 177,304 117,314 74,326 Z" fill="none" stroke="url(#goldMetallic)" stroke-width="2.5" />
+    <path d="M 80,240 C 120,227 175,216 232,218 L 232,300 C 175,298 120,308 80,320 Z" fill="none" stroke="url(#goldMetallic)" stroke-width="1" stroke-dasharray="3,2" />
+
+    <!-- Right Page Gold Filigree Frame -->
+    <path d="M 438,236 C 395,222 335,210 274,212 L 274,306 C 335,304 395,314 438,326 Z" fill="none" stroke="url(#goldMetallic)" stroke-width="2.5" />
+    <path d="M 432,240 C 392,227 337,216 280,218 L 280,300 C 337,298 392,308 432,320 Z" fill="none" stroke="url(#goldMetallic)" stroke-width="1" stroke-dasharray="3,2" />
+
+    <!-- Mihrab Dome Arch Ornaments on Page Tops -->
+    <!-- Left Arch -->
+    <path d="M 128,231 C 128,231 156,211 184,231" fill="none" stroke="url(#goldMetallic)" stroke-width="2" />
+    <polygon points="156,213 159,219 153,219" fill="url(#goldMetallic)" />
+    <circle cx="156" cy="224" r="3.5" fill="url(#emeraldCover)" stroke="url(#goldMetallic)" stroke-width="1" />
+
+    <!-- Right Arch -->
+    <path d="M 384,231 C 384,231 356,211 328,231" fill="none" stroke="url(#goldMetallic)" stroke-width="2" />
+    <polygon points="356,213 359,219 353,219" fill="url(#goldMetallic)" />
+    <circle cx="356" cy="224" r="3.5" fill="url(#emeraldCover)" stroke="url(#goldMetallic)" stroke-width="1" />
+
+    <!-- E. BEAUTIFUL ARABIC CALLIGRAPHY MOTIFS & VERSE ROWS -->
+    <!-- Left Header Calligraphy Line (Stylized Bismillah) -->
+    <path d="M 112,242 C 132,237 147,239 162,236 C 177,238 192,235 212,239" stroke="#78350F" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.9" />
+
+    <!-- Right Header Calligraphy Line -->
+    <path d="M 300,239 C 320,235 335,238 350,236 C 365,239 380,237 400,242" stroke="#78350F" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.9" />
+
+    <!-- Calligraphy Text Lines with Gold Ayah Rosette Symbols -->
+    <!-- Left Page Rows -->
+    <line x1="90" y1="256" x2="220" y2="246" stroke="#8C6D46" stroke-width="2" stroke-linecap="round" opacity="0.85" />
+    <circle cx="152" cy="251" r="3" fill="url(#goldMetallic)" />
+
+    <line x1="90" y1="270" x2="220" y2="260" stroke="#8C6D46" stroke-width="2" stroke-linecap="round" opacity="0.85" />
+    <circle cx="206" cy="261" r="3" fill="url(#goldMetallic)" />
+
+    <line x1="90" y1="284" x2="220" y2="274" stroke="#8C6D46" stroke-width="2" stroke-linecap="round" opacity="0.85" />
+    <circle cx="104" cy="283" r="3" fill="url(#goldMetallic)" />
+
+    <line x1="90" y1="298" x2="220" y2="288" stroke="#8C6D46" stroke-width="2" stroke-linecap="round" opacity="0.85" />
+
+    <!-- Right Page Rows -->
+    <line x1="292" y1="246" x2="422" y2="256" stroke="#8C6D46" stroke-width="2" stroke-linecap="round" opacity="0.85" />
+    <circle cx="360" cy="251" r="3" fill="url(#goldMetallic)" />
+
+    <line x1="292" y1="260" x2="422" y2="270" stroke="#8C6D46" stroke-width="2" stroke-linecap="round" opacity="0.85" />
+    <circle cx="306" cy="261" r="3" fill="url(#goldMetallic)" />
+
+    <line x1="292" y1="274" x2="422" y2="284" stroke="#8C6D46" stroke-width="2" stroke-linecap="round" opacity="0.85" />
+    <circle cx="408" cy="283" r="3" fill="url(#goldMetallic)" />
+
+    <line x1="292" y1="288" x2="422" y2="298" stroke="#8C6D46" stroke-width="2" stroke-linecap="round" opacity="0.85" />
+
+    <!-- F. CASCADING EMERALD SILK RIBBON BOOKMARK WITH GOLD TASSEL -->
+    <path d="M 256,194 C 254,210 248,280 238,350 C 235,368 245,382 250,370 C 258,350 260,210 256,194 Z" fill="url(#emeraldCover)" filter="url(#goldGlow)" />
+    <path d="M 256,194 C 254,210 248,280 238,350" stroke="url(#goldMetallic)" stroke-width="1.5" fill="none" />
+    <circle cx="238" cy="352" r="4.5" fill="url(#goldMetallic)" />
+    <path d="M 233,355 L 243,388 L 227,388 Z" fill="url(#goldMetallic)" />
+    <!-- Tassel Fringe Threads -->
+    <line x1="230" y1="388" x2="228" y2="398" stroke="url(#goldLight)" stroke-width="1.5" />
+    <line x1="233" y1="388" x2="233" y2="400" stroke="url(#goldLight)" stroke-width="1.5" />
+    <line x1="236" y1="388" x2="238" y2="400" stroke="url(#goldLight)" stroke-width="1.5" />
+    <line x1="240" y1="388" x2="243" y2="398" stroke="url(#goldLight)" stroke-width="1.5" />
+  </g>
+
+  <!-- 6. SACRED CROWN EMBLEM (FLOATING 3D RUB EL HIZB ROSETTE & CRESCENT) -->
+  <g transform="translate(256, 108)" filter="url(#goldGlow)">
+    <!-- 8-Pointed Star Frame -->
+    <g stroke="url(#goldMetallic)" stroke-width="2.5" fill="url(#emeraldCover)">
+      <rect x="-32" y="-32" width="64" height="64" rx="6" />
+      <rect x="-32" y="-32" width="64" height="64" rx="6" transform="rotate(45)" />
+    </g>
+
+    <!-- Beaded Inner Gold Ring -->
+    <circle cx="0" cy="0" r="28" fill="none" stroke="url(#goldMetallic)" stroke-width="1.5" stroke-dasharray="4,2" />
+    <circle cx="0" cy="0" r="24" fill="url(#emeraldDark)" />
+
+    <!-- Metallic Gold Crescent Moon -->
+    <path d="M 4,-15 A 15,15 0 1,0 15,8 A 12,12 0 1,1 4,-15 Z" fill="url(#goldMetallic)" />
+
+    <!-- 5-Pointed Radiant Gold Star -->
+    <polygon points="9,-6 12,0 18,0 13,4 15,10 9,6 3,10 5,4 0,0 6,0" fill="url(#goldLight)" />
   </g>
 </svg>
