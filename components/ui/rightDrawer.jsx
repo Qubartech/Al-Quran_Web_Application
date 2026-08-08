@@ -31,7 +31,7 @@ const DrawerOverlay = React.forwardRef(({ className, ...props }, ref) => (
     ref={ref}
     className={cn(
       // Improved overlay with smooth fade
-      "fixed inset-0 z-50 bg-black/50 dark:bg-black/70",
+      "fixed inset-0 z-[20000] bg-black/50 dark:bg-black/70",
       "transition-opacity duration-300",
       className
     )}
@@ -48,7 +48,7 @@ const DrawerContent = React.forwardRef(
         ref={ref}
         className={cn(
           // Right side drawer with proper positioning
-          "fixed right-0 top-0 z-50 h-full w-full sm:max-w-md flex flex-col",
+          "fixed right-0 top-0 z-[20000] h-full w-full sm:max-w-md flex flex-col",
           "border-l border-white/20 dark:border-slate-800/80",
           // Glass mode
           "bg-white/75 dark:bg-slate-900/75 backdrop-blur-xl",

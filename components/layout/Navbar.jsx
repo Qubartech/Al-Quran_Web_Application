@@ -22,7 +22,8 @@ import {
   GraduationCap,
   UserCheck,
   PanelLeft,
-  Clock
+  Clock,
+  Calendar
 } from "lucide-react";
 
 function Navbar() {
@@ -71,6 +72,7 @@ function Navbar() {
     { name: "Surahs", href: "/surah", icon: BookOpen },
     { name: "Juz / Paras", href: "/juz", icon: Layers },
     { name: "Prayer & Tracker", href: "/prayer", icon: Clock },
+    { name: "Prayer Calendar", href: "/prayer/calendar", icon: Calendar },
     { name: "Learn Quran", href: "/learn", icon: GraduationCap },
     { name: "Dedicated Player", href: "/player", icon: Play }
   ];
@@ -104,7 +106,11 @@ function Navbar() {
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-1.5">
           {navLinks.map((link) => {
-            const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+            const isActive = link.href === "/"
+              ? pathname === "/"
+              : link.href === "/prayer"
+                ? pathname === "/prayer"
+                : pathname.startsWith(link.href);
             const Icon = link.icon;
             return (
               <Link
@@ -257,7 +263,11 @@ function Navbar() {
                 </span>
 
                 {navLinks.map((link) => {
-                  const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+                  const isActive = link.href === "/"
+                    ? pathname === "/"
+                    : link.href === "/prayer"
+                      ? pathname === "/prayer"
+                      : pathname.startsWith(link.href);
                   const Icon = link.icon;
                   return (
                     <Link
