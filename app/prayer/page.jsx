@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import useCity from "@/lib/getLocation";
@@ -421,9 +423,19 @@ export default function PrayerPage() {
                 <Sparkles size={14} className="text-amber-300" /> Daily Salah Companion
               </span>
 
-              {tracker?.isSyncedWithAccount && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sky-500/20 text-sky-200 text-xs font-extrabold backdrop-blur-md border border-sky-400/30" title="Prayer logs synced with your account">
-                  Cloud Synced
+              {tracker?.user ? (
+                tracker?.isSyncedWithAccount ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-200 text-xs font-extrabold backdrop-blur-md border border-emerald-400/40 shadow-sm" title="Prayer tracker synced with your account database">
+                    <CheckCircle2 size={13} className="text-emerald-300" /> Account Synced
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-200 text-xs font-extrabold backdrop-blur-md border border-amber-400/40 animate-pulse" title="Syncing prayer logs with your account database...">
+                    <Sparkles size={13} className="text-amber-300" /> Syncing Account...
+                  </span>
+                )
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-500/20 text-slate-200 text-xs font-bold backdrop-blur-md border border-white/20" title="Guest mode: logs stored in browser local storage. Log in to sync to cloud.">
+                  Local Storage (Guest)
                 </span>
               )}
 

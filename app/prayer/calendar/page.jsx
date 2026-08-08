@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { toast } from "react-toastify";
 import useCity from "@/lib/getLocation";
