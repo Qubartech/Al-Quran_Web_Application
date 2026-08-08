@@ -224,12 +224,12 @@ function Navbar() {
         <div className="md:hidden">
           {/* Backdrop Overlay */}
           <div
-            className="fixed inset-0 z-[9999] bg-slate-950/75 backdrop-blur-sm animate-fadeIn cursor-pointer"
+            className="fixed inset-0 z-[20000] bg-slate-950/75 backdrop-blur-sm animate-fadeIn cursor-pointer"
             onClick={() => setMobileMenuOpen(false)}
           />
 
           {/* Right Slide-in Drawer with smooth slideInRight animation */}
-          <div className="fixed top-0 right-0 bottom-0 z-[10000] w-72 sm:w-80 h-full bg-slate-950 text-slate-100 backdrop-blur-2xl border-l border-slate-800 shadow-2xl p-6 flex flex-col justify-between overflow-y-auto animate-slideInRight">
+          <div className="fixed top-0 right-0 bottom-0 z-[20000] w-72 sm:w-80 h-full bg-slate-950 text-slate-100 backdrop-blur-2xl border-l border-slate-800 shadow-2xl p-6 flex flex-col justify-between overflow-y-auto animate-slideInRight">
 
             {/* Drawer Header */}
             <div className="flex flex-col gap-6">
