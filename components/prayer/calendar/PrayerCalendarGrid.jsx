@@ -51,34 +51,34 @@ export default function PrayerCalendarGrid({
       </div>
 
       {/* Outer Horizontal Scroll Container for Small Screens */}
-      <div className="w-full overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-        <div className="min-w-[620px] sm:min-w-full flex flex-col gap-2.5 sm:gap-4">
+      <div className="w-full overflow-x-auto pb-3 px-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <div className="min-w-[700px] sm:min-w-full flex flex-col gap-2 sm:gap-4">
           
           {/* 7 Day Header */}
-          <div className="grid grid-cols-7 gap-1.5 sm:gap-2 text-center">
+          <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center">
             {WEEKDAYS.map((w, idx) => (
               <div
                 key={w.en}
-                className={`py-2 sm:py-3 rounded-xl sm:rounded-2xl border transition-all ${
+                className={`py-1.5 sm:py-2.5 rounded-xl border transition-all ${
                   idx === 5
                     ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400 font-extrabold"
                     : "bg-slate-900/90 border-slate-800 text-slate-300 font-bold"
                 }`}
               >
-                <div className="text-[11px] sm:text-xs uppercase tracking-wider">{w.en}</div>
-                <div className="text-[10px] font-arabic opacity-70 hidden sm:block mt-0.5">{w.ar}</div>
+                <div className="text-[10px] sm:text-xs uppercase tracking-wider">{w.en}</div>
+                <div className="text-[9px] font-arabic opacity-70 hidden sm:block mt-0.5">{w.ar}</div>
               </div>
             ))}
           </div>
 
           {/* Days Grid */}
-          <div className="grid grid-cols-7 gap-1.5 sm:gap-2.5 md:gap-3">
+          <div className="grid grid-cols-7 gap-1 sm:gap-2.5 md:gap-3">
             
             {/* Leading empty boxes */}
             {Array.from({ length: paddingSlots }).map((_, i) => (
               <div
                 key={`pad-${i}`}
-                className="min-h-[110px] sm:min-h-[135px] md:min-h-[155px] rounded-2xl sm:rounded-3xl bg-slate-900/20 border border-slate-800/40 opacity-20 pointer-events-none"
+                className="min-h-[80px] sm:min-h-[120px] md:min-h-[145px] rounded-xl sm:rounded-3xl bg-slate-900/20 border border-slate-800/40 opacity-20 pointer-events-none"
               />
             ))}
 
@@ -104,19 +104,19 @@ export default function PrayerCalendarGrid({
                 <div
                   key={greg.date || idx}
                   onClick={() => onSelectDay(d)}
-                  className={`group relative min-h-[110px] sm:min-h-[135px] md:min-h-[155px] p-2 sm:p-3 md:p-3.5 rounded-2xl sm:rounded-3xl border transition-all duration-200 cursor-pointer flex flex-col justify-between overflow-hidden backdrop-blur-md ${
+                  className={`group relative min-h-[82px] sm:min-h-[120px] md:min-h-[145px] p-1.5 sm:p-2.5 md:p-3 rounded-xl sm:rounded-3xl border transition-all duration-200 cursor-pointer flex flex-col justify-between overflow-hidden backdrop-blur-md ${
                     isToday
-                      ? "bg-gradient-to-br from-emerald-500/25 via-teal-950/50 to-slate-950 border-emerald-500 shadow-xl shadow-emerald-500/25 ring-2 ring-emerald-500/50"
+                      ? "bg-gradient-to-br from-emerald-500/25 via-teal-950/50 to-slate-950 border-emerald-500 shadow-lg shadow-emerald-500/25 ring-1 sm:ring-2 ring-emerald-500/50"
                       : isFriday
                       ? "bg-slate-900/90 border-slate-800 hover:border-emerald-500/50 hover:bg-slate-850"
-                      : "bg-slate-900/80 border-slate-800 hover:border-emerald-500/40 hover:bg-slate-900 shadow-md"
+                      : "bg-slate-900/80 border-slate-800 hover:border-emerald-500/40 hover:bg-slate-900 shadow-sm"
                   }`}
                 >
-                  {/* Card Header: Gregorian & Hijri Date Stacked to avoid horizontal collision */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-1 sm:pb-2 border-b border-slate-800/80 gap-0.5">
+                  {/* Card Header: Gregorian & Hijri Date Stacked tightly */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-0.5 sm:pb-1.5 border-b border-slate-800/80 gap-0.5">
                     <div className="flex items-center gap-1">
                       <span
-                        className={`text-base sm:text-lg md:text-xl font-black leading-none ${
+                        className={`text-sm sm:text-base md:text-lg font-black leading-none ${
                           isToday ? "text-emerald-400" : "text-white"
                         }`}
                       >
@@ -124,7 +124,7 @@ export default function PrayerCalendarGrid({
                       </span>
 
                       {isToday && (
-                        <span className="px-1 py-0.5 rounded bg-emerald-500 text-white font-black text-[8px] sm:text-[9px] uppercase tracking-wider">
+                        <span className="px-1 py-0.2 rounded bg-emerald-500 text-white font-black text-[7px] sm:text-[8px] uppercase tracking-wider">
                           Today
                         </span>
                       )}
@@ -132,46 +132,46 @@ export default function PrayerCalendarGrid({
 
                     {/* Hijri Date Display */}
                     <div className="flex items-center gap-1 text-right">
-                      <span className="text-[10px] sm:text-xs font-extrabold text-amber-400 leading-none">
+                      <span className="text-[9px] sm:text-[11px] font-extrabold text-amber-400 leading-none">
                         {hijri.day} {hijri.month?.en?.substring(0, 3)}
                       </span>
                     </div>
                   </div>
 
                   {/* Timing Schedule Chips */}
-                  <div className="my-1 sm:my-1.5 flex flex-col gap-1 text-[10px] sm:text-[11px]">
+                  <div className="my-0.5 sm:my-1 flex flex-col gap-0.5 text-[9px] sm:text-[10px]">
                     <div className="flex items-center justify-between text-slate-300">
                       <span className="text-slate-400 font-medium flex items-center gap-0.5">
-                        <span className="text-emerald-400">🌅</span>
+                        <span className="text-emerald-400 text-[9px]">🌅</span>
                         <span className="hidden sm:inline">Fajr</span>
                       </span>
-                      <span className="font-extrabold text-[10px] sm:text-[11px] text-slate-200">{fajrShort}</span>
+                      <span className="font-extrabold text-[9px] sm:text-[10px] text-slate-200">{fajrShort}</span>
                     </div>
 
                     <div className="flex items-center justify-between text-slate-300">
                       <span className="text-slate-400 font-medium flex items-center gap-0.5">
-                        <span className="text-rose-400">🌆</span>
+                        <span className="text-rose-400 text-[9px]">🌆</span>
                         <span className="hidden sm:inline">Maghrib</span>
                       </span>
-                      <span className="font-extrabold text-rose-300 text-[10px] sm:text-[11px]">{maghribShort}</span>
+                      <span className="font-extrabold text-rose-300 text-[9px] sm:text-[10px]">{maghribShort}</span>
                     </div>
                   </div>
 
                   {/* Card Footer: Badges & Fasting info */}
-                  <div className="flex items-center justify-between gap-1 mt-auto pt-1 sm:pt-1.5 border-t border-slate-800/80 text-[9px] sm:text-[10px]">
+                  <div className="flex items-center justify-between gap-1 mt-auto pt-0.5 sm:pt-1 border-t border-slate-800/80 text-[8px] sm:text-[9px]">
                     {badges.length > 0 ? (
-                      <span className={`px-1.5 py-0.5 rounded-lg font-extrabold truncate max-w-[55px] sm:max-w-[100px] text-[8px] sm:text-[9px] border ${badges[0].color}`}>
+                      <span className={`px-1 py-0.5 rounded font-extrabold truncate max-w-[48px] sm:max-w-[90px] text-[7.5px] sm:text-[8.5px] border ${badges[0].color}`}>
                         {badges[0].title}
                       </span>
                     ) : (
-                      <span className="text-slate-400 text-[9px] sm:text-[10px] truncate max-w-[60px] sm:max-w-none font-medium">
+                      <span className="text-slate-400 text-[8px] sm:text-[9px] truncate max-w-[50px] sm:max-w-none font-medium">
                         {d.fasting?.formatted || ""}
                       </span>
                     )}
 
                     {completedCount > 0 && (
-                      <span className="text-emerald-400 font-extrabold flex items-center gap-0.5 text-[9px] shrink-0">
-                        <CheckCircle2 size={11} /> <span>{completedCount}/5</span>
+                      <span className="text-emerald-400 font-extrabold flex items-center gap-0.5 text-[8.5px] shrink-0">
+                        <CheckCircle2 size={10} /> <span>{completedCount}/5</span>
                       </span>
                     )}
                   </div>
