@@ -7,10 +7,11 @@ import UserProvider from "@/context/UserProvider";
 import { SidebarProvider } from "@/context/SidebarProvider";
 import { PrayerTrackerProvider } from "@/context/PrayerTrackerContext";
 import NoFlashThemeScript from "@/components/theme/NoFlashThemeScript";
-// import "boxicons";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { Inter } from "next/font/google";
 import { cookies } from "next/headers";
-import { arabicFont } from './fonts'
+import { arabicFont } from './fonts';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -68,7 +69,7 @@ export default function RootLayout({ children }) {
                     <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-100/40 blur-[120px] dark:hidden"></div>
                     <div className="absolute bottom-[10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-teal-100/30 blur-[130px] dark:hidden"></div>
                     <div className="absolute top-[40%] left-[20%] w-[400px] h-[400px] rounded-full bg-amber-55/20 blur-[100px] dark:hidden"></div>
-                    
+
                     {/* Dark Mode Blobs */}
                     <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-950/20 blur-[120px] hidden dark:block"></div>
                     <div className="absolute bottom-[10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-teal-950/15 blur-[130px] hidden dark:block"></div>
@@ -78,6 +79,18 @@ export default function RootLayout({ children }) {
                     {children}
                   </div>
                   <Footer />
+                  <ToastContainer
+                    position="bottom-right"
+                    autoClose={3000}
+                    hideProgressBar={false}
+                    newestOnTop
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="dark"
+                  />
                 </PrayerTrackerProvider>
               </SidebarProvider>
             </AudioProvider>

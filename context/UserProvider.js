@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import supabase from "@/lib/supabase";
+import { toast } from "react-toastify";
 
 const UserContext = createContext({
   user: null,
@@ -48,7 +49,11 @@ export default function UserProvider({ children }) {
       email,
       password,
     });
-    if (error) throw error;
+    if (error) {
+      toast.error(error.message || "Failed to create account.");
+      throw error;
+    }
+    toast.success("Account created successfully! Check your email for confirmation.");
     return data;
   };
 
@@ -57,13 +62,21 @@ export default function UserProvider({ children }) {
       email,
       password,
     });
-    if (error) throw error;
+    if (error) {
+      toast.error(error.message || "Invalid credentials.");
+      throw error;
+    }
+    toast.success("Successfully logged in! Welcome back.");
     return data;
   };
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    if (error) {
+      toast.error(error.message || "Failed to sign out.");
+      throw error;
+    }
+    toast.info("Signed out successfully.");
   };
 
   const value = {

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import { toast } from "react-toastify";
 import useCity from "@/lib/getLocation";
 import { usePrayerTracker } from "@/context/PrayerTrackerContext";
 import { fetchMonthlyCalendar } from "@/lib/api/aladhanCalendar";
@@ -180,12 +181,13 @@ export default function PrayerCalendarPage() {
         setIsManual(true);
         setActiveLocation(newLoc);
         localStorage.setItem("quran_manual_location", JSON.stringify(newLoc));
+        toast.success(`Location updated to ${queryStr}`);
       } else {
-        alert(`Location "${queryStr}" not found. Please try another city.`);
+        toast.error(`Location "${queryStr}" not found. Please try another city.`);
       }
     } catch (e) {
       console.error(e);
-      alert("Error searching location. Please check your internet connection.");
+      toast.error("Error searching location. Please check your internet connection.");
     } finally {
       setLoading(false);
     }
@@ -194,6 +196,7 @@ export default function PrayerCalendarPage() {
   const handleResetGps = () => {
     localStorage.removeItem("quran_manual_location");
     setIsManual(false);
+    toast.info("Resetting location to GPS detection...");
     if (gpsLocation && !gpsLocation.loading && !gpsLocation.error && gpsLocation.latitude) {
       setActiveLocation({
         city: gpsLocation.city || "Detected Location",
@@ -213,6 +216,7 @@ export default function PrayerCalendarPage() {
     localStorage.setItem("quran_prayer_method", newMethod);
     localStorage.setItem("quran_prayer_school", newSchool);
     setShowSettings(false);
+    toast.success("Prayer calculation settings saved!");
   };
 
   const handleExportCSV = () => {
@@ -222,6 +226,7 @@ export default function PrayerCalendarPage() {
       MONTH_NAMES[month - 1],
       year
     );
+    toast.success("Exported Prayer Timetable as CSV!");
   };
 
   const handleExportICS = () => {
@@ -231,6 +236,7 @@ export default function PrayerCalendarPage() {
       MONTH_NAMES[month - 1],
       year
     );
+    toast.success("Exported Prayer Calendar as iCal (.ics)!");
   };
 
   const locationName = activeLocation
