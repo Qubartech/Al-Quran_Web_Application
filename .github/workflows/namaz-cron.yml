@@ -10,4 +10,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping API
-        run: curl -s "https://quran-application-with-next-js-seh2.vercel.app/api/push/send?bypass=true"
+        run: curl -s "https://alquran.qubartech.com/api/push/send?bypass=true"
