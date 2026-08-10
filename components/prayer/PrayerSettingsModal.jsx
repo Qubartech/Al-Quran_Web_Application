@@ -14,7 +14,8 @@ import {
   Compass,
   Play,
   Square,
-  Music
+  Music,
+  Send
 } from "lucide-react";
 import { usePrayerTracker } from "@/context/PrayerTrackerContext";
 import { CALCULATION_METHODS } from "@/lib/api/calculationMethods";
@@ -209,25 +210,37 @@ export default function PrayerSettingsModal({
                 <Bell size={14} className="text-emerald-500" /> Azan Audio & Alerts
               </span>
 
-              <button
-                type="button"
-                onClick={handleToggleAzanPreview}
-                className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm ${
-                  tracker?.isAzanPlaying
-                    ? "bg-rose-600 text-white hover:bg-rose-700"
-                    : "bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-600/20"
-                }`}
-              >
-                {tracker?.isAzanPlaying ? (
-                  <>
-                    <Square size={13} className="fill-current" /> Stop Azan
-                  </>
-                ) : (
-                  <>
-                    <Play size={13} className="fill-current" /> Preview Azan
-                  </>
-                )}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => tracker?.testNotification && tracker.testNotification()}
+                  className="text-xs font-bold px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white transition-all shadow-md shadow-sky-600/20 flex items-center gap-1.5"
+                  title="Test real browser & background notification"
+                >
+                  <Send size={12} />
+                  Test Notification
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleToggleAzanPreview}
+                  className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm ${
+                    tracker?.isAzanPlaying
+                      ? "bg-rose-600 text-white hover:bg-rose-700"
+                      : "bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-600/20"
+                  }`}
+                >
+                  {tracker?.isAzanPlaying ? (
+                    <>
+                      <Square size={13} className="fill-current" /> Stop Azan
+                    </>
+                  ) : (
+                    <>
+                      <Play size={13} className="fill-current" /> Preview Azan
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Global Notifications Switch */}
@@ -286,14 +299,17 @@ export default function PrayerSettingsModal({
                     <button
                       key={opt.id}
                       type="button"
-                      onClick={() => tracker?.changeAzanVoice(opt.id)}
+                      onClick={() => tracker?.changeAzanVoice(opt.id, true)}
                       className={`p-3 rounded-xl text-left border transition-all flex flex-col gap-0.5 ${
                         isSelected
-                          ? "bg-emerald-500/10 border-emerald-500 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-bold"
+                          ? "bg-emerald-500/10 border-emerald-500 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-bold shadow-sm"
                           : "bg-white dark:bg-slate-900 border-slate-200/60 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                       }`}
                     >
-                      <span className="text-xs font-bold">{opt.label}</span>
+                      <span className="text-xs font-bold flex items-center justify-between">
+                        {opt.label}
+                        {isSelected && <span className="text-[9px] bg-emerald-600 text-white px-1.5 py-0.5 rounded-md font-black uppercase">Active</span>}
+                      </span>
                       <span className="text-[10px] text-slate-400 dark:text-slate-500">{opt.desc}</span>
                     </button>
                   );

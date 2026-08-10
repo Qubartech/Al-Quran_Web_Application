@@ -954,24 +954,36 @@ export default function PrayerPage() {
                 </span>
               </div>
 
-              <button
-                type="button"
-                onClick={() => {
-                  if (tracker?.isAzanPlaying) {
-                    tracker?.stopAzanSound();
-                  } else {
-                    tracker?.playAzanSound("Dhuhr");
-                  }
-                }}
-                className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all shadow-md flex items-center gap-1.5 ${
-                  tracker?.isAzanPlaying
-                    ? "bg-rose-600 hover:bg-rose-700 text-white shadow-rose-600/30"
-                    : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20"
-                }`}
-              >
-                <Volume2 size={13} className={tracker?.isAzanPlaying ? "animate-pulse" : ""} />
-                {tracker?.isAzanPlaying ? "Stop Azan" : "Play Azan Preview"}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => tracker?.testNotification && tracker.testNotification()}
+                  className="text-xs font-bold px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white transition-all shadow-md shadow-sky-600/20 flex items-center gap-1.5"
+                  title="Test real browser & 5-sec background notification"
+                >
+                  <Bell size={13} />
+                  Test Notification
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (tracker?.isAzanPlaying) {
+                      tracker?.stopAzanSound();
+                    } else {
+                      tracker?.playAzanSound("Dhuhr");
+                    }
+                  }}
+                  className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all shadow-md flex items-center gap-1.5 ${
+                    tracker?.isAzanPlaying
+                      ? "bg-rose-600 hover:bg-rose-700 text-white shadow-rose-600/30"
+                      : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20"
+                  }`}
+                >
+                  <Volume2 size={13} className={tracker?.isAzanPlaying ? "animate-pulse" : ""} />
+                  {tracker?.isAzanPlaying ? "Stop Azan" : "Play Azan Preview"}
+                </button>
+              </div>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -990,7 +1002,7 @@ export default function PrayerPage() {
                     <button
                       key={v.id}
                       type="button"
-                      onClick={() => tracker?.changeAzanVoice(v.id)}
+                      onClick={() => tracker?.changeAzanVoice(v.id, true)}
                       className={`py-2 px-2.5 rounded-xl text-xs font-bold transition-all border text-center ${
                         isSelected
                           ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20"

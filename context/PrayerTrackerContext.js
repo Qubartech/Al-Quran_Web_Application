@@ -127,11 +127,6 @@ export function PrayerTrackerProvider({ children }) {
     }
   }, [user?.id]);
 
-  const changeAzanVoice = (voice) => {
-    setAzanVoice(voice);
-    saveSettings(remindersEnabled, prayerReminders, reminderSound, voice);
-  };
-
   // Stop currently playing Azan audio
   const stopAzanSound = useCallback(() => {
     if (activeAudioRef.current) {
@@ -234,6 +229,89 @@ export function PrayerTrackerProvider({ children }) {
       playNotificationSound();
     }
   }, [reminderSound, azanVoice, playNotificationSound, stopAzanSound]);
+
+  // Change Azan Voice and automatically play audio preview immediately!
+  const changeAzanVoice = (voice, autoPlay = true) => {
+    setAzanVoice(voice);
+    saveSettings(remindersEnabled, prayerReminders, reminderSound, voice);
+
+    if (autoPlay) {
+      const testPrayerName = voice === "fajr" ? "Fajr" : "Dhuhr";
+      playAzanSound(testPrayerName, voice);
+    }
+  };
+
+  // Test Real Browser Notification & Sound
+  const testNotification = useCallback(async () => {
+    if (typeof window === "undefined") return;
+
+    if (!("Notification" in window)) {
+      toast.error("Browser notifications are not supported in this browser.");
+      return;
+    }
+
+    let perm = Notification.permission;
+    if (perm !== "granted") {
+      try {
+        perm = await Notification.requestPermission();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    if (perm !== "granted") {
+      toast.warning("Notification permission not granted. Please allow notification permissions in your browser.");
+      return;
+    }
+
+    // Play Azan sound preview
+    playAzanSound("Test Prayer");
+
+    const voiceLabel =
+      azanVoice === "madinah"
+        ? "Madinah Azan"
+        : azanVoice === "fajr"
+        ? "Fajr Azan"
+        : azanVoice === "chime"
+        ? "Soft Chime"
+        : "Makkah Azan";
+
+    const title = `🔔 Test Namaz Alert (${voiceLabel})`;
+    const options = {
+      body: "Azan notifications and sound alerts are working properly! A 5-second background test alert will also fire.",
+      icon: "/quran.svg",
+      badge: "/quran.svg",
+      tag: `namaz-test-${Date.now()}`,
+      renotify: true,
+      data: { url: "/prayer" },
+      requireInteraction: true,
+    };
+
+    if (swRegistration && swRegistration.showNotification) {
+      swRegistration.showNotification(title, options).catch((err) => {
+        console.error("SW notification error, fallback to standard Notification:", err);
+        fallbackNotification(title, options);
+      });
+    } else {
+      fallbackNotification(title, options);
+    }
+
+    // Schedule 5-second test background notification via Service Worker
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: "SCHEDULE_PRAYERS",
+        prayers: [
+          {
+            name: "5-Sec Test Alert",
+            timeMs: Date.now() + 5000,
+            voice: azanVoice,
+          },
+        ],
+      });
+    }
+
+    toast.success("Test notification triggered! A 5-second background test alert is also scheduled.");
+  }, [azanVoice, swRegistration, playAzanSound]);
 
   // Load logs & sync with user account
   useEffect(() => {
@@ -753,6 +831,7 @@ export function PrayerTrackerProvider({ children }) {
     changeAzanVoice,
     playAzanSound,
     stopAzanSound,
+    testNotification,
     globalTimings,
     updateGlobalTimings,
     toggleGlobalReminders,
