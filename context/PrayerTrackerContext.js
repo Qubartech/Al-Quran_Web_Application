@@ -318,6 +318,40 @@ export function PrayerTrackerProvider({ children }) {
         }
 
         let sub = activeSub;
+        if (sub) {
+          // Detect VAPID key changes and force re-subscription
+          try {
+            const activeKey = sub.options.applicationServerKey;
+            if (activeKey) {
+              const activeKeyUint8 = new Uint8Array(activeKey);
+              const currentKeyUint8 = urlBase64ToUint8Array(vapidPublicKey);
+
+              let keyMatches = activeKeyUint8.length === currentKeyUint8.length;
+              if (keyMatches) {
+                for (let i = 0; i < activeKeyUint8.length; i++) {
+                  if (activeKeyUint8[i] !== currentKeyUint8[i]) {
+                    keyMatches = false;
+                    break;
+                  }
+                }
+              }
+
+              if (!keyMatches) {
+                console.log("Web Push Sync: VAPID keys changed, clearing old subscription...");
+                await fetch("/api/push/subscribe", {
+                  method: "DELETE",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ endpoint: sub.endpoint }),
+                });
+                await sub.unsubscribe();
+                sub = null;
+              }
+            }
+          } catch (keyErr) {
+            console.warn("Web Push Sync: error verifying subscription VAPID key compatibility:", keyErr);
+          }
+        }
+
         if (!sub) {
           console.log("Web Push Sync: creating new push subscription...");
           sub = await swRegistration.pushManager.subscribe({
