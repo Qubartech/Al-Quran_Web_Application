@@ -17,6 +17,17 @@ const LEGACY_STORAGE_KEY_LOGS = "quran_namaz_tracker_logs";
 const NOTIFIED_MAP_KEY = "quran_namaz_notified_map";
 const AZAN_VOICE_KEY = "quran_namaz_azan_voice";
 
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/\-/g, "+").replace(/_/g, "/");
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
 export function PrayerTrackerProvider({ children }) {
   const { user, session } = useUser();
 
@@ -30,22 +41,25 @@ export function PrayerTrackerProvider({ children }) {
     Isha: true,
   });
   const [reminderSound, setReminderSound] = useState(true);
-  const [azanVoice, setAzanVoice] = useState("makkah"); // 'makkah', 'madinah', 'fajr', 'chime'
+  const [azanVoice, setAzanVoice] = useState("makkah");
 
   // 2. Azan Audio Playback state
   const [isAzanPlaying, setIsAzanPlaying] = useState(false);
   const [activeAzanPrayer, setActiveAzanPrayer] = useState("");
   const activeAudioRef = useRef(null);
 
-  // 3. Prayer completion logs state
+  // 3. Test Alarm Target state for closed-tab background testing
+  const [testAlarmTargetMs, setTestAlarmTargetMs] = useState(null);
+
+  // 4. Prayer completion logs state
   const [completedLogs, setCompletedLogs] = useState({});
   const [isSyncedWithAccount, setIsSyncedWithAccount] = useState(false);
 
-  // 4. Service worker registration & global timings state
+  // 5. Service worker registration & global timings state
   const [swRegistration, setSwRegistration] = useState(null);
   const [globalTimings, setGlobalTimings] = useState(null);
 
-  // 5. Track last notified prayer to avoid duplicate alerts
+  // 6. Track last notified prayer to avoid duplicate alerts
   const [notifiedMap, setNotifiedMap] = useState(() => {
     if (typeof window === "undefined") return {};
     try {
@@ -81,52 +95,6 @@ export function PrayerTrackerProvider({ children }) {
     }
   }, []);
 
-  // Helper to load settings from storage
-  const loadLocalSettings = useCallback((userId) => {
-    if (typeof window === "undefined") return;
-    try {
-      const suffix = userId ? `_${userId}` : "_guest";
-      const settingsKey = `quran_namaz_reminder_settings${suffix}`;
-      let savedSettings = localStorage.getItem(settingsKey);
-      if (!savedSettings && !userId) {
-        savedSettings = localStorage.getItem(LEGACY_STORAGE_KEY_SETTINGS);
-      }
-      if (savedSettings) {
-        const parsed = JSON.parse(savedSettings);
-        if (typeof parsed.remindersEnabled === "boolean") setRemindersEnabled(parsed.remindersEnabled);
-        if (parsed.prayerReminders) setPrayerReminders(parsed.prayerReminders);
-        if (typeof parsed.reminderSound === "boolean") setReminderSound(parsed.reminderSound);
-      }
-
-      const savedVoice = localStorage.getItem(AZAN_VOICE_KEY);
-      if (savedVoice) {
-        setAzanVoice(savedVoice);
-      }
-    } catch (e) {
-      console.error("Failed to load settings from localStorage:", e);
-    }
-  }, []);
-
-  // Helper to save settings to storage
-  const saveSettings = useCallback((newRemindersEnabled, newPrayerReminders, newSound, newVoice) => {
-    if (typeof window === "undefined") return;
-    try {
-      const suffix = user?.id ? `_${user.id}` : "_guest";
-      const settingsKey = `quran_namaz_reminder_settings${suffix}`;
-      const payload = JSON.stringify({
-        remindersEnabled: newRemindersEnabled,
-        prayerReminders: newPrayerReminders,
-        reminderSound: newSound,
-      });
-      localStorage.setItem(settingsKey, payload);
-      if (newVoice) {
-        localStorage.setItem(AZAN_VOICE_KEY, newVoice);
-      }
-    } catch (e) {
-      console.error("Failed to save reminder settings:", e);
-    }
-  }, [user?.id]);
-
   // Stop currently playing Azan audio
   const stopAzanSound = useCallback(() => {
     if (activeAudioRef.current) {
@@ -137,38 +105,6 @@ export function PrayerTrackerProvider({ children }) {
     setIsAzanPlaying(false);
     setActiveAzanPrayer("");
   }, []);
-
-  // Synthesized soft chime fallback
-  const playNotificationSound = useCallback(() => {
-    if (!reminderSound || typeof window === "undefined") return;
-    try {
-      const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtxClass) return;
-
-      const audioCtx = new AudioCtxClass();
-      if (audioCtx.state === "suspended") {
-        audioCtx.resume();
-      }
-
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
-      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.5); // A5
-
-      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.start();
-      osc.stop(audioCtx.currentTime + 1.2);
-    } catch (e) {
-      console.error("Audio synth error:", e);
-    }
-  }, [reminderSound]);
 
   // Play Azan Audio (or fallback synth chime)
   const playAzanSound = useCallback((prayerName, forceVoice) => {
@@ -228,7 +164,99 @@ export function PrayerTrackerProvider({ children }) {
       console.error("Error playing Azan audio:", e);
       playNotificationSound();
     }
-  }, [reminderSound, azanVoice, playNotificationSound, stopAzanSound]);
+  }, [reminderSound, azanVoice, stopAzanSound]);
+
+  // Handle notification click query parameter triggers on mount
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("playAzan") === "true") {
+      const pName = params.get("prayer") || "Namaz";
+      const voice = params.get("voice");
+      playAzanSound(pName, voice);
+
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  }, [playAzanSound]);
+
+  // Synthesized soft chime fallback
+  const playNotificationSound = useCallback(() => {
+    if (!reminderSound || typeof window === "undefined") return;
+    try {
+      const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtxClass) return;
+
+      const audioCtx = new AudioCtxClass();
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.5); // A5
+
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + 1.2);
+    } catch (e) {
+      console.error("Audio synth error:", e);
+    }
+  }, [reminderSound]);
+
+  // Helper to load settings from storage
+  const loadLocalSettings = useCallback((userId) => {
+    if (typeof window === "undefined") return;
+    try {
+      const suffix = userId ? `_${userId}` : "_guest";
+      const settingsKey = `quran_namaz_reminder_settings${suffix}`;
+      let savedSettings = localStorage.getItem(settingsKey);
+      if (!savedSettings && !userId) {
+        savedSettings = localStorage.getItem(LEGACY_STORAGE_KEY_SETTINGS);
+      }
+      if (savedSettings) {
+        const parsed = JSON.parse(savedSettings);
+        if (typeof parsed.remindersEnabled === "boolean") setRemindersEnabled(parsed.remindersEnabled);
+        if (parsed.prayerReminders) setPrayerReminders(parsed.prayerReminders);
+        if (typeof parsed.reminderSound === "boolean") setReminderSound(parsed.reminderSound);
+      }
+
+      const savedVoice = localStorage.getItem(AZAN_VOICE_KEY);
+      if (savedVoice) {
+        setAzanVoice(savedVoice);
+      }
+    } catch (e) {
+      console.error("Failed to load settings from localStorage:", e);
+    }
+  }, []);
+
+  // Helper to save settings to storage
+  const saveSettings = useCallback((newRemindersEnabled, newPrayerReminders, newSound, newVoice) => {
+    if (typeof window === "undefined") return;
+    try {
+      const suffix = user?.id ? `_${user.id}` : "_guest";
+      const settingsKey = `quran_namaz_reminder_settings${suffix}`;
+      const payload = JSON.stringify({
+        remindersEnabled: newRemindersEnabled,
+        prayerReminders: newPrayerReminders,
+        reminderSound: newSound,
+      });
+      localStorage.setItem(settingsKey, payload);
+      if (newVoice) {
+        localStorage.setItem(AZAN_VOICE_KEY, newVoice);
+      }
+    } catch (e) {
+      console.error("Failed to save reminder settings:", e);
+    }
+  }, [user?.id]);
 
   // Change Azan Voice and automatically play audio preview immediately!
   const changeAzanVoice = (voice, autoPlay = true) => {
@@ -241,7 +269,95 @@ export function PrayerTrackerProvider({ children }) {
     }
   };
 
-  // Test Real Browser Notification & Sound
+  // Synchronize Push Subscription with PostgreSQL database
+  const syncPushSubscription = useCallback(
+    async (enabled, currentReminders, voice) => {
+      if (typeof window === "undefined" || !swRegistration) return;
+
+      try {
+        const activeSub = await swRegistration.pushManager.getSubscription();
+
+        if (!enabled) {
+          if (activeSub) {
+            await fetch("/api/push/subscribe", {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ endpoint: activeSub.endpoint }),
+            });
+            await activeSub.unsubscribe();
+          }
+          return;
+        }
+
+        if (Notification.permission !== "granted") {
+          const perm = await Notification.requestPermission();
+          if (perm !== "granted") {
+            console.warn("Notifications not granted by user");
+            return;
+          }
+        }
+
+        const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+        if (!vapidPublicKey) {
+          console.warn("VAPID public key missing in environment");
+          return;
+        }
+
+        let sub = activeSub;
+        if (!sub) {
+          sub = await swRegistration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+          });
+        }
+
+        let savedManual = null;
+        let savedMethod = 3;
+        let savedSchool = 0;
+        try {
+          savedMethod = parseInt(localStorage.getItem("quran_prayer_method") || "3", 10);
+          savedSchool = parseInt(localStorage.getItem("quran_prayer_school") || "0", 10);
+          const rawManual = localStorage.getItem("quran_manual_location");
+          if (rawManual) savedManual = JSON.parse(rawManual);
+        } catch (e) {}
+
+        const activeRemindersList = [];
+        const remindersToCheck = currentReminders || prayerReminders;
+        Object.keys(remindersToCheck).forEach((p) => {
+          if (remindersToCheck[p]) activeRemindersList.push(p);
+        });
+
+        const subscribePayload = {
+          subscription: sub,
+          userId: user?.id || null,
+          city: savedManual?.city || "Dhaka",
+          country: savedManual?.country || "Bangladesh",
+          method: savedMethod,
+          school: savedSchool,
+          voice: voice || azanVoice,
+          reminders: activeRemindersList.join(","),
+        };
+
+        await fetch("/api/push/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(subscribePayload),
+        });
+      } catch (err) {
+        console.error("Failed to sync push subscription:", err);
+      }
+    },
+    [swRegistration, prayerReminders, azanVoice, user?.id]
+  );
+
+  // Sync push subscription state with PostgreSQL database automatically
+  useEffect(() => {
+    if (swRegistration) {
+      syncPushSubscription(remindersEnabled, prayerReminders, azanVoice);
+    }
+  }, [remindersEnabled, prayerReminders, azanVoice, swRegistration, syncPushSubscription]);
+
+  // Test Real Browser Notification & Sound (including Web Push API verification)
   const testNotification = useCallback(async () => {
     if (typeof window === "undefined") return;
 
@@ -264,54 +380,127 @@ export function PrayerTrackerProvider({ children }) {
       return;
     }
 
-    // Play Azan sound preview
+    // Play sound preview locally
     playAzanSound("Test Prayer");
 
-    const voiceLabel =
-      azanVoice === "madinah"
-        ? "Madinah Azan"
-        : azanVoice === "fajr"
-        ? "Fajr Azan"
-        : azanVoice === "chime"
-        ? "Soft Chime"
-        : "Makkah Azan";
+    // Try sending a real server-side Web Push notification to test closed-tab pathway
+    let webPushTriggered = false;
+    if (swRegistration) {
+      try {
+        const activeSub = await swRegistration.pushManager.getSubscription();
+        if (activeSub) {
+          const keys = activeSub.toJSON().keys || {};
+          const voiceLabel = azanVoice === "madinah" ? "Madinah Azan" : azanVoice === "fajr" ? "Fajr Azan" : azanVoice === "chime" ? "Soft Chime" : "Makkah Azan";
 
-    const title = `🔔 Test Namaz Alert (${voiceLabel})`;
-    const options = {
-      body: "Azan notifications and sound alerts are working properly! A 5-second background test alert will also fire.",
-      icon: "/quran.svg",
-      badge: "/quran.svg",
-      tag: `namaz-test-${Date.now()}`,
-      renotify: true,
-      data: { url: "/prayer" },
-      requireInteraction: true,
-    };
+          const pushRes = await fetch("/api/push/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              endpoint: activeSub.endpoint,
+              p256dh: keys.p256dh || "",
+              auth: keys.auth || "",
+              title: `🔔 Real Web Push Test (${voiceLabel})`,
+              message: "This push notification was delivered from the PostgreSQL server. Background push works!",
+              voice: azanVoice,
+              prayerName: "Test Push Alert"
+            }),
+          });
+          if (pushRes.ok) {
+            webPushTriggered = true;
+          }
+        }
+      } catch (pushErr) {
+        console.warn("Failed to trigger server-side test push:", pushErr);
+      }
+    }
 
-    if (swRegistration && swRegistration.showNotification) {
-      swRegistration.showNotification(title, options).catch((err) => {
-        console.error("SW notification error, fallback to standard Notification:", err);
+    if (!webPushTriggered) {
+      const voiceLabel = azanVoice === "madinah" ? "Madinah" : azanVoice === "fajr" ? "Fajr" : azanVoice === "chime" ? "Chime" : "Makkah";
+      const title = `🔔 Local Test Namaz Alert (${voiceLabel})`;
+      const options = {
+        body: "Local alerts are working! Server push was unavailable. Ensure notifications are enabled.",
+        icon: "/quran.svg",
+        badge: "/quran.svg",
+        tag: `namaz-test-${Date.now()}`,
+        renotify: true,
+        data: { url: "/prayer" },
+        requireInteraction: true,
+      };
+
+      if (swRegistration && swRegistration.showNotification) {
+        swRegistration.showNotification(title, options).catch((err) => {
+          console.error("SW notification error, fallback to standard Notification:", err);
+          fallbackNotification(title, options);
+        });
+      } else {
         fallbackNotification(title, options);
-      });
-    } else {
-      fallbackNotification(title, options);
+      }
     }
 
-    // Schedule 5-second test background notification via Service Worker
-    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage({
-        type: "SCHEDULE_PRAYERS",
-        prayers: [
-          {
-            name: "5-Sec Test Alert",
-            timeMs: Date.now() + 5000,
-            voice: azanVoice,
-          },
-        ],
-      });
-    }
-
-    toast.success("Test notification triggered! A 5-second background test alert is also scheduled.");
+    toast.success("Test notification triggered!");
   }, [azanVoice, swRegistration, playAzanSound]);
+
+  // Schedule a custom closed-tab test alarm (seconds or time string)
+  const scheduleTestAlarm = useCallback(
+    async (delayInput, customLabel = "Closed-Tab Test Azan") => {
+      if (typeof window === "undefined") return;
+
+      if (!("Notification" in window)) {
+        toast.error("Browser notifications are not supported in this browser.");
+        return;
+      }
+
+      let perm = Notification.permission;
+      if (perm !== "granted") {
+        try {
+          perm = await Notification.requestPermission();
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      if (perm !== "granted") {
+        toast.warning("Please allow browser notification permissions first.");
+        return;
+      }
+
+      let targetTimeMs = Date.now() + 10000;
+
+      if (typeof delayInput === "number") {
+        targetTimeMs = Date.now() + delayInput * 1000;
+      } else if (typeof delayInput === "string" && delayInput.includes(":")) {
+        const [hStr, mStr] = delayInput.split(":");
+        const now = new Date();
+        const targetDate = new Date(now);
+        targetDate.setHours(parseInt(hStr, 10), parseInt(mStr, 10), 0, 0);
+
+        if (targetDate.getTime() <= now.getTime()) {
+          targetDate.setDate(targetDate.getDate() + 1);
+        }
+        targetTimeMs = targetDate.getTime();
+      }
+
+      setTestAlarmTargetMs(targetTimeMs);
+
+      const swController = navigator.serviceWorker.controller || (swRegistration && swRegistration.active);
+      if (swController) {
+        swController.postMessage({
+          type: "SCHEDULE_TEST_ALARM",
+          testTimeMs: targetTimeMs,
+          label: customLabel,
+          voice: azanVoice,
+        });
+      }
+
+      const timeString = new Date(targetTimeMs).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      const delaySecs = Math.max(1, Math.round((targetTimeMs - Date.now()) / 1000));
+
+      toast.success(`⏰ Test alarm set for ${timeString} (in ${delaySecs}s)! Close or exit the website now to test background notifications.`, {
+        autoClose: 7000,
+      });
+    },
+    [azanVoice, swRegistration]
+  );
 
   // Load logs & sync with user account
   useEffect(() => {
@@ -685,10 +874,8 @@ export function PrayerTrackerProvider({ children }) {
         return updated;
       });
 
-      // Play Azan Audio / Chime
       playAzanSound(prayerName);
 
-      // Display Browser Notification
       const title = `Time for ${prayerName} Prayer! (Azan)`;
       const options = {
         body: `It is now time for ${prayerName} Salah. May Allah accept your prayers!`,
@@ -782,42 +969,46 @@ export function PrayerTrackerProvider({ children }) {
     };
   }, [remindersEnabled, globalTimings, checkTimings]);
 
-  // Sync scheduled prayers with Service Worker
+  // Sync full prayer configuration & location with Service Worker for persistent background notifications (even when app is closed)
   useEffect(() => {
-    if (!remindersEnabled || !globalTimings) return;
+    if (typeof navigator === "undefined" || !navigator.serviceWorker) return;
 
-    if (typeof navigator !== "undefined" && navigator.serviceWorker && navigator.serviceWorker.controller) {
-      const now = new Date();
-      const corePrayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
-      const upcomingPrayers = [];
+    const syncSWConfig = () => {
+      const swController = navigator.serviceWorker.controller || (swRegistration && swRegistration.active);
+      if (!swController) return;
 
-      corePrayers.forEach((prayerName) => {
-        if (!prayerReminders[prayerName]) return;
-        const timeVal = globalTimings[prayerName];
-        if (!timeVal) return;
+      let savedManual = null;
+      let savedMethod = 3;
+      let savedSchool = 0;
+      try {
+        savedMethod = parseInt(localStorage.getItem("quran_prayer_method") || "3", 10);
+        savedSchool = parseInt(localStorage.getItem("quran_prayer_school") || "0", 10);
+        const rawManual = localStorage.getItem("quran_manual_location");
+        if (rawManual) savedManual = JSON.parse(rawManual);
+      } catch (e) {}
 
-        const cleanTime = timeVal.split(" ")[0];
-        const [hStr, mStr] = cleanTime.split(":");
-        if (!hStr || !mStr) return;
-
-        const prayerDate = new Date(now);
-        prayerDate.setHours(parseInt(hStr, 10), parseInt(mStr, 10), 0, 0);
-
-        if (prayerDate.getTime() > now.getTime()) {
-          upcomingPrayers.push({
-            name: prayerName,
-            timeMs: prayerDate.getTime(),
-            voice: azanVoice,
-          });
-        }
+      swController.postMessage({
+        type: "SAVE_PRAYER_CONFIG",
+        timings: globalTimings,
+        location: savedManual,
+        method: savedMethod,
+        school: savedSchool,
+        remindersEnabled,
+        prayerReminders,
+        voice: azanVoice,
       });
+    };
 
-      navigator.serviceWorker.controller.postMessage({
-        type: "SCHEDULE_PRAYERS",
-        prayers: upcomingPrayers,
-      });
+    syncSWConfig();
+
+    if (swRegistration && "periodicSync" in swRegistration) {
+      try {
+        swRegistration.periodicSync.register("namaz-azan-sync", {
+          minInterval: 12 * 60 * 60 * 1000,
+        }).catch((e) => console.log("Periodic sync register notice:", e));
+      } catch (e) {}
     }
-  }, [remindersEnabled, prayerReminders, globalTimings, swRegistration, azanVoice]);
+  }, [remindersEnabled, prayerReminders, globalTimings, azanVoice, swRegistration]);
 
   const value = {
     user,
@@ -828,10 +1019,12 @@ export function PrayerTrackerProvider({ children }) {
     azanVoice,
     isAzanPlaying,
     activeAzanPrayer,
+    testAlarmTargetMs,
     changeAzanVoice,
     playAzanSound,
     stopAzanSound,
     testNotification,
+    scheduleTestAlarm,
     globalTimings,
     updateGlobalTimings,
     toggleGlobalReminders,
