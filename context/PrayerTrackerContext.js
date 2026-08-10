@@ -18,14 +18,20 @@ const NOTIFIED_MAP_KEY = "quran_namaz_notified_map";
 const AZAN_VOICE_KEY = "quran_namaz_azan_voice";
 
 function urlBase64ToUint8Array(base64String) {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/\-/g, "+").replace(/_/g, "/");
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
+  if (!base64String) return new Uint8Array(0);
+  try {
+    const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding).replace(/\-/g, "+").replace(/_/g, "/");
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  } catch (e) {
+    console.error("Failed to convert VAPID key base64:", e);
+    return new Uint8Array(0);
   }
-  return outputArray;
 }
 
 export function PrayerTrackerProvider({ children }) {
@@ -81,13 +87,15 @@ export function PrayerTrackerProvider({ children }) {
     return {};
   });
 
-  // Register Service Worker
+  // Register Service Worker and force update to ensure new version activates
   useEffect(() => {
     if (typeof window !== "undefined" && "serviceWorker" in navigator) {
       navigator.serviceWorker
         .register("/sw.js")
         .then((reg) => {
           setSwRegistration(reg);
+          // Force update to download new SW version with push handlers
+          reg.update().catch((e) => console.log("SW update check:", e));
         })
         .catch((err) => {
           console.error("ServiceWorker registration failed:", err);
@@ -274,41 +282,49 @@ export function PrayerTrackerProvider({ children }) {
     async (enabled, currentReminders, voice) => {
       if (typeof window === "undefined" || !swRegistration) return;
 
+      console.log("Web Push Sync: starting...", { enabled, voice });
+
       try {
         const activeSub = await swRegistration.pushManager.getSubscription();
 
         if (!enabled) {
           if (activeSub) {
+            console.log("Web Push Sync: removing active subscription from database...");
             await fetch("/api/push/subscribe", {
               method: "DELETE",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ endpoint: activeSub.endpoint }),
             });
             await activeSub.unsubscribe();
+            console.log("Web Push Sync: unsubscribed successfully.");
           }
           return;
         }
 
+        console.log("Web Push Sync: checking notification permission...");
         if (Notification.permission !== "granted") {
           const perm = await Notification.requestPermission();
           if (perm !== "granted") {
-            console.warn("Notifications not granted by user");
+            console.warn("Web Push Sync: notifications not granted by user");
             return;
           }
         }
 
         const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+        console.log("Web Push Sync: loading VAPID Public Key...", vapidPublicKey);
         if (!vapidPublicKey) {
-          console.warn("VAPID public key missing in environment");
+          console.warn("Web Push Sync: VAPID public key missing in environment");
           return;
         }
 
         let sub = activeSub;
         if (!sub) {
+          console.log("Web Push Sync: creating new push subscription...");
           sub = await swRegistration.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
           });
+          console.log("Web Push Sync: new subscription created.");
         }
 
         let savedManual = null;
@@ -338,13 +354,21 @@ export function PrayerTrackerProvider({ children }) {
           reminders: activeRemindersList.join(","),
         };
 
-        await fetch("/api/push/subscribe", {
+        console.log("Web Push Sync: registering subscription on PostgreSQL backend...");
+        const res = await fetch("/api/push/subscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(subscribePayload),
         });
+
+        if (res.ok) {
+          console.log("Web Push Sync: successfully synchronized subscription to database!");
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          console.error("Web Push Sync: backend subscription failed:", errData);
+        }
       } catch (err) {
-        console.error("Failed to sync push subscription:", err);
+        console.error("Web Push Sync: failed to sync push subscription:", err);
       }
     },
     [swRegistration, prayerReminders, azanVoice, user?.id]
