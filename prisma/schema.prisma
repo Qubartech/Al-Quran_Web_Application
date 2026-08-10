@@ -111,9 +111,10 @@ model PushSubscription {
   method    Int      @default(3)
   school    Int      @default(0)
   voice     String   @default("makkah")
-  reminders String   @default("Fajr,Dhuhr,Asr,Maghrib,Isha")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  reminders    String   @default("Fajr,Dhuhr,Asr,Maghrib,Isha")
+  lastNotified String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@index([userId])
 }

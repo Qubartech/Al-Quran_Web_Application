@@ -35,10 +35,12 @@ async function fetchTimingsCached(city, country, method, school) {
 
     const res = await fetch(url);
     const data = await res.json();
-    if (data && data.code === 200 && data.data?.timings) {
+    if (data && data.code === 200 && data.data) {
       const timings = data.data.timings;
-      timingCache.set(cacheKey, { timestamp: now, timings });
-      return timings;
+      const timezone = data.data.meta?.timezone || "Asia/Dhaka";
+      const payload = { timings, timezone };
+      timingCache.set(cacheKey, { timestamp: now, data: payload });
+      return payload;
     }
   } catch (e) {
     console.error(`Failed to fetch timings for ${cacheKey}:`, e);
@@ -54,14 +56,41 @@ async function runCronPushCycle() {
 
   for (const sub of subscriptions) {
     try {
-      const timings = await fetchTimingsCached(sub.city, sub.country, sub.method, sub.school);
-      if (!timings) continue;
+      const apiData = await fetchTimingsCached(sub.city, sub.country, sub.method, sub.school);
+      if (!apiData) continue;
 
+      const { timings, timezone } = apiData;
+
+      // Calculate current date, hour, and minute in the subscriber's specific timezone
       const now = new Date();
-      const hour = String(now.getHours()).padStart(2, "0");
-      const minute = String(now.getMinutes()).padStart(2, "0");
-      const currentTimeStr = `${hour}:${minute}`;
+      let userHourStr = "";
+      let userMinStr = "";
+      let userDateStr = "";
 
+      try {
+        const formatter = new Intl.DateTimeFormat("en-US", {
+          timeZone: timezone,
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+        const parts = formatter.formatToParts(now);
+        const year = parts.find((p) => p.type === "year").value;
+        const month = parts.find((p) => p.type === "month").value;
+        const day = parts.find((p) => p.type === "day").value;
+        userHourStr = parts.find((p) => p.type === "hour").value;
+        userMinStr = parts.find((p) => p.type === "minute").value;
+        userDateStr = `${year}-${month}-${day}`;
+      } catch (e) {
+        userHourStr = String(now.getHours()).padStart(2, "0");
+        userMinStr = String(now.getMinutes()).padStart(2, "0");
+        userDateStr = now.toISOString().split("T")[0];
+      }
+
+      const currentMinutes = parseInt(userHourStr, 10) * 60 + parseInt(userMinStr, 10);
       const activeReminders = sub.reminders.split(",");
 
       for (const prayerName of corePrayers) {
@@ -71,8 +100,20 @@ async function runCronPushCycle() {
         if (!prayerTimeRaw) continue;
 
         const cleanPrayerTime = prayerTimeRaw.split(" ")[0]; // "13:20"
+        const [pHourStr, pMinStr] = cleanPrayerTime.split(":");
+        const prayerMinutes = parseInt(pHourStr, 10) * 60 + parseInt(pMinStr, 10);
 
-        if (currentTimeStr === cleanPrayerTime) {
+        const diffMinutes = currentMinutes - prayerMinutes;
+
+        // Check if the prayer time arrived in the last 6 minutes (safely matches GitHub Actions 5-min cron scheduler)
+        if (diffMinutes >= 0 && diffMinutes < 6) {
+          const notifyKey = `${userDateStr}_${prayerName}`;
+
+          // Avoid duplicate notifications if triggered multiple times within the 6-min window
+          if (sub.lastNotified === notifyKey) {
+            continue;
+          }
+
           const pushSub = {
             endpoint: sub.endpoint,
             keys: {
@@ -83,13 +124,20 @@ async function runCronPushCycle() {
 
           const payload = JSON.stringify({
             title: `Time for ${prayerName} Prayer!`,
-            body: `It is now time for ${prayerName} Salah in ${sub.city || "your location"}.`,
+            body: `It is now time for ${prayerName} Salah in ${sub.city || "your location"}. May Allah accept your prayers!`,
             voice: sub.voice,
             prayerName: prayerName,
-            tag: `namaz-notification-${prayerName}-${Date.now()}`,
+            tag: `namaz-notification-${prayerName}-${userDateStr}`,
           });
 
           await webpush.sendNotification(pushSub, payload);
+
+          // Update DB immediately to record notification and block duplication
+          await prisma.pushSubscription.update({
+            where: { id: sub.id },
+            data: { lastNotified: notifyKey },
+          });
+
           results.sent++;
         }
       }
