@@ -65,10 +65,10 @@ export default function SurahHeroHeader({
   return (
     <>
       {/* ── 1. Main Hero Banner Content ── */}
-      <div className="relative py-10 md:py-12 px-6 md:px-10 rounded-3xl overflow-hidden glass shadow-2xl mb-4 border border-emerald-500/25 dark:border-emerald-500/30 animate-fadeIn">
+      <div className="relative py-10 md:py-12 px-6 md:px-10 rounded-3xl overflow-hidden glass shadow-sm mb-4 border border-emerald-500/15 dark:border-emerald-500/30 animate-fadeIn transition-all duration-300">
         
         {/* Islamic Ambient Glows & Mesh Gradients */}
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-emerald-600/10 dark:from-emerald-500/15 dark:via-teal-500/10 dark:to-emerald-600/15 z-0 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-50/80 via-teal-50/60 to-cyan-50/70 dark:from-emerald-950/70 dark:via-slate-900/90 dark:to-teal-950/70 z-0 pointer-events-none" />
         <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-80 h-80 bg-emerald-500/15 dark:bg-emerald-400/20 rounded-full blur-3xl z-0 pointer-events-none" />
         <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-teal-500/15 dark:bg-teal-400/15 rounded-full blur-3xl z-0 pointer-events-none" />
         <div className="absolute -bottom-20 -right-20 w-72 h-72 bg-emerald-500/15 dark:bg-emerald-400/15 rounded-full blur-3xl z-0 pointer-events-none" />

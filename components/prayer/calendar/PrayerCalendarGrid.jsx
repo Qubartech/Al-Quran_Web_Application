@@ -108,7 +108,7 @@ export default function PrayerCalendarGrid({
                     isToday
                       ? "bg-gradient-to-br from-emerald-50 dark:from-emerald-500/25 via-emerald-100/30 dark:via-teal-950/50 to-white dark:to-slate-950 border-emerald-500 shadow-lg shadow-emerald-500/10 dark:shadow-emerald-500/25 ring-1 sm:ring-2 ring-emerald-500/50"
                       : isFriday
-                      ? "bg-slate-50 dark:bg-slate-900/90 border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-slate-100 dark:hover:bg-slate-850"
+                      ? "bg-slate-50 dark:bg-slate-900/90 border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-slate-100 dark:hover:bg-slate-800"
                       : "bg-white dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 hover:border-emerald-500/40 hover:bg-slate-50 dark:hover:bg-slate-900 shadow-sm"
                   }`}
                 >

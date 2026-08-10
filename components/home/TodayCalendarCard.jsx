@@ -53,7 +53,7 @@ export default function TodayCalendarCard() {
   const percentage = Math.round((completedCount / 5) * 100);
 
   return (
-    <div className="relative w-full rounded-2xl sm:rounded-3xl bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-950 border border-slate-800/80 shadow-2xl p-3 sm:p-4 text-white overflow-hidden backdrop-blur-xl">
+    <div className="relative w-full rounded-2xl sm:rounded-3xl glass border border-emerald-100/80 dark:border-slate-800 shadow-xs p-3 sm:p-4 text-slate-900 dark:text-white overflow-hidden backdrop-blur-xl transition-all duration-300">
       {/* Background Radial Ambient Glows */}
       <div className="absolute top-0 right-0 w-80 h-80 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
@@ -62,43 +62,43 @@ export default function TodayCalendarCard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 items-stretch relative z-10">
         
         {/* Card 1: Gregorian & Hijri Date Hero */}
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-850/60 border border-slate-800/80 flex items-center gap-3.5 shadow-sm">
-          <div className="p-3 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-500/30 text-emerald-400 shrink-0 shadow-inner">
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-white/80 dark:bg-slate-900/60 border border-emerald-100/70 dark:border-slate-800 flex items-center gap-3.5 shadow-2xs">
+          <div className="p-3 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 shrink-0 shadow-inner">
             <CalendarIcon size={24} />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[11px] font-black uppercase tracking-wider text-emerald-400">
+              <span className="text-[11px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                 Today&apos;s Calendar
               </span>
               {hijriDate && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1 shadow-sm">
-                  <Moon size={11} className="text-amber-400" />
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 flex items-center gap-1 shadow-2xs">
+                  <Moon size={11} className="text-amber-500 dark:text-amber-400" />
                   {hijriDate}
                 </span>
               )}
             </div>
-            <h3 className="text-base sm:text-lg font-black text-white mt-1 tracking-tight truncate">
+            <h3 className="text-base sm:text-lg font-black text-slate-800 dark:text-white mt-1 tracking-tight truncate">
               {gregDateStr || "Today"}
             </h3>
           </div>
         </div>
 
         {/* Card 2: Fasting Timings & Habits Progress */}
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-850/60 border border-slate-800/80 flex flex-col justify-center gap-2.5 shadow-sm">
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-white/80 dark:bg-slate-900/60 border border-emerald-100/70 dark:border-slate-800 flex flex-col justify-center gap-2.5 shadow-2xs">
           {/* Suhoor & Iftar Timings */}
           {timings && (
-            <div className="flex items-center justify-between text-xs border-b border-slate-800/80 pb-2">
-              <span className="text-slate-400 font-bold flex items-center gap-1.5">
-                <UtensilsCrossed size={14} className="text-teal-400" /> Fasting Hours
+            <div className="flex items-center justify-between text-xs border-b border-emerald-100/60 dark:border-slate-800/80 pb-2">
+              <span className="text-slate-500 dark:text-slate-400 font-bold flex items-center gap-1.5">
+                <UtensilsCrossed size={14} className="text-teal-600 dark:text-teal-400" /> Fasting Hours
               </span>
               <div className="flex items-center gap-2.5 font-mono font-extrabold text-xs">
-                <span className="text-emerald-300">
+                <span className="text-emerald-700 dark:text-emerald-300">
                   <span className="text-slate-400 font-normal text-[11px] mr-1">Suhoor</span>
                   {formatTime12(timings.Fajr)}
                 </span>
-                <span className="text-slate-600">|</span>
-                <span className="text-rose-300">
+                <span className="text-slate-300 dark:text-slate-600">|</span>
+                <span className="text-rose-600 dark:text-rose-300">
                   <span className="text-slate-400 font-normal text-[11px] mr-1">Iftar</span>
                   {formatTime12(timings.Maghrib)}
                 </span>
@@ -110,12 +110,12 @@ export default function TodayCalendarCard() {
           <div className="flex items-center justify-between gap-2.5 pt-0.5">
             <div className="flex flex-col gap-1 flex-1">
               <div className="flex items-center justify-between text-[11px] font-extrabold">
-                <span className="text-slate-300 flex items-center gap-1">
-                  <CheckCircle2 size={13} className="text-emerald-400" /> Today&apos;s Habits
+                <span className="text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                  <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" /> Today&apos;s Habits
                 </span>
-                <span className="text-emerald-400 font-mono">{completedCount}/5 ({percentage}%)</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-mono">{completedCount}/5 ({percentage}%)</span>
               </div>
-              <div className="w-full h-1.5 rounded-full bg-slate-900 overflow-hidden">
+              <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-900 overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500 rounded-full"
                   style={{ width: `${percentage}%` }}
@@ -124,8 +124,8 @@ export default function TodayCalendarCard() {
             </div>
 
             {streakCount > 0 && (
-              <span className="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black flex items-center gap-1 shrink-0">
-                <Flame size={12} className="text-amber-400 fill-amber-400/30" />
+              <span className="px-2 py-1 rounded-lg bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 text-[10px] font-black flex items-center gap-1 shrink-0">
+                <Flame size={12} className="text-amber-500 fill-amber-500/30 dark:text-amber-400" />
                 <span>{streakCount}d Streak</span>
               </span>
             )}
@@ -133,20 +133,20 @@ export default function TodayCalendarCard() {
         </div>
 
         {/* Card 3: Action Card to Open Full Calendar */}
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-emerald-950/40 via-slate-850/60 to-slate-900 border border-emerald-500/25 flex flex-col sm:flex-row lg:flex-col xl:flex-row items-center justify-between gap-3 shadow-sm">
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-white/80 dark:bg-slate-900/60 border border-emerald-100/70 dark:border-slate-800 flex flex-col sm:flex-row lg:flex-col xl:flex-row items-center justify-between gap-3 shadow-2xs">
           <div className="flex flex-col text-center sm:text-left lg:text-center xl:text-left">
-            <span className="text-xs sm:text-sm font-black text-white flex items-center gap-1.5 justify-center sm:justify-start lg:justify-center xl:justify-start">
-              <Sparkles size={14} className="text-amber-400" />
+            <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white flex items-center gap-1.5 justify-center sm:justify-start lg:justify-center xl:justify-start">
+              <Sparkles size={14} className="text-amber-500 dark:text-amber-400" />
               Full Prayer Calendar
             </span>
-            <span className="text-[11px] text-slate-400 font-medium mt-0.5">
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
               Monthly timetable, Hijri views & exports
             </span>
           </div>
 
           <Link
             href="/prayer/calendar"
-            className="w-full sm:w-auto xl:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md shadow-emerald-950/50 shrink-0 whitespace-nowrap cursor-pointer"
+            className="w-full sm:w-auto xl:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm shrink-0 whitespace-nowrap cursor-pointer"
           >
             <span>Open Calendar</span>
             <ArrowRight size={15} />

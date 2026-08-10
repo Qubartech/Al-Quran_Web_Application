@@ -93,39 +93,40 @@ export default function PrayerCalendarHeader({
     <div className="flex flex-col gap-4 sm:gap-6 w-full print:hidden">
       
       {/* Top Banner / Hero Title */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-950 p-5 sm:p-6 md:p-8 text-white shadow-2xl shadow-emerald-950/40 border border-emerald-500/25">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-72 h-72 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 -mb-10 w-56 h-56 rounded-full bg-teal-500/10 blur-2xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-3xl glass border border-emerald-500/15 dark:border-emerald-500/25 p-5 sm:p-6 md:p-8 text-slate-900 dark:text-white shadow-sm transition-all duration-500">
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-50/80 via-teal-50/60 to-cyan-50/70 dark:from-emerald-950/70 dark:via-slate-900/90 dark:to-teal-950/70 z-0" />
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-72 h-72 rounded-full bg-emerald-400/15 dark:bg-emerald-500/10 blur-3xl pointer-events-none z-0" />
+        <div className="absolute bottom-0 left-1/3 -mb-10 w-56 h-56 rounded-full bg-teal-400/15 dark:bg-teal-500/10 blur-2xl pointer-events-none z-0" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/35 text-emerald-300 text-xs font-extrabold tracking-wider uppercase shadow-inner">
-              <Sparkles size={13} className="text-emerald-400 shrink-0" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-extrabold tracking-wider uppercase shadow-2xs">
+              <Sparkles size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span>AlAdhan Calculation Engine</span>
             </div>
             
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight bg-gradient-to-r from-white via-slate-100 to-emerald-200 bg-clip-text text-transparent">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white drop-shadow-2xs">
                 Prayer Times Calendar
               </h1>
               {tracker?.user ? (
                 tracker?.isSyncedWithAccount ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/25 text-emerald-200 text-[10px] font-black border border-emerald-400/40 backdrop-blur-md shadow-sm" title="Calendar is synced with your account">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-200 text-[10px] font-black border border-emerald-500/30 backdrop-blur-md shadow-2xs" title="Calendar is synced with your account">
                     Account Synced
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/25 text-amber-200 text-[10px] font-black border border-amber-400/40 backdrop-blur-md animate-pulse" title="Syncing calendar with your account...">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-200 text-[10px] font-black border border-amber-500/30 backdrop-blur-md animate-pulse" title="Syncing calendar with your account...">
                     Syncing...
                   </span>
                 )
               ) : (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-slate-300 text-[10px] font-bold border border-white/15 backdrop-blur-md" title="Guest mode: logs saved in local storage. Log in to sync to cloud.">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 dark:bg-white/10 text-slate-700 dark:text-slate-300 text-[10px] font-bold border border-emerald-200/50 dark:border-white/15 backdrop-blur-md" title="Guest mode: logs saved in local storage. Log in to sync to cloud.">
                   Local Storage (Guest)
                 </span>
               )}
             </div>
             
-            <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed font-medium">
               Comprehensive monthly timetable with accurate Fajr, Dhuhr, Asr, Maghrib, Isha, Tahajjud times, and Hijri dates.
             </p>
           </div>
@@ -133,11 +134,11 @@ export default function PrayerCalendarHeader({
           {/* Quick Location & Controls */}
           <div className="flex items-center gap-2.5 flex-wrap">
             {/* Location Badge */}
-            <div className="flex-1 sm:flex-initial flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-xs sm:text-sm font-medium text-slate-100 min-w-0 shadow-lg">
-              <MapPin size={17} className="text-emerald-400 shrink-0" />
+            <div className="flex-1 sm:flex-initial flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/80 dark:bg-slate-900/60 backdrop-blur-md border border-emerald-200/50 dark:border-white/15 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 min-w-0 shadow-2xs">
+              <MapPin size={17} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
               <div className="flex flex-col min-w-0">
-                <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider leading-tight">Location</span>
-                <span className="font-extrabold text-white truncate max-w-[130px] sm:max-w-[190px]">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider leading-tight">Location</span>
+                <span className="font-extrabold text-slate-900 dark:text-white truncate max-w-[130px] sm:max-w-[190px]">
                   {activeLocation ? `${activeLocation.city}${activeLocation.country ? `, ${activeLocation.country}` : ""}` : "Loading..."}
                 </span>
               </div>
@@ -147,7 +148,7 @@ export default function PrayerCalendarHeader({
             <button
               onClick={onResetGps}
               title="Use GPS Geolocation"
-              className="p-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-slate-200 hover:text-white transition-all cursor-pointer shrink-0 shadow-lg"
+              className="p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 hover:bg-white dark:hover:bg-slate-900 border border-emerald-200/50 dark:border-white/15 text-slate-700 dark:text-slate-200 hover:text-emerald-600 transition-all cursor-pointer shrink-0 shadow-2xs"
             >
               <Navigation size={16} />
             </button>
@@ -155,7 +156,7 @@ export default function PrayerCalendarHeader({
             {/* Calculation Settings Button */}
             <button
               onClick={onOpenSettings}
-              className="px-4 py-3 rounded-2xl bg-gradient-to-r from-emerald-500/25 to-teal-500/25 hover:from-emerald-500/35 hover:to-teal-500/35 border border-emerald-500/45 text-emerald-300 hover:text-white transition-all text-xs sm:text-sm font-extrabold cursor-pointer shrink-0 shadow-lg shadow-emerald-950/40 flex items-center gap-2"
+              className="px-4 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white transition-all text-xs sm:text-sm font-extrabold cursor-pointer shrink-0 shadow-sm flex items-center gap-2"
             >
               <SlidersHorizontal size={16} />
               <span>Settings</span>
@@ -164,15 +165,15 @@ export default function PrayerCalendarHeader({
         </div>
 
         {/* Quick Cities Bar */}
-        <div className="mt-5 pt-4 border-t border-white/10 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-          <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider whitespace-nowrap mr-1 flex items-center gap-1 shrink-0">
+        <div className="mt-5 pt-4 border-t border-emerald-200/50 dark:border-white/10 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <span className="text-[11px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap mr-1 flex items-center gap-1 shrink-0">
             <Globe size={13} /> Quick City:
           </span>
           {QUICK_CITIES.map((loc) => (
             <button
               key={loc.city}
               onClick={() => onSearchLocation(loc.city)}
-              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-emerald-500/25 text-xs text-slate-200 hover:text-white transition-all border border-white/15 whitespace-nowrap shrink-0 cursor-pointer font-semibold shadow-sm"
+              className="px-3 py-1.5 rounded-xl bg-white/80 dark:bg-slate-900/60 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 text-xs text-slate-700 dark:text-slate-200 transition-all border border-emerald-200/50 dark:border-white/15 whitespace-nowrap shrink-0 cursor-pointer font-semibold shadow-2xs"
             >
               {loc.city}
             </button>
@@ -181,7 +182,7 @@ export default function PrayerCalendarHeader({
       </div>
 
       {/* Main Control Strip Panel - Compact & Sleek */}
-      <div className="flex flex-col gap-3 p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-xl backdrop-blur-xl">
+      <div className="flex flex-col gap-3 p-3 sm:p-3.5 rounded-2xl glass border border-emerald-100/80 dark:border-slate-800 shadow-xs backdrop-blur-xl">
         
         {/* Row 1: Month/Year Controls + Hijri Summary Pill */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 w-full">

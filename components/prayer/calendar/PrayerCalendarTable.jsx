@@ -39,7 +39,7 @@ export default function PrayerCalendarTable({
         <span className="text-[10px] text-slate-500 dark:text-slate-400">↔ Scroll right for all timings</span>
       </div>
 
-      <div className="w-full overflow-x-auto rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl backdrop-blur-md">
+      <div className="w-full overflow-x-auto rounded-3xl glass border border-emerald-100/80 dark:border-slate-800 shadow-xs backdrop-blur-md">
         <table className="w-full text-left text-xs border-collapse min-w-[760px] md:min-w-full">
 
           {/* Table Header */}
