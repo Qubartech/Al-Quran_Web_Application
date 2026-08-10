@@ -10,13 +10,13 @@ import {
   Bell,
   Volume2,
   VolumeX,
-  Check,
   Loader2,
-  HelpCircle,
-  Compass
+  Compass,
+  Play,
+  Square,
+  Music
 } from "lucide-react";
 import { usePrayerTracker } from "@/context/PrayerTrackerContext";
-
 import { CALCULATION_METHODS } from "@/lib/api/calculationMethods";
 
 export default function PrayerSettingsModal({
@@ -33,7 +33,6 @@ export default function PrayerSettingsModal({
 }) {
   const tracker = usePrayerTracker();
   const [searchQuery, setSearchQuery] = useState("");
-  const [testSoundPlaying, setTestSoundPlaying] = useState(false);
 
   if (!isOpen) return null;
 
@@ -44,31 +43,20 @@ export default function PrayerSettingsModal({
     setSearchQuery("");
   };
 
-  const handleTestChime = () => {
-    setTestSoundPlaying(true);
-    if (tracker?.playNotificationSound) {
-      tracker.playNotificationSound();
+  const handleToggleAzanPreview = () => {
+    if (tracker?.isAzanPlaying) {
+      tracker?.stopAzanSound();
     } else {
-      // Fallback simple chime
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.5);
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 1.2);
-      } catch (e) {
-        console.error(e);
-      }
+      tracker?.playAzanSound("Dhuhr");
     }
-    setTimeout(() => setTestSoundPlaying(false), 1200);
   };
+
+  const azanVoiceOptions = [
+    { id: "makkah", label: "Makkah Adhan", desc: "Masjid al-Haram" },
+    { id: "madinah", label: "Madinah Adhan", desc: "Masjid an-Nabawi" },
+    { id: "fajr", label: "Fajr Adhan", desc: "Special Fajr Call" },
+    { id: "chime", label: "Soft Chime", desc: "Synthesized Tone" }
+  ];
 
   const corePrayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
@@ -90,7 +78,7 @@ export default function PrayerSettingsModal({
                 Namaz Settings & Preferences
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Configure calculation methods, location, & reminders
+                Configure calculation methods, location, & Azan alerts
               </p>
             </div>
           </div>
@@ -214,20 +202,31 @@ export default function PrayerSettingsModal({
             </div>
           </div>
 
-          {/* 3. Notifications & Alert Sound Controls */}
+          {/* 3. Azan Audio & Notifications Controls */}
           <div className="flex flex-col gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/50">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
-                <Bell size={14} className="text-emerald-500" /> Notifications & Sound
+                <Bell size={14} className="text-emerald-500" /> Azan Audio & Alerts
               </span>
 
               <button
                 type="button"
-                onClick={handleTestChime}
-                className="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-all flex items-center gap-1"
+                onClick={handleToggleAzanPreview}
+                className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 shadow-sm ${
+                  tracker?.isAzanPlaying
+                    ? "bg-rose-600 text-white hover:bg-rose-700"
+                    : "bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-600/20"
+                }`}
               >
-                <Volume2 size={13} className={testSoundPlaying ? "animate-bounce" : ""} />
-                Test Sound Chime
+                {tracker?.isAzanPlaying ? (
+                  <>
+                    <Square size={13} className="fill-current" /> Stop Azan
+                  </>
+                ) : (
+                  <>
+                    <Play size={13} className="fill-current" /> Preview Azan
+                  </>
+                )}
               </button>
             </div>
 
@@ -260,7 +259,7 @@ export default function PrayerSettingsModal({
             <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200/60 dark:border-slate-800">
               <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200">
                 {tracker?.reminderSound ? <Volume2 size={16} className="text-emerald-500" /> : <VolumeX size={16} className="text-slate-400" />}
-                Chime Sound Effect
+                Azan Audio Sound
               </div>
               <button
                 type="button"
@@ -273,6 +272,33 @@ export default function PrayerSettingsModal({
               >
                 {tracker?.reminderSound ? "ON" : "OFF"}
               </button>
+            </div>
+
+            {/* Azan Voice Selection Cards */}
+            <div className="flex flex-col gap-2">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                <Music size={12} className="text-emerald-500" /> Preferred Azan Voice
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {azanVoiceOptions.map((opt) => {
+                  const isSelected = (tracker?.azanVoice || "makkah") === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => tracker?.changeAzanVoice(opt.id)}
+                      className={`p-3 rounded-xl text-left border transition-all flex flex-col gap-0.5 ${
+                        isSelected
+                          ? "bg-emerald-500/10 border-emerald-500 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-bold"
+                          : "bg-white dark:bg-slate-900 border-slate-200/60 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                      }`}
+                    >
+                      <span className="text-xs font-bold">{opt.label}</span>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500">{opt.desc}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Individual Prayer Reminders */}

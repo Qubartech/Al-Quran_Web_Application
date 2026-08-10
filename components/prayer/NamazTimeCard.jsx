@@ -199,6 +199,9 @@ const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true, clas
 
         if (data.code === 200 && data.data) {
           setTimings(data.data.timings);
+          if (tracker?.updateGlobalTimings) {
+            tracker.updateGlobalTimings(data.data.timings);
+          }
           const hijri = data.data.date.hijri;
           setHijriDate(`${hijri.day} ${hijri.month.en} ${hijri.year} AH`);
         } else {
@@ -260,6 +263,9 @@ const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true, clas
         setActiveLocation(newLoc);
         setIsManual(true);
         setTimings(data.data.timings);
+        if (tracker?.updateGlobalTimings) {
+          tracker.updateGlobalTimings(data.data.timings);
+        }
         const hijri = data.data.date.hijri;
         setHijriDate(`${hijri.day} ${hijri.month.en} ${hijri.year} AH`);
         localStorage.setItem("quran_manual_location", JSON.stringify(newLoc));

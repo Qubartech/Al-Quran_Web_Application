@@ -301,6 +301,9 @@ export default function PrayerPage() {
 
         if (data.code === 200 && data.data) {
           setTimings(data.data.timings);
+          if (tracker?.updateGlobalTimings) {
+            tracker.updateGlobalTimings(data.data.timings);
+          }
           const hijri = data.data.date.hijri;
           setHijriDate(`${hijri.day} ${hijri.month.en} ${hijri.year} AH`);
         }
@@ -350,6 +353,9 @@ export default function PrayerPage() {
         setActiveLocation(newLoc);
         setIsManual(true);
         setTimings(data.data.timings);
+        if (tracker?.updateGlobalTimings) {
+          tracker.updateGlobalTimings(data.data.timings);
+        }
         const hijri = data.data.date.hijri;
         setHijriDate(`${hijri.day} ${hijri.month.en} ${hijri.year} AH`);
         localStorage.setItem("quran_manual_location", JSON.stringify(newLoc));
@@ -938,28 +944,68 @@ export default function PrayerPage() {
             </div>
           </div>
 
-          {/* 3. Notification Chime Preview Widget */}
-          <div className="p-6 rounded-3xl bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-cyan-500/10 border border-emerald-500/20 shadow-lg flex flex-col gap-3">
+          {/* 3. Azan Audio Notification Widget */}
+          <div className="p-6 rounded-3xl bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-cyan-500/10 border border-emerald-500/20 shadow-lg flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Volume2 size={18} className="text-emerald-500" />
                 <span className="text-xs font-extrabold text-slate-800 dark:text-slate-200">
-                  Notification Alert Sound
+                  Azan Audio Notification
                 </span>
               </div>
 
               <button
                 type="button"
-                onClick={() => tracker?.playNotificationSound && tracker.playNotificationSound()}
-                className="text-xs font-bold px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-md shadow-emerald-600/20 flex items-center gap-1.5"
+                onClick={() => {
+                  if (tracker?.isAzanPlaying) {
+                    tracker?.stopAzanSound();
+                  } else {
+                    tracker?.playAzanSound("Dhuhr");
+                  }
+                }}
+                className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all shadow-md flex items-center gap-1.5 ${
+                  tracker?.isAzanPlaying
+                    ? "bg-rose-600 hover:bg-rose-700 text-white shadow-rose-600/30"
+                    : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20"
+                }`}
               >
-                <Volume2 size={13} />
-                Test Chime
+                <Volume2 size={13} className={tracker?.isAzanPlaying ? "animate-pulse" : ""} />
+                {tracker?.isAzanPlaying ? "Stop Azan" : "Play Azan Preview"}
               </button>
             </div>
 
+            <div className="flex flex-col gap-2">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                Select Azan Voice:
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {[
+                  { id: "makkah", label: "Makkah" },
+                  { id: "madinah", label: "Madinah" },
+                  { id: "fajr", label: "Fajr Special" },
+                  { id: "chime", label: "Soft Chime" }
+                ].map((v) => {
+                  const isSelected = (tracker?.azanVoice || "makkah") === v.id;
+                  return (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => tracker?.changeAzanVoice(v.id)}
+                      className={`py-2 px-2.5 rounded-xl text-xs font-bold transition-all border text-center ${
+                        isSelected
+                          ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20"
+                          : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                      }`}
+                    >
+                      {v.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Synthesized soft Islamic alert chime plays when prayer time arrives if notification sound is enabled.
+              Full melodious Azan recitations play automatically at prayer times when notification sound is enabled.
             </p>
           </div>
 
