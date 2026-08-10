@@ -62,10 +62,10 @@ export default function QuickAccessCard({ className = "" }) {
   const currentFact = QURAN_FACTS[factIndex];
 
   return (
-    <div className={`p-5 md:p-6 rounded-3xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/80 shadow-xl flex flex-col justify-between gap-4 ${className}`}>
+    <div className={`p-5 md:p-6 rounded-3xl glass border border-emerald-100/80 dark:border-slate-800/80 shadow-xs flex flex-col justify-between gap-4 ${className}`}>
       
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800/80 pb-3">
+      <div className="flex items-center justify-between border-b border-emerald-100/60 dark:border-slate-800/80 pb-3">
         <span className="text-xs md:text-sm font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
           <Star size={16} className="fill-emerald-500/20" />
           Popular Surahs & Quick Access

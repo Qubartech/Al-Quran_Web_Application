@@ -301,6 +301,9 @@ export default function PrayerPage() {
 
         if (data.code === 200 && data.data) {
           setTimings(data.data.timings);
+          if (tracker?.updateGlobalTimings) {
+            tracker.updateGlobalTimings(data.data.timings);
+          }
           const hijri = data.data.date.hijri;
           setHijriDate(`${hijri.day} ${hijri.month.en} ${hijri.year} AH`);
         }
@@ -350,6 +353,9 @@ export default function PrayerPage() {
         setActiveLocation(newLoc);
         setIsManual(true);
         setTimings(data.data.timings);
+        if (tracker?.updateGlobalTimings) {
+          tracker.updateGlobalTimings(data.data.timings);
+        }
         const hijri = data.data.date.hijri;
         setHijriDate(`${hijri.day} ${hijri.month.en} ${hijri.year} AH`);
         localStorage.setItem("quran_manual_location", JSON.stringify(newLoc));
@@ -406,11 +412,12 @@ export default function PrayerPage() {
     <div className="min-h-screen pb-20 pt-6 px-4 md:px-6 w-full max-w-screen-2xl mx-auto flex flex-col gap-8">
       
       {/* 1. Hero Dashboard Header Card */}
-      <div className="relative overflow-hidden p-6 md:p-10 rounded-3xl bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-950 text-white shadow-2xl shadow-emerald-950/40 border border-emerald-500/25 transition-all duration-700">
+      <div className="relative overflow-hidden p-6 md:p-10 rounded-3xl glass border border-emerald-500/15 dark:border-emerald-500/25 shadow-sm text-slate-900 dark:text-white transition-all duration-700">
         
         {/* Background Islamic Arch / Decorative Glow */}
-        <div className="absolute right-0 top-0 translate-x-12 -translate-y-12 w-96 h-96 rounded-full bg-white/10 blur-3xl pointer-events-none"></div>
-        <div className="absolute left-1/3 bottom-0 w-64 h-64 rounded-full bg-emerald-400/10 blur-2xl pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-50/80 via-teal-50/60 to-cyan-50/70 dark:from-emerald-950/70 dark:via-slate-900/90 dark:to-teal-950/70 z-0"></div>
+        <div className="absolute right-0 top-0 translate-x-12 -translate-y-12 w-96 h-96 rounded-full bg-emerald-400/15 dark:bg-white/10 blur-3xl pointer-events-none z-0"></div>
+        <div className="absolute left-1/3 bottom-0 w-64 h-64 rounded-full bg-teal-400/15 dark:bg-emerald-400/10 blur-2xl pointer-events-none z-0"></div>
 
         {/* Calligraphy & Sub-header */}
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
@@ -419,54 +426,54 @@ export default function PrayerPage() {
           <div className="flex flex-col gap-3 max-w-xl">
             
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-white text-xs font-bold backdrop-blur-md border border-white/20">
-                <Sparkles size={14} className="text-amber-300" /> Daily Salah Companion
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-white text-xs font-bold backdrop-blur-md border border-emerald-200/50 dark:border-white/20 shadow-2xs">
+                <Sparkles size={14} className="text-amber-500 dark:text-amber-300" /> Daily Salah Companion
               </span>
 
               {tracker?.user ? (
                 tracker?.isSyncedWithAccount ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-200 text-xs font-extrabold backdrop-blur-md border border-emerald-400/40 shadow-sm" title="Prayer tracker synced with your account database">
-                    <CheckCircle2 size={13} className="text-emerald-300" /> Account Synced
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-200 text-xs font-extrabold backdrop-blur-md border border-emerald-500/30 dark:border-emerald-400/40 shadow-2xs" title="Prayer tracker synced with your account database">
+                    <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-300" /> Account Synced
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-200 text-xs font-extrabold backdrop-blur-md border border-amber-400/40 animate-pulse" title="Syncing prayer logs with your account database...">
-                    <Sparkles size={13} className="text-amber-300" /> Syncing Account...
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-200 text-xs font-extrabold backdrop-blur-md border border-amber-500/30 dark:border-amber-400/40 animate-pulse" title="Syncing prayer logs with your account database...">
+                    <Sparkles size={13} className="text-amber-500 dark:text-amber-300" /> Syncing Account...
                   </span>
                 )
               ) : (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-500/20 text-slate-200 text-xs font-bold backdrop-blur-md border border-white/20" title="Guest mode: logs stored in browser local storage. Log in to sync to cloud.">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-200/60 dark:bg-slate-500/20 text-slate-700 dark:text-slate-200 text-xs font-bold backdrop-blur-md border border-slate-300/40 dark:border-white/20" title="Guest mode: logs stored in browser local storage. Log in to sync to cloud.">
                   Local Storage (Guest)
                 </span>
               )}
 
               {/* Location Badge */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-medium backdrop-blur-md border border-white/15">
-                <MapPin size={13} className="text-emerald-300" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-white/90 text-xs font-medium backdrop-blur-md border border-emerald-200/50 dark:border-white/15 shadow-2xs">
+                <MapPin size={13} className="text-emerald-600 dark:text-emerald-300" />
                 <span className="truncate max-w-[160px]">
                   {activeLocation ? `${activeLocation.city}${activeLocation.country ? `, ${activeLocation.country}` : ""}` : "Locating..."}
                 </span>
                 {activeLocation?.isGps && (
-                  <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-emerald-400/20 text-emerald-200 uppercase">GPS</span>
+                  <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-700 dark:text-emerald-200 uppercase">GPS</span>
                 )}
               </div>
 
               {hijriDate && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/10 text-emerald-200 text-xs font-bold backdrop-blur-md border border-white/15">
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/80 dark:bg-slate-900/60 text-emerald-700 dark:text-emerald-200 text-xs font-bold backdrop-blur-md border border-emerald-200/50 dark:border-white/15 shadow-2xs">
                   {hijriDate}
                 </span>
               )}
             </div>
 
             <div className="flex flex-col gap-1">
-              <span className="text-amber-200/90 text-lg font-arabic font-semibold tracking-wider">
+              <span className="text-emerald-700 dark:text-amber-200/90 text-lg font-arabic font-semibold tracking-wider">
                 بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
               </span>
-              <h1 className="text-3xl md:text-5xl font-black tracking-tight drop-shadow-sm">
+              <h1 className="text-3xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white drop-shadow-2xs">
                 Prayer Dashboard
               </h1>
             </div>
 
-            <p className="text-sm text-white/80 font-medium leading-relaxed max-w-lg">
+            <p className="text-sm text-slate-600 dark:text-white/80 font-medium leading-relaxed max-w-lg">
               Perform your 5 daily prayers on time, track your habit streak, and receive automatic azan alerts.
             </p>
 
@@ -474,7 +481,7 @@ export default function PrayerPage() {
             <div className="flex items-center gap-3 pt-2 flex-wrap">
               <Link
                 href="/prayer/calendar"
-                className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-extrabold shadow-lg shadow-emerald-950/30 transition-all flex items-center gap-2"
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-sm transition-all flex items-center gap-2"
               >
                 <Calendar size={14} />
                 Full Prayer Calendar
@@ -482,7 +489,7 @@ export default function PrayerPage() {
 
               <button
                 onClick={() => setShowSettings(true)}
-                className="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-bold backdrop-blur-md border border-white/25 transition-all flex items-center gap-2 shadow-lg"
+                className="px-4 py-2 rounded-xl bg-white/80 hover:bg-white dark:bg-slate-900/60 dark:hover:bg-slate-900 text-slate-800 dark:text-white text-xs font-bold backdrop-blur-md border border-emerald-200/60 dark:border-white/25 transition-all flex items-center gap-2 shadow-2xs"
               >
                 <SlidersHorizontal size={14} />
                 Prayer Settings
@@ -492,8 +499,8 @@ export default function PrayerPage() {
                 onClick={() => tracker?.toggleGlobalReminders()}
                 className={`px-4 py-2 rounded-xl text-xs font-bold backdrop-blur-md border transition-all flex items-center gap-2 ${
                   tracker?.remindersEnabled
-                    ? "bg-emerald-500/40 border-emerald-400/50 text-white shadow-lg"
-                    : "bg-white/10 border-white/20 text-white/80 hover:bg-white/20"
+                    ? "bg-emerald-600 text-white border-emerald-500 shadow-sm"
+                    : "bg-white/80 dark:bg-slate-900/60 border-emerald-200/60 dark:border-white/20 text-slate-800 dark:text-white/80 hover:bg-white dark:hover:bg-slate-900"
                 }`}
               >
                 {tracker?.remindersEnabled ? (
@@ -514,26 +521,26 @@ export default function PrayerPage() {
 
           {/* Right Column: Live Countdown Hero Widget */}
           {prayerStatus && (
-            <div className="relative p-6 rounded-3xl bg-white/10 backdrop-blur-2xl border border-white/20 shadow-2xl flex flex-col items-center justify-center gap-4 min-w-[280px] md:min-w-[320px]">
+            <div className="relative p-6 rounded-3xl bg-white/80 dark:bg-slate-900/70 backdrop-blur-2xl border border-emerald-100/80 dark:border-white/20 shadow-xs flex flex-col items-center justify-center gap-4 min-w-[280px] md:min-w-[320px]">
               
               <div className="flex flex-col items-center text-center gap-1">
-                <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-200">
+                <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-700 dark:text-emerald-200">
                   Next Prayer
                 </span>
-                <span className="text-2xl md:text-3xl font-black text-white flex items-center gap-2">
+                <span className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                   {prayerStatus.nextPrayer}
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-white/20 text-white font-mono">
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:bg-white/20 dark:text-white font-mono">
                     {timings ? formatTime12(timings[prayerStatus.nextPrayer]) : ""}
                   </span>
                 </span>
-                <span className="text-xs text-white/70">
-                  Currently: <strong className="text-white font-bold">{prayerStatus.activePrayer}</strong>
+                <span className="text-xs text-slate-500 dark:text-white/70">
+                  Currently: <strong className="text-slate-800 dark:text-white font-bold">{prayerStatus.activePrayer}</strong>
                 </span>
               </div>
 
               {/* Ticking Monospaced Timer */}
-              <div className="flex items-center gap-2 bg-black/20 px-6 py-3 rounded-2xl border border-white/15 backdrop-blur-md">
-                <Clock size={20} className="text-amber-300 animate-pulse" />
+              <div className="flex items-center gap-2 bg-slate-900 text-white dark:bg-black/40 px-6 py-3 rounded-2xl border border-slate-800 dark:border-white/15 backdrop-blur-md">
+                <Clock size={20} className="text-amber-400 animate-pulse" />
                 <span className="text-3xl md:text-4xl font-black font-mono tracking-tight text-white">
                   {prayerStatus.diffHrs.toString().padStart(2, "0")}h{" "}
                   {prayerStatus.diffMins.toString().padStart(2, "0")}m{" "}
@@ -543,13 +550,13 @@ export default function PrayerPage() {
 
               {/* Progress Line */}
               <div className="w-full flex flex-col gap-1.5">
-                <div className="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-slate-200 dark:bg-white/20 h-2 rounded-full overflow-hidden">
                   <div
-                    className="bg-gradient-to-r from-amber-400 to-emerald-400 h-full rounded-full transition-all duration-1000"
+                    className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-1000"
                     style={{ width: `${prayerStatus.progressPercent}%` }}
                   ></div>
                 </div>
-                <div className="flex justify-between text-[10px] font-semibold text-white/70">
+                <div className="flex justify-between text-[10px] font-semibold text-slate-500 dark:text-white/70">
                   <span>{prayerStatus.activePrayer}</span>
                   <span>{prayerStatus.nextPrayer} ({prayerStatus.progressPercent}%)</span>
                 </div>
@@ -561,55 +568,55 @@ export default function PrayerPage() {
         </div>
 
         {/* Hero Quick Stats Bar */}
-        <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-3 mt-8 pt-6 border-t border-white/15">
+        <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-3 mt-8 pt-6 border-t border-emerald-200/50 dark:border-white/15">
           
           {/* 1. Streak */}
-          <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 shrink-0">
+          <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-900/60 backdrop-blur-md border border-emerald-100/80 dark:border-white/15 flex items-center gap-3 shadow-2xs">
+            <div className="h-10 w-10 rounded-xl bg-amber-500/15 border border-amber-400/30 flex items-center justify-center text-amber-600 dark:text-amber-300 shrink-0">
               <Flame size={22} className="animate-pulse" />
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-white/70">Current Streak</span>
-              <span className="text-xl font-black text-white">
-                {streak} <span className="text-xs font-bold text-amber-300">Days</span>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-white/70">Current Streak</span>
+              <span className="text-xl font-black text-slate-900 dark:text-white">
+                {streak} <span className="text-xs font-bold text-amber-600 dark:text-amber-300">Days</span>
               </span>
             </div>
           </div>
 
           {/* 2. Streak Badge */}
-          <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 shrink-0">
+          <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-900/60 backdrop-blur-md border border-emerald-100/80 dark:border-white/15 flex items-center gap-3 shadow-2xs">
+            <div className="h-10 w-10 rounded-xl bg-purple-500/15 border border-purple-400/30 flex items-center justify-center text-purple-600 dark:text-purple-300 shrink-0">
               <Award size={22} />
             </div>
             <div className="flex flex-col truncate">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-white/70">Rank Level</span>
-              <span className={`text-xs font-black truncate ${streakBadge.text}`}>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-white/70">Rank Level</span>
+              <span className={`text-xs font-black truncate text-purple-700 dark:${streakBadge.text}`}>
                 {streakBadge.title}
               </span>
             </div>
           </div>
 
           {/* 3. Today's Logged */}
-          <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 shrink-0">
+          <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-900/60 backdrop-blur-md border border-emerald-100/80 dark:border-white/15 flex items-center gap-3 shadow-2xs">
+            <div className="h-10 w-10 rounded-xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-600 dark:text-emerald-300 shrink-0">
               <CheckCircle2 size={22} />
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-white/70">Today Progress</span>
-              <span className="text-xl font-black text-white">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-white/70">Today Progress</span>
+              <span className="text-xl font-black text-slate-900 dark:text-white">
                 {todayDailyStatus?.completedCount || 0} / 5
               </span>
             </div>
           </div>
 
           {/* 4. 30-Day Completion Rate */}
-          <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center text-cyan-300 shrink-0">
+          <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-slate-900/60 backdrop-blur-md border border-emerald-100/80 dark:border-white/15 flex items-center gap-3 shadow-2xs">
+            <div className="h-10 w-10 rounded-xl bg-cyan-500/15 border border-cyan-400/30 flex items-center justify-center text-cyan-600 dark:text-cyan-300 shrink-0">
               <TrendingUp size={22} />
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-white/70">30-Day Score</span>
-              <span className="text-xl font-black text-white">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-white/70">30-Day Score</span>
+              <span className="text-xl font-black text-slate-900 dark:text-white">
                 {stats?.overallPercentage || 0}%
               </span>
             </div>
@@ -626,7 +633,7 @@ export default function PrayerPage() {
         <div className="lg:col-span-7 flex flex-col gap-6">
           
           {/* Date Selector & Day Checklist Banner */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xl flex flex-col gap-6">
+          <div className="p-6 rounded-3xl glass border border-emerald-100/80 dark:border-slate-800 shadow-xs flex flex-col gap-6">
             
             {/* Date Navigation Bar */}
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
@@ -856,7 +863,7 @@ export default function PrayerPage() {
         <div className="lg:col-span-5 flex flex-col gap-6">
           
           {/* 1. Past 7-Day History Log */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xl flex flex-col gap-4">
+          <div className="p-6 rounded-3xl glass border border-emerald-100/80 dark:border-slate-800 shadow-xs flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                 <BarChart3 size={16} className="text-emerald-500" /> Past 7 Days Activity
@@ -904,7 +911,7 @@ export default function PrayerPage() {
           </div>
 
           {/* 2. Prayer-by-Prayer Breakdown (30 Days) */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xl flex flex-col gap-4">
+          <div className="p-6 rounded-3xl glass border border-emerald-100/80 dark:border-slate-800 shadow-xs flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                 <TrendingUp size={16} className="text-emerald-500" /> Prayer Consistency (30 Days)
@@ -937,28 +944,80 @@ export default function PrayerPage() {
             </div>
           </div>
 
-          {/* 3. Notification Chime Preview Widget */}
-          <div className="p-6 rounded-3xl bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-cyan-500/10 border border-emerald-500/20 shadow-lg flex flex-col gap-3">
+          {/* 3. Azan Audio Notification Widget */}
+          <div className="p-6 rounded-3xl bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-cyan-500/10 border border-emerald-500/20 shadow-lg flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Volume2 size={18} className="text-emerald-500" />
                 <span className="text-xs font-extrabold text-slate-800 dark:text-slate-200">
-                  Notification Alert Sound
+                  Azan Audio Notification
                 </span>
               </div>
 
-              <button
-                type="button"
-                onClick={() => tracker?.playNotificationSound && tracker.playNotificationSound()}
-                className="text-xs font-bold px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-md shadow-emerald-600/20 flex items-center gap-1.5"
-              >
-                <Volume2 size={13} />
-                Test Chime
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => tracker?.testNotification && tracker.testNotification()}
+                  className="text-xs font-bold px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white transition-all shadow-md shadow-sky-600/20 flex items-center gap-1.5"
+                  title="Test real browser & 5-sec background notification"
+                >
+                  <Bell size={13} />
+                  Test Notification
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (tracker?.isAzanPlaying) {
+                      tracker?.stopAzanSound();
+                    } else {
+                      tracker?.playAzanSound("Dhuhr");
+                    }
+                  }}
+                  className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all shadow-md flex items-center gap-1.5 ${
+                    tracker?.isAzanPlaying
+                      ? "bg-rose-600 hover:bg-rose-700 text-white shadow-rose-600/30"
+                      : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20"
+                  }`}
+                >
+                  <Volume2 size={13} className={tracker?.isAzanPlaying ? "animate-pulse" : ""} />
+                  {tracker?.isAzanPlaying ? "Stop Azan" : "Play Azan Preview"}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                Select Azan Voice:
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {[
+                  { id: "makkah", label: "Makkah" },
+                  { id: "madinah", label: "Madinah" },
+                  { id: "fajr", label: "Fajr Special" },
+                  { id: "chime", label: "Soft Chime" }
+                ].map((v) => {
+                  const isSelected = (tracker?.azanVoice || "makkah") === v.id;
+                  return (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => tracker?.changeAzanVoice(v.id, true)}
+                      className={`py-2 px-2.5 rounded-xl text-xs font-bold transition-all border text-center ${
+                        isSelected
+                          ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20"
+                          : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                      }`}
+                    >
+                      {v.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Synthesized soft Islamic alert chime plays when prayer time arrives if notification sound is enabled.
+              Full melodious Azan recitations play automatically at prayer times when notification sound is enabled.
             </p>
           </div>
 

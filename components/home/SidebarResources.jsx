@@ -53,29 +53,29 @@ export default function SidebarResources() {
     <div className="flex flex-col gap-6">
       
       {/* Widget 1: Quran Insights & Metrics */}
-      <div className="p-6 rounded-3xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/80 shadow-xl flex flex-col gap-4">
+      <div className="p-6 rounded-3xl glass border border-emerald-100/80 dark:border-slate-800/80 shadow-xs flex flex-col gap-4">
         <h3 className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
           <TrendingUp size={16} />
           Quran Insights & Structure
         </h3>
         
         <div className="grid grid-cols-2 gap-3">
-          <div className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 flex flex-col gap-0.5">
+          <div className="p-3.5 rounded-2xl bg-white/70 dark:bg-slate-800/40 border border-emerald-100/60 dark:border-slate-700/50 flex flex-col gap-0.5 shadow-2xs">
             <span className="text-2xl font-black text-slate-900 dark:text-slate-100 font-mono">114</span>
             <span className="text-[11px] font-bold text-slate-400">Chapters (Surahs)</span>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 flex flex-col gap-0.5">
+          <div className="p-3.5 rounded-2xl bg-white/70 dark:bg-slate-800/40 border border-emerald-100/60 dark:border-slate-700/50 flex flex-col gap-0.5 shadow-2xs">
             <span className="text-2xl font-black text-slate-900 dark:text-slate-100 font-mono">6,236</span>
             <span className="text-[11px] font-bold text-slate-400">Verses (Ayahs)</span>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 flex flex-col gap-0.5">
+          <div className="p-3.5 rounded-2xl bg-white/70 dark:bg-slate-800/40 border border-emerald-100/60 dark:border-slate-700/50 flex flex-col gap-0.5 shadow-2xs">
             <span className="text-2xl font-black text-amber-600 dark:text-amber-400 font-mono">86</span>
             <span className="text-[11px] font-bold text-slate-400">Meccan (Makki)</span>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 flex flex-col gap-0.5">
+          <div className="p-3.5 rounded-2xl bg-white/70 dark:bg-slate-800/40 border border-emerald-100/60 dark:border-slate-700/50 flex flex-col gap-0.5 shadow-2xs">
             <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">28</span>
             <span className="text-[11px] font-bold text-slate-400">Medinan (Madani)</span>
           </div>
@@ -83,7 +83,7 @@ export default function SidebarResources() {
       </div>
 
       {/* Widget 2: User Activity (Recents & Bookmarks) */}
-      <div className="p-6 rounded-3xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/80 shadow-xl flex flex-col gap-4">
+      <div className="p-6 rounded-3xl glass border border-emerald-100/80 dark:border-slate-800/80 shadow-xs flex flex-col gap-4">
         <h3 className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
           <Compass size={16} />
           My Personal Activity

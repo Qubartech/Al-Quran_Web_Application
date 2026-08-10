@@ -1,8 +1,10 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { useUser } from "@/context/UserProvider";
 import { toast } from "react-toastify";
+import { ALADHAN_API_BASE_URL } from "@/lib/api/config";
+import { Volume2, Square } from "lucide-react";
 
 const PrayerTrackerContext = createContext(null);
 
@@ -12,15 +14,8 @@ export function usePrayerTracker() {
 
 const LEGACY_STORAGE_KEY_SETTINGS = "quran_namaz_reminder_settings";
 const LEGACY_STORAGE_KEY_LOGS = "quran_namaz_tracker_logs";
-
-function getStorageKeys(userId) {
-  const suffix = userId ? `_${userId}` : "_guest";
-  return {
-    settingsKey: `quran_namaz_reminder_settings${suffix}`,
-    logsKey: `quran_namaz_tracker_logs${suffix}`,
-    guestLogsKey: "quran_namaz_tracker_logs_guest",
-  };
-}
+const NOTIFIED_MAP_KEY = "quran_namaz_notified_map";
+const AZAN_VOICE_KEY = "quran_namaz_azan_voice";
 
 export function PrayerTrackerProvider({ children }) {
   const { user, session } = useUser();
@@ -35,20 +30,64 @@ export function PrayerTrackerProvider({ children }) {
     Isha: true,
   });
   const [reminderSound, setReminderSound] = useState(true);
+  const [azanVoice, setAzanVoice] = useState("makkah"); // 'makkah', 'madinah', 'fajr', 'chime'
 
-  // 2. Prayer completion logs state: { "YYYY-MM-DD": { Fajr: true, Dhuhr: true, ... } }
+  // 2. Azan Audio Playback state
+  const [isAzanPlaying, setIsAzanPlaying] = useState(false);
+  const [activeAzanPrayer, setActiveAzanPrayer] = useState("");
+  const activeAudioRef = useRef(null);
+
+  // 3. Prayer completion logs state
   const [completedLogs, setCompletedLogs] = useState({});
   const [isSyncedWithAccount, setIsSyncedWithAccount] = useState(false);
 
-  // 3. Track last notified prayer to avoid duplicate alerts: { "2026-08-03_Fajr": true }
-  const [notifiedMap, setNotifiedMap] = useState({});
+  // 4. Service worker registration & global timings state
+  const [swRegistration, setSwRegistration] = useState(null);
+  const [globalTimings, setGlobalTimings] = useState(null);
+
+  // 5. Track last notified prayer to avoid duplicate alerts
+  const [notifiedMap, setNotifiedMap] = useState(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      const saved = localStorage.getItem(NOTIFIED_MAP_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const todayStr = new Date().toISOString().split("T")[0];
+        const filtered = {};
+        Object.keys(parsed).forEach((k) => {
+          if (k.startsWith(todayStr)) {
+            filtered[k] = parsed[k];
+          }
+        });
+        return filtered;
+      }
+    } catch (e) {
+      console.error("Failed to load notifiedMap from localStorage:", e);
+    }
+    return {};
+  });
+
+  // Register Service Worker
+  useEffect(() => {
+    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((reg) => {
+          setSwRegistration(reg);
+        })
+        .catch((err) => {
+          console.error("ServiceWorker registration failed:", err);
+        });
+    }
+  }, []);
 
   // Helper to load settings from storage
   const loadLocalSettings = useCallback((userId) => {
     if (typeof window === "undefined") return;
     try {
-      const keys = getStorageKeys(userId);
-      let savedSettings = localStorage.getItem(keys.settingsKey);
+      const suffix = userId ? `_${userId}` : "_guest";
+      const settingsKey = `quran_namaz_reminder_settings${suffix}`;
+      let savedSettings = localStorage.getItem(settingsKey);
       if (!savedSettings && !userId) {
         savedSettings = localStorage.getItem(LEGACY_STORAGE_KEY_SETTINGS);
       }
@@ -58,43 +97,237 @@ export function PrayerTrackerProvider({ children }) {
         if (parsed.prayerReminders) setPrayerReminders(parsed.prayerReminders);
         if (typeof parsed.reminderSound === "boolean") setReminderSound(parsed.reminderSound);
       }
+
+      const savedVoice = localStorage.getItem(AZAN_VOICE_KEY);
+      if (savedVoice) {
+        setAzanVoice(savedVoice);
+      }
     } catch (e) {
       console.error("Failed to load settings from localStorage:", e);
     }
   }, []);
 
   // Helper to save settings to storage
-  const saveSettings = useCallback((newRemindersEnabled, newPrayerReminders, newSound) => {
+  const saveSettings = useCallback((newRemindersEnabled, newPrayerReminders, newSound, newVoice) => {
     if (typeof window === "undefined") return;
     try {
-      const keys = getStorageKeys(user?.id);
+      const suffix = user?.id ? `_${user.id}` : "_guest";
+      const settingsKey = `quran_namaz_reminder_settings${suffix}`;
       const payload = JSON.stringify({
         remindersEnabled: newRemindersEnabled,
         prayerReminders: newPrayerReminders,
         reminderSound: newSound,
       });
-      localStorage.setItem(keys.settingsKey, payload);
+      localStorage.setItem(settingsKey, payload);
+      if (newVoice) {
+        localStorage.setItem(AZAN_VOICE_KEY, newVoice);
+      }
     } catch (e) {
       console.error("Failed to save reminder settings:", e);
     }
   }, [user?.id]);
 
-  // Load logs & sync with user account when session or user changes
+  // Stop currently playing Azan audio
+  const stopAzanSound = useCallback(() => {
+    if (activeAudioRef.current) {
+      activeAudioRef.current.pause();
+      activeAudioRef.current.currentTime = 0;
+      activeAudioRef.current = null;
+    }
+    setIsAzanPlaying(false);
+    setActiveAzanPrayer("");
+  }, []);
+
+  // Synthesized soft chime fallback
+  const playNotificationSound = useCallback(() => {
+    if (!reminderSound || typeof window === "undefined") return;
+    try {
+      const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtxClass) return;
+
+      const audioCtx = new AudioCtxClass();
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.5); // A5
+
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + 1.2);
+    } catch (e) {
+      console.error("Audio synth error:", e);
+    }
+  }, [reminderSound]);
+
+  // Play Azan Audio (or fallback synth chime)
+  const playAzanSound = useCallback((prayerName, forceVoice) => {
+    if (!reminderSound || typeof window === "undefined") return;
+
+    const selectedVoice = forceVoice || azanVoice;
+
+    if (selectedVoice === "chime") {
+      playNotificationSound();
+      return;
+    }
+
+    let audioUrl = "/audio/azan_makkah.mp3";
+    if (prayerName === "Fajr" || selectedVoice === "fajr") {
+      audioUrl = "/audio/azan_fajr.mp3";
+    } else if (selectedVoice === "madinah") {
+      audioUrl = "/audio/azan_madinah.mp3";
+    } else if (selectedVoice === "makkah") {
+      audioUrl = "/audio/azan_makkah.mp3";
+    }
+
+    try {
+      stopAzanSound();
+
+      const audio = new Audio(audioUrl);
+      activeAudioRef.current = audio;
+
+      audio.onended = () => {
+        setIsAzanPlaying(false);
+        setActiveAzanPrayer("");
+        activeAudioRef.current = null;
+      };
+
+      audio.onerror = () => {
+        console.warn("Azan audio playback failed, falling back to chime sound.");
+        playNotificationSound();
+        setIsAzanPlaying(false);
+        setActiveAzanPrayer("");
+        activeAudioRef.current = null;
+      };
+
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsAzanPlaying(true);
+            setActiveAzanPrayer(prayerName || "Namaz");
+          })
+          .catch((err) => {
+            console.warn("Auto-play prevented or failed, falling back to soft chime:", err);
+            playNotificationSound();
+            setIsAzanPlaying(false);
+            setActiveAzanPrayer("");
+          });
+      }
+    } catch (e) {
+      console.error("Error playing Azan audio:", e);
+      playNotificationSound();
+    }
+  }, [reminderSound, azanVoice, playNotificationSound, stopAzanSound]);
+
+  // Change Azan Voice and automatically play audio preview immediately!
+  const changeAzanVoice = (voice, autoPlay = true) => {
+    setAzanVoice(voice);
+    saveSettings(remindersEnabled, prayerReminders, reminderSound, voice);
+
+    if (autoPlay) {
+      const testPrayerName = voice === "fajr" ? "Fajr" : "Dhuhr";
+      playAzanSound(testPrayerName, voice);
+    }
+  };
+
+  // Test Real Browser Notification & Sound
+  const testNotification = useCallback(async () => {
+    if (typeof window === "undefined") return;
+
+    if (!("Notification" in window)) {
+      toast.error("Browser notifications are not supported in this browser.");
+      return;
+    }
+
+    let perm = Notification.permission;
+    if (perm !== "granted") {
+      try {
+        perm = await Notification.requestPermission();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    if (perm !== "granted") {
+      toast.warning("Notification permission not granted. Please allow notification permissions in your browser.");
+      return;
+    }
+
+    // Play Azan sound preview
+    playAzanSound("Test Prayer");
+
+    const voiceLabel =
+      azanVoice === "madinah"
+        ? "Madinah Azan"
+        : azanVoice === "fajr"
+        ? "Fajr Azan"
+        : azanVoice === "chime"
+        ? "Soft Chime"
+        : "Makkah Azan";
+
+    const title = `🔔 Test Namaz Alert (${voiceLabel})`;
+    const options = {
+      body: "Azan notifications and sound alerts are working properly! A 5-second background test alert will also fire.",
+      icon: "/quran.svg",
+      badge: "/quran.svg",
+      tag: `namaz-test-${Date.now()}`,
+      renotify: true,
+      data: { url: "/prayer" },
+      requireInteraction: true,
+    };
+
+    if (swRegistration && swRegistration.showNotification) {
+      swRegistration.showNotification(title, options).catch((err) => {
+        console.error("SW notification error, fallback to standard Notification:", err);
+        fallbackNotification(title, options);
+      });
+    } else {
+      fallbackNotification(title, options);
+    }
+
+    // Schedule 5-second test background notification via Service Worker
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: "SCHEDULE_PRAYERS",
+        prayers: [
+          {
+            name: "5-Sec Test Alert",
+            timeMs: Date.now() + 5000,
+            voice: azanVoice,
+          },
+        ],
+      });
+    }
+
+    toast.success("Test notification triggered! A 5-second background test alert is also scheduled.");
+  }, [azanVoice, swRegistration, playAzanSound]);
+
+  // Load logs & sync with user account
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     let isMounted = true;
-
-    // First load settings for current state
     loadLocalSettings(user?.id);
 
     async function handleSyncAndLoad() {
-      const keys = getStorageKeys(user?.id);
+      const suffix = user?.id ? `_${user.id}` : "_guest";
+      const logsKey = `quran_namaz_tracker_logs${suffix}`;
+      const guestLogsKey = "quran_namaz_tracker_logs_guest";
 
-      // Read local user logs & guest logs
       let localUserLogs = {};
       try {
-        const rawUserLogs = localStorage.getItem(keys.logsKey) || (!user ? localStorage.getItem(LEGACY_STORAGE_KEY_LOGS) : null);
+        const rawUserLogs = localStorage.getItem(logsKey) || (!user ? localStorage.getItem(LEGACY_STORAGE_KEY_LOGS) : null);
         if (rawUserLogs) {
           localUserLogs = JSON.parse(rawUserLogs) || {};
         }
@@ -104,7 +337,7 @@ export function PrayerTrackerProvider({ children }) {
 
       let guestLogs = {};
       try {
-        const rawGuestLogs = localStorage.getItem(keys.guestLogsKey);
+        const rawGuestLogs = localStorage.getItem(guestLogsKey);
         if (rawGuestLogs) {
           guestLogs = JSON.parse(rawGuestLogs) || {};
         }
@@ -113,7 +346,6 @@ export function PrayerTrackerProvider({ children }) {
       }
 
       if (!session?.access_token || !user?.id) {
-        // Unauthenticated / Guest Mode
         if (isMounted) {
           setCompletedLogs(localUserLogs);
           setIsSyncedWithAccount(false);
@@ -121,7 +353,6 @@ export function PrayerTrackerProvider({ children }) {
         return;
       }
 
-      // User logged in: Sync with account API
       try {
         const res = await fetch("/api/prayer-tracker", {
           headers: {
@@ -133,7 +364,6 @@ export function PrayerTrackerProvider({ children }) {
           const data = await res.json();
           const remoteLogs = data.logs || {};
 
-          // Merge: remote + local user logs + guest logs
           const mergedLogs = { ...remoteLogs };
           const localCombined = { ...guestLogs, ...localUserLogs };
 
@@ -153,15 +383,13 @@ export function PrayerTrackerProvider({ children }) {
             setCompletedLogs(mergedLogs);
             setIsSyncedWithAccount(true);
             try {
-              localStorage.setItem(keys.logsKey, JSON.stringify(mergedLogs));
-              // Clear guest logs since they have been migrated
-              localStorage.removeItem(keys.guestLogsKey);
+              localStorage.setItem(logsKey, JSON.stringify(mergedLogs));
+              localStorage.removeItem(guestLogsKey);
             } catch (e) {
-              console.error("Failed to save merged logs to localStorage:", e);
+              console.error("Failed to save merged logs:", e);
             }
           }
 
-          // Push merged dataset back to server database to ensure full sync
           await fetch("/api/prayer-tracker", {
             method: "POST",
             headers: {
@@ -171,7 +399,6 @@ export function PrayerTrackerProvider({ children }) {
             body: JSON.stringify({ logsMap: mergedLogs }),
           });
         } else {
-          // If fetch remote failed, fallback to local user logs
           if (isMounted) {
             setCompletedLogs({ ...guestLogs, ...localUserLogs });
             setIsSyncedWithAccount(false);
@@ -193,12 +420,65 @@ export function PrayerTrackerProvider({ children }) {
     };
   }, [user?.id, session?.access_token, loadLocalSettings]);
 
+  // Update global timings manually or from components
+  const updateGlobalTimings = useCallback((newTimings) => {
+    if (newTimings && typeof newTimings === "object") {
+      setGlobalTimings(newTimings);
+    }
+  }, []);
+
+  // Fetch timings if not available globally
+  useEffect(() => {
+    if (globalTimings || typeof window === "undefined") return;
+
+    let isMounted = true;
+    const fetchTimingsForContext = async () => {
+      try {
+        const savedMethod = localStorage.getItem("quran_prayer_method") || "3";
+        const savedSchool = localStorage.getItem("quran_prayer_school") || "0";
+        const savedManual = localStorage.getItem("quran_manual_location");
+
+        let url = "";
+        if (savedManual) {
+          try {
+            const parsed = JSON.parse(savedManual);
+            if (parsed.isGps && parsed.latitude && parsed.longitude) {
+              url = `${ALADHAN_API_BASE_URL}/timings?latitude=${parsed.latitude}&longitude=${parsed.longitude}&method=${savedMethod}&school=${savedSchool}`;
+            } else if (parsed.city) {
+              const query = parsed.country ? `${parsed.city}, ${parsed.country}` : parsed.city;
+              url = `${ALADHAN_API_BASE_URL}/timingsByAddress?address=${encodeURIComponent(query)}&method=${savedMethod}&school=${savedSchool}`;
+            }
+          } catch (e) {
+            console.error("Failed to parse manual location in context:", e);
+          }
+        }
+
+        if (!url) {
+          url = `${ALADHAN_API_BASE_URL}/timingsByAddress?address=Dhaka, Bangladesh&method=${savedMethod}&school=${savedSchool}`;
+        }
+
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.code === 200 && data.data?.timings && isMounted) {
+          setGlobalTimings(data.data.timings);
+        }
+      } catch (err) {
+        console.error("Error fetching context timings:", err);
+      }
+    };
+
+    fetchTimingsForContext();
+    return () => {
+      isMounted = false;
+    };
+  }, [globalTimings]);
+
   // Toggle Global Reminders ON/OFF
   const toggleGlobalReminders = async (forcedValue) => {
     const nextVal = typeof forcedValue === "boolean" ? forcedValue : !remindersEnabled;
 
     if (nextVal && typeof window !== "undefined" && "Notification" in window) {
-      if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+      if (Notification.permission !== "granted") {
         try {
           const perm = await Notification.requestPermission();
           if (perm !== "granted") {
@@ -211,27 +491,27 @@ export function PrayerTrackerProvider({ children }) {
     }
 
     setRemindersEnabled(nextVal);
-    saveSettings(nextVal, prayerReminders, reminderSound);
+    saveSettings(nextVal, prayerReminders, reminderSound, azanVoice);
   };
 
-  // Toggle Individual Prayer Reminder (Fajr, Dhuhr, etc.)
+  // Toggle Individual Prayer Reminder
   const togglePrayerReminder = (prayerName) => {
     const nextMap = {
       ...prayerReminders,
       [prayerName]: !prayerReminders[prayerName],
     };
     setPrayerReminders(nextMap);
-    saveSettings(remindersEnabled, nextMap, reminderSound);
+    saveSettings(remindersEnabled, nextMap, reminderSound, azanVoice);
   };
 
   // Toggle Sound Notifications
   const toggleReminderSound = () => {
     const nextSound = !reminderSound;
     setReminderSound(nextSound);
-    saveSettings(remindersEnabled, prayerReminders, nextSound);
+    saveSettings(remindersEnabled, prayerReminders, nextSound, azanVoice);
   };
 
-  // Toggle Prayer Completion Checkmark for a given date (defaults to today YYYY-MM-DD)
+  // Toggle Prayer Completion Checkmark
   const togglePrayerCompletion = (dateStr, prayerName) => {
     const targetDate = dateStr || new Date().toISOString().split("T")[0];
     let nextStatus = false;
@@ -251,8 +531,9 @@ export function PrayerTrackerProvider({ children }) {
 
       if (typeof window !== "undefined") {
         try {
-          const keys = getStorageKeys(user?.id);
-          localStorage.setItem(keys.logsKey, JSON.stringify(updatedLogs));
+          const suffix = user?.id ? `_${user.id}` : "_guest";
+          const logsKey = `quran_namaz_tracker_logs${suffix}`;
+          localStorage.setItem(logsKey, JSON.stringify(updatedLogs));
         } catch (e) {
           console.error("Failed to save prayer logs to localStorage:", e);
         }
@@ -267,7 +548,6 @@ export function PrayerTrackerProvider({ children }) {
       toast.info(`Marked ${prayerName} as incomplete.`, { toastId: `toast_${targetDate}_${prayerName}` });
     }
 
-    // Sync toggle to user account DB if logged in
     if (session?.access_token) {
       fetch("/api/prayer-tracker", {
         method: "POST",
@@ -285,18 +565,17 @@ export function PrayerTrackerProvider({ children }) {
           if (res.ok) {
             setIsSyncedWithAccount(true);
           } else {
-            console.warn("Prayer completion sync returned non-OK status:", res.status);
             setIsSyncedWithAccount(false);
           }
         })
         .catch((err) => {
-          console.error("Failed to sync prayer completion to user account:", err);
+          console.error("Failed to sync prayer completion:", err);
           setIsSyncedWithAccount(false);
         });
     }
   };
 
-  // Get daily completion status for a specific date
+  // Get daily completion status
   const getDailyStatus = useCallback(
     (dateStr) => {
       const targetDate = dateStr || new Date().toISOString().split("T")[0];
@@ -323,12 +602,11 @@ export function PrayerTrackerProvider({ children }) {
     [completedLogs]
   );
 
-  // Calculate current streak count (consecutive days with 5/5 completed)
+  // Calculate streak
   const getStreakCount = useCallback(() => {
     let streak = 0;
     const today = new Date();
 
-    // Check backwards starting from today or yesterday
     for (let i = 0; i < 365; i++) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
@@ -338,7 +616,6 @@ export function PrayerTrackerProvider({ children }) {
       if (dayStatus.completedCount === 5) {
         streak++;
       } else if (i === 0 && dayStatus.completedCount < 5) {
-        // If today is not finished yet, don't break streak from yesterday
         continue;
       } else {
         break;
@@ -348,7 +625,7 @@ export function PrayerTrackerProvider({ children }) {
     return streak;
   }, [getDailyStatus]);
 
-  // Calculate activity statistics over a window of days (e.g. 7, 30 days)
+  // Calculate stats
   const getStats = useCallback(
     (daysWindow = 30) => {
       const today = new Date();
@@ -388,84 +665,159 @@ export function PrayerTrackerProvider({ children }) {
     [getDailyStatus]
   );
 
-  // Play soft synthesized alert sound for prayer notification
-  const playNotificationSound = () => {
-    if (!reminderSound || typeof window === "undefined") return;
-    try {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
-      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.5); // A5
-
-      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.start();
-      osc.stop(audioCtx.currentTime + 1.2);
-    } catch (e) {
-      console.error("Audio synth error:", e);
-    }
-  };
-
   // Trigger Notification for a specific prayer time
   const triggerPrayerNotification = useCallback(
     (prayerName) => {
       const todayStr = new Date().toISOString().split("T")[0];
       const notifyKey = `${todayStr}_${prayerName}`;
 
-      if (notifiedMap[notifyKey]) return; // Already notified today
+      if (notifiedMap[notifyKey]) return;
 
-      setNotifiedMap((prev) => ({ ...prev, [notifyKey]: true }));
-
-      // Sound alert
-      playNotificationSound();
-
-      // Browser Notification
-      if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
-        try {
-          new Notification(`Time for ${prayerName} Prayer!`, {
-            body: `It is now time for ${prayerName} Salah. May Allah accept your prayers!`,
-            icon: "/quran.svg",
-          });
-        } catch (e) {
-          console.error("Web Notification error:", e);
+      setNotifiedMap((prev) => {
+        const updated = { ...prev, [notifyKey]: true };
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.setItem(NOTIFIED_MAP_KEY, JSON.stringify(updated));
+          } catch (e) {
+            console.error("Failed to save notifiedMap:", e);
+          }
         }
+        return updated;
+      });
+
+      // Play Azan Audio / Chime
+      playAzanSound(prayerName);
+
+      // Display Browser Notification
+      const title = `Time for ${prayerName} Prayer! (Azan)`;
+      const options = {
+        body: `It is now time for ${prayerName} Salah. May Allah accept your prayers!`,
+        icon: "/quran.svg",
+        badge: "/quran.svg",
+        tag: `namaz-notification-${prayerName}`,
+        renotify: true,
+        data: { url: "/prayer" },
+        requireInteraction: true,
+      };
+
+      if (swRegistration && swRegistration.showNotification) {
+        swRegistration.showNotification(title, options).catch(() => {
+          fallbackNotification(title, options);
+        });
+      } else {
+        fallbackNotification(title, options);
       }
     },
-    [notifiedMap, reminderSound]
+    [notifiedMap, swRegistration, playAzanSound]
   );
 
-  // Background checker for Prayer Timings
+  function fallbackNotification(title, options) {
+    if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+      try {
+        new Notification(title, options);
+      } catch (e) {
+        console.error("Web Notification error:", e);
+      }
+    }
+  }
+
+  // Background checker for Prayer Timings with Date-based window matching
   const checkTimings = useCallback(
-    (timings) => {
-      if (!remindersEnabled || !timings) return;
+    (timingsToCheck) => {
+      const activeTimings = timingsToCheck || globalTimings;
+      if (!remindersEnabled || !activeTimings) return;
 
       const now = new Date();
-      const currentHours = now.getHours().toString().padStart(2, "0");
-      const currentMins = now.getMinutes().toString().padStart(2, "0");
-      const currentTimeStr = `${currentHours}:${currentMins}`;
-
+      const todayStr = now.toISOString().split("T")[0];
       const corePrayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
       corePrayers.forEach((prayerName) => {
         if (!prayerReminders[prayerName]) return;
-        const timeVal = timings[prayerName];
+        const timeVal = activeTimings[prayerName];
         if (!timeVal) return;
 
-        const cleanTime = timeVal.split(" ")[0]; // "05:12 (BDT)" -> "05:12"
-        if (cleanTime === currentTimeStr) {
-          triggerPrayerNotification(prayerName);
+        const cleanTime = timeVal.split(" ")[0];
+        const [hStr, mStr] = cleanTime.split(":");
+        if (!hStr || !mStr) return;
+
+        const prayerDate = new Date(now);
+        prayerDate.setHours(parseInt(hStr, 10), parseInt(mStr, 10), 0, 0);
+
+        const diffMs = now.getTime() - prayerDate.getTime();
+        const notifyKey = `${todayStr}_${prayerName}`;
+
+        if (diffMs >= 0 && diffMs <= 15 * 60 * 1000) {
+          if (!notifiedMap[notifyKey]) {
+            triggerPrayerNotification(prayerName);
+          }
         }
       });
     },
-    [remindersEnabled, prayerReminders, triggerPrayerNotification]
+    [remindersEnabled, prayerReminders, globalTimings, notifiedMap, triggerPrayerNotification]
   );
+
+  // Continuous background ticker
+  useEffect(() => {
+    if (!remindersEnabled || !globalTimings) return;
+
+    checkTimings(globalTimings);
+
+    const intervalId = setInterval(() => {
+      checkTimings(globalTimings);
+    }, 10000);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        checkTimings(globalTimings);
+      }
+    };
+
+    window.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleVisibilityChange);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleVisibilityChange);
+    };
+  }, [remindersEnabled, globalTimings, checkTimings]);
+
+  // Sync scheduled prayers with Service Worker
+  useEffect(() => {
+    if (!remindersEnabled || !globalTimings) return;
+
+    if (typeof navigator !== "undefined" && navigator.serviceWorker && navigator.serviceWorker.controller) {
+      const now = new Date();
+      const corePrayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+      const upcomingPrayers = [];
+
+      corePrayers.forEach((prayerName) => {
+        if (!prayerReminders[prayerName]) return;
+        const timeVal = globalTimings[prayerName];
+        if (!timeVal) return;
+
+        const cleanTime = timeVal.split(" ")[0];
+        const [hStr, mStr] = cleanTime.split(":");
+        if (!hStr || !mStr) return;
+
+        const prayerDate = new Date(now);
+        prayerDate.setHours(parseInt(hStr, 10), parseInt(mStr, 10), 0, 0);
+
+        if (prayerDate.getTime() > now.getTime()) {
+          upcomingPrayers.push({
+            name: prayerName,
+            timeMs: prayerDate.getTime(),
+            voice: azanVoice,
+          });
+        }
+      });
+
+      navigator.serviceWorker.controller.postMessage({
+        type: "SCHEDULE_PRAYERS",
+        prayers: upcomingPrayers,
+      });
+    }
+  }, [remindersEnabled, prayerReminders, globalTimings, swRegistration, azanVoice]);
 
   const value = {
     user,
@@ -473,7 +825,15 @@ export function PrayerTrackerProvider({ children }) {
     remindersEnabled,
     prayerReminders,
     reminderSound,
-    completedLogs,
+    azanVoice,
+    isAzanPlaying,
+    activeAzanPrayer,
+    changeAzanVoice,
+    playAzanSound,
+    stopAzanSound,
+    testNotification,
+    globalTimings,
+    updateGlobalTimings,
     toggleGlobalReminders,
     togglePrayerReminder,
     toggleReminderSound,
@@ -482,11 +842,45 @@ export function PrayerTrackerProvider({ children }) {
     getStreakCount,
     getStats,
     checkTimings,
+    playNotificationSound,
   };
 
   return (
     <PrayerTrackerContext.Provider value={value}>
       {children}
+
+      {/* Floating Active Azan Audio Player Control Banner */}
+      {isAzanPlaying && (
+        <div className="fixed bottom-6 right-6 z-[30000] flex items-center gap-4 p-4 rounded-2xl bg-slate-900/95 dark:bg-slate-900/95 border border-emerald-500/40 text-white shadow-2xl backdrop-blur-xl animate-in slide-in-from-bottom-5 duration-300">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
+              <Volume2 size={20} className="animate-pulse text-emerald-400" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs font-black uppercase tracking-wider text-emerald-400">
+                Playing Azan - {activeAzanPrayer}
+              </span>
+              <span className="text-xs text-slate-300 font-medium">
+                {azanVoice === "madinah"
+                  ? "Madinah Adhan"
+                  : azanVoice === "fajr"
+                  ? "Fajr Adhan"
+                  : azanVoice === "chime"
+                  ? "Soft Chime"
+                  : "Makkah Adhan"}
+              </span>
+            </div>
+          </div>
+
+          <button
+            onClick={stopAzanSound}
+            className="px-3 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-md shadow-rose-600/30"
+          >
+            <Square size={13} className="fill-current" />
+            Stop Azan
+          </button>
+        </div>
+      )}
     </PrayerTrackerContext.Provider>
   );
 }
