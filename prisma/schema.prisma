@@ -21,6 +21,7 @@ model User {
   recentSurahs         RecentSurah[]
   learnProgress        LearnProgress[]
   prayerLogs           PrayerLog[]
+  pushSubscriptions    PushSubscription[]
 }
 
 model PrayerLog {
@@ -95,5 +96,24 @@ model LearnProgress {
   createdAt DateTime @default(now())
 
   @@unique([userId, moduleId])
+  @@index([userId])
+}
+
+model PushSubscription {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  city      String?
+  country   String?
+  method    Int      @default(3)
+  school    Int      @default(0)
+  voice     String   @default("makkah")
+  reminders String   @default("Fajr,Dhuhr,Asr,Maghrib,Isha")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([userId])
 }

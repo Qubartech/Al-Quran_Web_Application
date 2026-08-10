@@ -29,6 +29,7 @@ import {
   Moon,
   MapPin,
   SlidersHorizontal,
+  Zap,
   Award,
   TrendingUp,
   RotateCcw,
@@ -1019,6 +1020,36 @@ export default function PrayerPage() {
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
               Full melodious Azan recitations play automatically at prayer times when notification sound is enabled.
             </p>
+
+            {/* Closed-Tab Background Notification Tester */}
+            <div className="mt-2 p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 via-indigo-500/5 to-emerald-500/10 border border-purple-500/20 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-extrabold text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
+                  <Zap size={14} className="text-purple-500 fill-purple-500/20" /> Closed-Tab Background Alarm Tester
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                Click a test timer below, then <strong>close or exit the website tab</strong>. Your device will receive the Azan notification automatically when the time arrives!
+              </p>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {[
+                  { label: "⚡ 10s Test", sec: 10 },
+                  { label: "⏱ 30s Test", sec: 30 },
+                  { label: "⏱ 1m Test", sec: 60 },
+                  { label: "⏱ 2m Test", sec: 120 }
+                ].map((item) => (
+                  <button
+                    key={item.sec}
+                    type="button"
+                    onClick={() => tracker?.scheduleTestAlarm(item.sec, `Closed-Tab ${item.label} Azan Alert`)}
+                    className="py-2 px-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-extrabold shadow-sm transition-all text-center"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
         </div>
