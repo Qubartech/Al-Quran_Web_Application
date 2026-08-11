@@ -49,13 +49,36 @@ async function fetchTimingsCached(city, country, method, school) {
 }
 
 // Core push loop scheduler
-async function runCronPushCycle() {
+async function runCronPushCycle(force = false) {
   const subscriptions = await prisma.pushSubscription.findMany();
   const results = { total: subscriptions.length, sent: 0, failed: 0, removed: 0 };
   const corePrayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
   for (const sub of subscriptions) {
     try {
+      if (force) {
+        const notifyKey = `${new Date().toISOString().split("T")[0]}_test`;
+
+        const pushSub = {
+          endpoint: sub.endpoint,
+          keys: {
+            p256dh: sub.p256dh,
+            auth: sub.auth,
+          },
+        };
+
+        const payload = JSON.stringify({
+          title: `Test Push Notification`,
+          body: `Background push notifications are working for ${sub.city || "your location"}!`,
+          voice: sub.voice,
+          prayerName: "Test",
+          tag: `namaz-test-${notifyKey}-${sub.id.slice(0, 5)}`,
+        });
+
+        await webpush.sendNotification(pushSub, payload);
+        results.sent++;
+        continue;
+      }
       const apiData = await fetchTimingsCached(sub.city, sub.country, sub.method, sub.school);
       if (!apiData) continue;
 
@@ -178,8 +201,20 @@ export async function POST(req) {
         tag: `namaz-${Date.now()}`,
       });
 
-      await webpush.sendNotification(pushSubscription, payload);
-      return NextResponse.json({ success: true, message: "Push sent successfully" });
+      try {
+        await webpush.sendNotification(pushSubscription, payload);
+        return NextResponse.json({ success: true, message: "Push sent successfully" });
+      } catch (err) {
+        if (err.statusCode === 410 || err.statusCode === 404) {
+          // Delete from database since it is expired or unsubscribed
+          await prisma.pushSubscription.delete({ where: { endpoint } }).catch(() => {});
+          return NextResponse.json(
+            { error: "Push subscription has expired or is unsubscribed", expired: true },
+            { status: 410 }
+          );
+        }
+        throw err;
+      }
     }
 
     // B. Cron style processing for all active subscriptions
@@ -189,7 +224,7 @@ export async function POST(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const results = await runCronPushCycle();
+    const results = await runCronPushCycle(body?.force === true);
     return NextResponse.json({ success: true, results });
   } catch (err) {
     console.error("Push sending error:", err);
@@ -202,6 +237,7 @@ export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const bypass = searchParams.get("bypass") === "true";
+    const force = searchParams.get("force") === "true";
 
     const cronSecret = process.env.CRON_SECRET;
     if (cronSecret && !bypass) {
@@ -211,7 +247,7 @@ export async function GET(req) {
       }
     }
 
-    const results = await runCronPushCycle();
+    const results = await runCronPushCycle(force);
     return NextResponse.json({ success: true, results });
   } catch (err) {
     console.error("Cron trigger error:", err);

@@ -17,8 +17,9 @@ import LanguageSelect from "@/components/settings/LanguageSelect";
 import TranslationSelect from "@/components/settings/TranslationSelect";
 import ReciterSelect from "@/components/settings/ReciterSelect";
 import FontSizeControls from "@/components/settings/FontSizeControls";
-import ArabicFontSelect from "@/components/settings/ArabicFontSelect";
 import WordTooltipToggle from "@/components/settings/WordTooltipToggle";
+import ArabicFontSelect from "@/components/settings/ArabicFontSelect";
+import ArabicTextTypeSelect from "@/components/settings/ArabicTextTypeSelect";
 import SettingsResetButton from "@/components/settings/SettingsResetButton";
 import useSettings from "@/components/settings/hooks/useSettings";
 
@@ -33,6 +34,7 @@ export default function SettingsDrawer({ open, onClose }) {
     fontSize,
     arabicFontSize,
     arabicFontFamily,
+    arabicTextType,
     reciterId,
     showWordTooltip,
     handleThemeChange,
@@ -41,6 +43,7 @@ export default function SettingsDrawer({ open, onClose }) {
     handleFontSizeChange,
     handleArabicFontSizeChange,
     handleArabicFontChange,
+    handleArabicTextTypeChange,
     handleReciterIdChange,
     handleToggleWordTooltip,
     resetAll,
@@ -115,6 +118,15 @@ export default function SettingsDrawer({ open, onClose }) {
             <WordTooltipToggle
               checked={showWordTooltip}
               onChange={handleToggleWordTooltip}
+            />
+          </div>
+
+          {/* Card 4.5: Arabic Text Format */}
+          <div className="p-4 rounded-2xl bg-white/70 dark:bg-slate-900/60 border border-gray-200/60 dark:border-slate-800/80 shadow-sm">
+            <ArabicTextTypeSelect
+              value={arabicTextType}
+              onChange={handleArabicTextTypeChange}
+              resolvedTheme={resolvedTheme}
             />
           </div>
 
