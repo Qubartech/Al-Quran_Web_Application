@@ -29,6 +29,53 @@ const SurahAyahList = ({
   const [englishTrans, setEnglishTrans] = useState(englishTransAyah || []);
   const audio = useAudio();
   const { user, session } = useUser();
+  const [playingWordAudio, setPlayingWordAudio] = useState(null);
+  const wordAudioRef = useRef(null);
+
+  const playWordAudio = (word, wordIdx, ayahIdx) => {
+    if (!word?.audio_url) return;
+
+    if (wordAudioRef.current) {
+      wordAudioRef.current.pause();
+    }
+
+    if (audio && typeof audio.pause === "function" && !audio.paused) {
+      audio.pause();
+    }
+
+    const audioUrl = word.audio_url.startsWith("http")
+      ? word.audio_url
+      : word.audio_url.startsWith("//")
+      ? `https:${word.audio_url}`
+      : `https://audio.qurancdn.com/${word.audio_url}`;
+
+    const newAudio = new Audio(audioUrl);
+    wordAudioRef.current = newAudio;
+    
+    const activeKey = `${ayahIdx}_${wordIdx}`;
+    setPlayingWordAudio(activeKey);
+
+    newAudio.play().catch((err) => {
+      console.error("Error playing word audio:", err);
+      setPlayingWordAudio(null);
+    });
+
+    newAudio.onended = () => {
+      setPlayingWordAudio(null);
+    };
+
+    newAudio.onerror = () => {
+      setPlayingWordAudio(null);
+    };
+  };
+
+  useEffect(() => {
+    return () => {
+      if (wordAudioRef.current) {
+        wordAudioRef.current.pause();
+      }
+    };
+  }, []);
   const [audioCurrentTime, setAudioCurrentTime] = useState(0);
   const [bookmarks, setBookmarks] = useState({});
   const [repeatAyahIndex, setRepeatAyahIndex] = useState(null);
@@ -444,15 +491,37 @@ const SurahAyahList = ({
           style={{ textAlign: "right", direction: "rtl" }}
         >
           {arabicAyah.map((ayah, idx) => {
-            const verseText = ayah?.text || ayah?.words?.map((w) => w.text_qpc_hafs || w.text_uthmani || w.text).join(" ");
             return (
               <span
                 key={idx}
                 id={`sura_${pageId}_ayah_${idx + 1}`}
-                className="inline-flex items-center flex-wrap hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors cursor-pointer select-none tracking-wide text-right"
+                className="inline-flex items-center flex-wrap select-none tracking-wide text-right"
                 dir="rtl"
               >
-                <span>{verseText}</span>
+                {ayah.words && ayah.words.length > 0 ? (
+                  ayah.words.map((word, wIdx) => {
+                    const isWord = word.char_type_name === "word";
+                    const wordText = word.text_qpc_hafs || word.text_uthmani || word.text;
+                    const isWordAudioPlaying = playingWordAudio === `${idx}_${wIdx}`;
+                    
+                    return (
+                      <span
+                        key={wIdx}
+                        onClick={() => isWord && playWordAudio(word, wIdx, idx)}
+                        className={`transition-all duration-150 cursor-pointer ${
+                          isWordAudioPlaying
+                            ? "text-emerald-500 dark:text-emerald-400 font-bold scale-110 drop-shadow-[0_2px_10px_rgba(16,185,129,0.4)]"
+                            : "hover:text-emerald-500 dark:hover:text-emerald-400"
+                        }`}
+                      >
+                        {wordText}
+                        {wIdx < ayah.words.length - 1 ? " " : ""}
+                      </span>
+                    );
+                  })
+                ) : (
+                  <span>{ayah.text}</span>
+                )}
               </span>
             );
           })}
@@ -609,15 +678,19 @@ const SurahAyahList = ({
                               const wordTranslit = word.transliteration?.text;
 
                               const isActiveWord = isPlaying && activeWordIndex === wIdx;
-                              const isDimmedStyle = isPlaying && activeWordIndex !== -1 && !isActiveWord;
+                              const isWordAudioPlaying = playingWordAudio === `${idx}_${wIdx}`;
+                              const isCurrentlyHighlighted = isActiveWord || isWordAudioPlaying;
+                              
+                              const isDimmedStyle = isPlaying && activeWordIndex !== -1 && !isCurrentlyHighlighted;
                               const shouldShowAutoTooltip = isActiveWord && (audio?.showWordTooltip ?? true);
-
+ 
                               return (
                                 <div
                                   key={wIdx}
+                                  onClick={() => isWord && playWordAudio(word, wIdx, idx)}
                                   className={`relative flex flex-col items-center justify-center px-0.5 sm:px-1 py-0.5 rounded-lg transition-all duration-200 group cursor-pointer outline-none focus:outline-none ${
-                                    isActiveWord
-                                      ? "z-10"
+                                    isCurrentlyHighlighted
+                                      ? "z-10 bg-emerald-50/50 dark:bg-slate-800/40"
                                       : isDimmedStyle
                                       ? "opacity-40 hover:opacity-100"
                                       : "hover:bg-gray-100/70 dark:hover:bg-slate-800/40"
@@ -626,7 +699,7 @@ const SurahAyahList = ({
                                   {/* Arabic word */}
                                   <span
                                     className={`font-semibold select-none transition-all duration-150 font-arabic ayah-arabic-text ${
-                                      isActiveWord
+                                      isCurrentlyHighlighted
                                         ? "text-emerald-500 dark:text-emerald-400 font-bold scale-110 drop-shadow-[0_2px_10px_rgba(16,185,129,0.4)]"
                                         : isDimmedStyle
                                         ? "text-gray-900/30 dark:text-gray-100/30"
