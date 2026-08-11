@@ -20,7 +20,7 @@ async function fetchTimingsCached(city, country, method, school) {
   if (timingCache.has(cacheKey)) {
     const cached = timingCache.get(cacheKey);
     if (now - cached.timestamp < 15 * 60 * 1000) { // 15 mins cache
-      return cached.timings;
+      return cached.data;
     }
   }
 

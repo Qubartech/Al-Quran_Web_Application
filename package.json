@@ -50,6 +50,7 @@
     "web-push": "^3.6.7"
   },
   "devDependencies": {
+    "baseline-browser-mapping": "^2.11.13",
     "prisma": "^7.9.1"
   }
 }
