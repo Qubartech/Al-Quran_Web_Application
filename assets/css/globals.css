@@ -507,3 +507,52 @@ button:focus-visible {
   animation: fadeIn 200ms ease-out forwards;
 }
 
+/* Tajweed Rules Styling */
+rule.ham_wasl {
+  color: #8c8c8c !important;
+  opacity: 0.75;
+}
+rule.laam_shamsiyah {
+  color: #8c8c8c !important;
+  opacity: 0.75;
+}
+rule.silent {
+  color: #8c8c8c !important;
+  opacity: 0.5;
+}
+rule.ghunnah {
+  color: #ff9100 !important;
+}
+rule.ikhfa {
+  color: #bd5cff !important;
+}
+rule.idghaam {
+  color: #10b981 !important;
+}
+rule.iqlab {
+  color: #06b6d4 !important;
+}
+rule.qalqalah {
+  color: #3b82f6 !important;
+}
+rule.madda_normal,
+rule.madda_permissible,
+rule.madda_necessary,
+rule.madda_obligatory {
+  color: #ef4444 !important;
+}
+
+/* IndoPak Nastaleeq Web Font Definition */
+@font-face {
+  font-family: 'IndoPakFont';
+  src: url('https://cdn.jsdelivr.net/gh/quran8vs/IndoPak@main/fonts/1.woff2') format('woff2');
+  font-display: swap;
+}
+
+/* Force IndoPak Font Override when IndoPak Text format is selected */
+[data-arabic-text-type="indopak"] .font-arabic,
+[data-arabic-text-type="indopak"] .ayah-arabic-text,
+.font-arabic-indopak {
+  font-family: 'IndoPakFont', 'Amiri', serif !important;
+}
+

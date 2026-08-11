@@ -24,6 +24,7 @@ export default function useSettings() {
   const [fontSize, setFontSize] = React.useState(18);
   const [arabicFontSize, setArabicFontSize] = React.useState(24);
   const [arabicFontFamily, setArabicFontFamily] = React.useState("uthmani");
+  const [arabicTextType, setArabicTextType] = React.useState("uthmani");
   const [reciterId, setReciterId] = React.useState("7");
 
   // Initial load
@@ -55,6 +56,13 @@ export default function useSettings() {
       const savedArabicFont = localStorage.getItem("app_arabic_font_family") || "uthmani";
       setArabicFontFamily(savedArabicFont);
       document.documentElement.setAttribute("data-arabic-font", savedArabicFont);
+    } catch {}
+
+    // Arabic Text Type
+    try {
+      const savedTextType = localStorage.getItem("app_arabic_text_type") || "uthmani";
+      setArabicTextType(savedTextType);
+      document.documentElement.setAttribute("data-arabic-text-type", savedTextType);
     } catch {}
 
     // Font sizes
@@ -256,6 +264,22 @@ export default function useSettings() {
     } catch {}
   };
 
+  const handleArabicTextTypeChange = (val) => {
+    setArabicTextType(val);
+    try {
+      localStorage.setItem("app_arabic_text_type", val);
+      document.documentElement.setAttribute("data-arabic-text-type", val);
+      window.dispatchEvent(new CustomEvent("quran-arabic-text-type-change", { detail: { value: val } }));
+    } catch {}
+    setTimeout(() => {
+      try {
+        router.refresh();
+      } catch {
+        if (typeof window !== "undefined") window.location.reload();
+      }
+    }, 150);
+  };
+
   const handleReciterIdChange = (val) => {
     const stringVal = String(val);
     setReciterId(stringVal);
@@ -308,11 +332,13 @@ export default function useSettings() {
       localStorage.removeItem("app_translation_identifier");
       localStorage.removeItem("app_font_size");
       localStorage.removeItem("app_arabic_font_size");
+      localStorage.removeItem("app_arabic_text_type");
       localStorage.removeItem("app_reciter_id");
       setThemeChoice("system");
       document.documentElement.style.setProperty("--ayah-font-size", "18px");
       const defaultArabic = typeof window !== "undefined" && window.innerWidth >= 768 ? 32 : 24;
       document.documentElement.style.setProperty("--ayah-arabic-font-size", `${defaultArabic}px`);
+      document.documentElement.setAttribute("data-arabic-text-type", "uthmani");
       setCookie("__language__", "", { expires: new Date(0), path: "/" });
       setCookie("__translation_identifier__", "", { expires: new Date(0), path: "/" });
       setCookie("__font_size__", "", { expires: new Date(0), path: "/" });
@@ -328,6 +354,7 @@ export default function useSettings() {
     setFontSize(18);
     const defaultArabic = typeof window !== "undefined" && window.innerWidth >= 768 ? 32 : 24;
     setArabicFontSize(defaultArabic);
+    setArabicTextType("uthmani");
     setReciterId("7");
     setTimeout(() => {
       try {
@@ -349,6 +376,7 @@ export default function useSettings() {
     fontSize,
     arabicFontSize,
     arabicFontFamily,
+    arabicTextType,
     showWordTooltip: audio?.showWordTooltip ?? true,
     // handlers
     handleThemeChange,
@@ -357,6 +385,7 @@ export default function useSettings() {
     handleFontSizeChange,
     handleArabicFontSizeChange,
     handleArabicFontChange,
+    handleArabicTextTypeChange,
     handleReciterIdChange,
     handleToggleWordTooltip: audio?.toggleWordTooltip,
     resetAll,
