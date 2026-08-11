@@ -12,6 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Inter } from "next/font/google";
 import { cookies } from "next/headers";
 import { arabicFont } from './fonts';
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -91,6 +92,7 @@ export default function RootLayout({ children }) {
                     pauseOnHover
                     theme="dark"
                   />
+                  <Analytics />
                 </PrayerTrackerProvider>
               </SidebarProvider>
             </AudioProvider>
