@@ -22,13 +22,14 @@ HTTP GET /api/push/send?bypass=true
 ---
 
 ## Step 1: Enable PostgreSQL Extensions
-To schedule jobs and make asynchronous HTTP requests directly from your database:
+To schedule jobs and make asynchronous HTTP requests directly from your database, run the following in your **Supabase SQL Editor**:
 
-1. Open your **Supabase Dashboard**.
-2. Navigate to **Database** (from the left sidebar) -> **Extensions**.
-3. Search for and enable the following extensions:
-   * **`pg_cron`**: Enables scheduling PostgreSQL commands.
-   * **`pg_net`**: Enables making asynchronous HTTP requests from inside the database.
+```sql
+-- Enable pg_cron (job scheduler) and pg_net (async HTTP requests)
+CREATE EXTENSION IF NOT EXISTS pg_cron;
+CREATE EXTENSION IF NOT EXISTS pg_net;
+```
+
 
 ---
 
