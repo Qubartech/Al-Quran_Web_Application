@@ -465,6 +465,10 @@ export function PrayerTrackerProvider({ children }) {
           });
           if (pushRes.ok) {
             webPushTriggered = true;
+          } else if (pushRes.status === 410) {
+            console.log("Subscription was expired (410), automatically refreshing push subscription...");
+            await activeSub.unsubscribe().catch(() => {});
+            await syncPushSubscription(true, prayerReminders, azanVoice);
           }
         }
       } catch (pushErr) {

@@ -1,6 +1,6 @@
 # 📖 Al-Quran Application (Next.js 13+ App Router)
 
-A state-of-the-art, feature-rich, interactive web application built with **Next.js (App Router)**, **Tailwind CSS**, **Prisma ORM**, and **Supabase** for reading, searching, exploring, listening to, and learning the Holy Quran.
+A state-of-the-art, feature-rich, interactive web application built with **Next.js (App Router)**, **Tailwind CSS**, **Prisma ORM**, and **Supabase** for reading, searching, exploring, listening to, and learning the Holy Quran, featuring automated **Namaz Timings, Closed-Tab Azan Alerts, and a Persistent Push Notification Queue System**.
 
 ---
 
@@ -13,7 +13,23 @@ A state-of-the-art, feature-rich, interactive web application built with **Next.
 - ✨ **Text-Only Active Word Highlight**: Synchronized audio word-by-word highlight featuring a vibrant emerald text glow without bulky container boxes.
 - 🌐 **Word Meaning Tooltips & User Toggle**: Auto-popup translation & transliteration tooltips during recitation with full user toggle control (accessible via the Floating Audio Player toolbar and the Settings Drawer).
 
-### 🎓 2. Comprehensive Quran Learning Academy (`/learn`)
+---
+
+### ⏰ 2. Namaz Timings & Background Push Notification Queue
+- 🧭 **Accurate Prayer Times**: Dynamic calculations for Fajr, Sunrise, Dhuhr, Asr, Maghrib, and Isha based on Auto-GPS or custom city search.
+- 📐 **Calculation Standards & Fiqh**: Supports major calculation methods (Muslim World League, ISNA, Umm al-Qura, Egyptian, Karachi, etc.) and Asr juristic methods (Standard / Hanafi).
+- 🔔 **Real-Time Web Push & Azan Audio**: Receive real-time browser push notifications and authentic Azan sound alerts (Makkah, Madinah, Fajr special, or Soft Chime) even when the tab is closed.
+- 🚀 **Persistent PostgreSQL Notification Queue (`NotificationQueue`)**:
+  - Automatically enqueues due prayer alerts for subscribers across different timezones.
+  - Built-in deduplication keys (`subId_prayer_date`) ensure **zero duplicate notifications**.
+  - **Automatic Retry Engine**: Transient delivery failures (network drops, rate limits) automatically retry with exponential backoff (30s, 60s, 120s, 300s, 600s) up to 5 attempts.
+  - **Dead Token Pruning**: Expired or revoked browser subscriptions (HTTP 410/404) are automatically cleaned up to keep the database fast and healthy.
+- ⚡ **Supabase Cron Job (`pg_cron` & `pg_net`)**:
+  - Runs periodic background triggers (`/api/push/send?bypass=true`) directly inside PostgreSQL to dispatch prayer alerts to all registered devices on time. (See [docs/supabase-cron.md](docs/supabase-cron.md) for setup guide).
+
+---
+
+### 🎓 3. Comprehensive Quran Learning Academy (`/learn`)
 - 🏆 **8 Complete Academy Levels (33 Curriculum Modules)**:
   - **Level 1**: *Arabic Alphabets & Qaida* (All 28 Arabic letters with vocal tract Makharij articulation tips across interactive slides).
   - **Level 2**: *Essential Tajweed Rules* (Ghunnah, Noon Sakinah, Meem Sakinah, Qalqalah, Madd).
@@ -26,12 +42,16 @@ A state-of-the-art, feature-rich, interactive web application built with **Next.
 - ✍️ **130+ Interactive Quiz Questions**: Comprehensive multi-choice quizzes with instant feedback, explanations, retry mechanisms, and academy score counters.
 - 📚 **Collapsible Reference Library**: Collapsible resource section showcasing 4 curriculum resource categories (Tajweed foundations, Quranic vocabulary, Tafseer context, and digital datasets).
 
-### 🎧 3. Centralized Audio & Player Controls
+---
+
+### 🎧 4. Centralized Audio & Player Controls
 - ⚡ **Instant Synchronous Audio Playback**: Direct Reciter CDN mapping ensures instant playback on user clicks, completely bypassing browser autoplay policy restrictions.
 - 🔄 **Reciter Hot-Swapping**: Seamlessly change reciters mid-verse without losing your current audio timestamp or position.
 - 🎵 **Floating Audio Player**: Glassmorphic player card with timeline seeking, repeat loop, speed controls (`0.5x` to `2x`), volume slider, and word tooltip auto-popup toggle button.
 
-### ⚙️ 4. Personalization & Settings
+---
+
+### ⚙️ 5. Personalization & Settings
 - 🎨 **Theme Toggle**: Light, Dark, and System preference support with zero FOUC.
 - 🌐 **Language & Translation Selection**: Multi-language translations fetched dynamically from Quran.com API.
 - 🔤 **Dynamic Font Resizing**: Independent sliders for Arabic script size and Translation font size.
@@ -45,8 +65,9 @@ A state-of-the-art, feature-rich, interactive web application built with **Next.
 - **Framework**: [Next.js 13+ (App Router)](https://nextjs.org/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/), Vanilla CSS design system, Lucide Icons
 - **Database & Auth**: [Prisma ORM](https://www.prisma.io/), PostgreSQL / [Supabase](https://supabase.com/)
-- **State Management**: React Context API (`AudioProvider`, `UserProvider`)
-- **API Integration**: Quran.com API v4 (Verses, Translations, Recitations, Segments)
+- **Push Notifications & Background Jobs**: Web Push API (`web-push`), VAPID, Service Worker, Supabase `pg_cron` & `pg_net`
+- **State Management**: React Context API (`AudioProvider`, `PrayerTrackerProvider`, `UserProvider`)
+- **API Integration**: Quran.com API v4, Aladhan Prayer Timings API, OpenCage Geocoding
 
 ---
 
@@ -69,13 +90,29 @@ npm install
 Create a `.env` file in the root directory:
 
 ```env
-DATABASE_URL="your-postgresql-database-url"
-DIRECT_URL="your-direct-database-url"
-NEXT_PUBLIC_SUPABASE_URL="your-supabase-url"
+# Database Connection Settings (Prisma)
+DATABASE_URL="your-supabase-connection-pooler-url"
+DIRECT_URL="your-supabase-direct-connection-url"
+
+# Supabase API Settings
+NEXT_PUBLIC_SUPABASE_URL="your-supabase-project-url"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+
+# Web Push VAPID Keys
+NEXT_PUBLIC_VAPID_PUBLIC_KEY="your-vapid-public-key"
+VAPID_PRIVATE_KEY="your-vapid-private-key"
 ```
 
-### 4. Run Development Server
+### 4. Database Setup
+
+Push the Prisma schema to your PostgreSQL database:
+
+```bash
+npx prisma db push
+npx prisma generate
+```
+
+### 5. Run Development Server
 
 ```bash
 npm run dev

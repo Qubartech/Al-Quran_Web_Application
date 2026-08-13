@@ -249,8 +249,8 @@ self.addEventListener("notificationclick", (event) => {
   const nd = event.notification.data || {};
   let targetUrl = nd.url || "/prayer";
 
-  if (nd.autoPlay && nd.prayerName && nd.voice) {
-    targetUrl = `/prayer?playAzan=true&prayer=${encodeURIComponent(nd.prayerName)}&voice=${encodeURIComponent(nd.voice)}`;
+  if (event.action === "play" || nd.autoPlay) {
+    targetUrl = `/prayer?playAzan=true&prayer=${encodeURIComponent(nd.prayerName || "Namaz")}&voice=${encodeURIComponent(nd.voice || "makkah")}`;
   }
 
   event.waitUntil(
@@ -281,26 +281,30 @@ self.addEventListener("push", (event) => {
     }
   }
 
-  const title = data.title || "Time for Prayer!";
+  const title = data.title || "🕌 Time for Prayer!";
   const voice = data.voice || "makkah";
   const prayerName = data.prayerName || "Namaz";
-  const voiceTitle = voice === "madinah" ? "Madinah Azan" : voice === "fajr" ? "Fajr Azan" : voice === "chime" ? "Soft Chime" : "Makkah Azan";
 
   const options = {
     body: data.body || `It is now time for ${prayerName}. May Allah accept your prayers!`,
     icon: "/quran.svg",
     badge: "/quran.svg",
     vibrate: [500, 200, 500, 200, 500],
-    tag: data.tag || `namaz-push-${Date.now()}`,
+    tag: data.tag || `namaz-push-${prayerName}-${Date.now()}`,
     renotify: true,
     data: { 
       url: "/prayer",
       autoPlay: true,
       prayerName,
-      voice
+      voice,
     },
+    actions: [
+      { action: "play", title: "▶ Play Azan" },
+      { action: "open", title: "📖 Open App" },
+    ],
     requireInteraction: true,
   };
 
   event.waitUntil(self.registration.showNotification(title, options));
 });
+
