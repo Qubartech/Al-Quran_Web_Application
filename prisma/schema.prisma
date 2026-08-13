@@ -100,21 +100,54 @@ model LearnProgress {
 }
 
 model PushSubscription {
-  id        String   @id @default(uuid())
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  endpoint  String   @unique
-  p256dh    String
-  auth      String
-  city      String?
-  country   String?
-  method    Int      @default(3)
-  school    Int      @default(0)
-  voice     String   @default("makkah")
-  reminders    String   @default("Fajr,Dhuhr,Asr,Maghrib,Isha")
-  lastNotified String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            String              @id @default(uuid())
+  userId        String?
+  user          User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint      String              @unique
+  p256dh        String
+  auth          String
+  city          String?
+  country       String?
+  method        Int                 @default(3)
+  school        Int                 @default(0)
+  voice         String              @default("makkah")
+  reminders     String              @default("Fajr,Dhuhr,Asr,Maghrib,Isha")
+  lastNotified  String?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  notifications NotificationQueue[]
 
   @@index([userId])
 }
+
+model NotificationQueue {
+  id             String            @id @default(uuid())
+  subscriptionId String?
+  subscription   PushSubscription? @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  userId         String?
+  endpoint       String
+  p256dh         String
+  auth           String
+  prayerName     String            // "Fajr", "Dhuhr", "Asr", "Maghrib", "Isha", "Test"
+  title          String
+  body           String
+  voice          String            @default("makkah")
+  payload        String?           @db.Text
+  status         String            @default("PENDING") // PENDING, PROCESSING, SENT, FAILED, RETRYING, CANCELLED
+  attempts       Int               @default(0)
+  maxAttempts    Int               @default(5)
+  lastError      String?           @db.Text
+  scheduledFor   DateTime          @default(now())
+  nextRetryAt    DateTime?
+  sentAt         DateTime?
+  dedupKey       String?           // e.g. "subId_Fajr_2026-08-14"
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@index([status, scheduledFor, nextRetryAt])
+  @@index([dedupKey])
+  @@index([userId])
+  @@index([endpoint])
+  @@index([subscriptionId])
+}
+
