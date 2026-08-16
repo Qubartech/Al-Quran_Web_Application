@@ -317,11 +317,12 @@
   }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.5s ease-out both;
+.animate-fadeIn,
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out both;
 }
 
-/* Slide up for verses */
+/* Slide up for verses and modals */
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -333,8 +334,9 @@
   }
 }
 
-.animate-slideUp {
-  animation: slideUp 0.4s ease-out both;
+.animate-slideUp,
+.animate-slide-up {
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Subtle glow pulse for active verse */

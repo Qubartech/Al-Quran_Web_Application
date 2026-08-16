@@ -6,6 +6,7 @@
   "id": "/",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "window-controls-overlay"],
   "orientation": "portrait-primary",
   "background_color": "#111827",
   "theme_color": "#059669",
@@ -33,6 +34,29 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Read Quran",
+      "short_name": "Quran",
+      "description": "Browse and read the Holy Quran surahs",
+      "url": "/surah",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Prayer Times",
+      "short_name": "Prayers",
+      "description": "View accurate prayer times and Azan tracker",
+      "url": "/prayer",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Audio Player",
+      "short_name": "Audio",
+      "description": "Listen to soothing Quran recitations",
+      "url": "/player",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ],
   "categories": ["lifestyle", "education", "utilities"]
