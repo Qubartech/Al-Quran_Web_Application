@@ -3,8 +3,9 @@ import { qfContentFetch } from '@/lib/qf/content';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request, { params }) {
-  const reciterId = params?.id;
-  const chapter = params?.chapter_number;
+  const resolvedParams = await params;
+  const reciterId = resolvedParams?.id;
+  const chapter = resolvedParams?.chapter_number;
   if (!reciterId || isNaN(Number(reciterId))) {
     return new Response(JSON.stringify({ ok: false, error: 'Invalid reciter id' }), {
       status: 400,

@@ -25,7 +25,7 @@ async function Juz({ params }) {
     notFound();
   }
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const langCode = cookieStore.get("__language__")?.value || "bn";
   const editionIdentifier = cookieStore.get(
     "__translation_identifier__"
