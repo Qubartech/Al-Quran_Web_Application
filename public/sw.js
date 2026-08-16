@@ -186,16 +186,33 @@ function showPrayerNotification(prayerName, voice) {
   const title = `Time for ${prayerName}! (${voiceTitle})`;
   const options = {
     body: `It is now time for ${prayerName}. Background notifications & Azan alerts are working!`,
-    icon: "/quran.svg",
-    badge: "/quran.svg",
+    icon: "/icon-192.png",
+    badge: "/badge-72.png",
     vibrate: [500, 200, 500, 200, 500],
-    data: { url: "/prayer" },
+    timestamp: Date.now(),
+    data: { url: "/prayer", autoPlay: true, prayerName, voice },
     tag: `namaz-notification-${prayerName}-${Date.now()}`,
     renotify: true,
-    requireInteraction: true,
+    actions: [
+      { action: "play", title: "▶ Play Azan" },
+      { action: "open", title: "📖 Open App" },
+    ],
   };
 
-  self.registration.showNotification(title, options);
+  try {
+    self.registration.showNotification(title, options).catch((err) => {
+      console.warn("SW rich notification failed, trying basic fallback for mobile:", err);
+      self.registration.showNotification(title, {
+        body: `It is now time for ${prayerName}.`,
+        icon: "/icon-192.png",
+        badge: "/badge-72.png",
+        tag: `namaz-${Date.now()}`,
+        data: { url: "/prayer", prayerName, voice },
+      });
+    });
+  } catch (e) {
+    console.error("showPrayerNotification failed:", e);
+  }
 }
 
 self.addEventListener("message", async (event) => {
@@ -256,7 +273,7 @@ self.addEventListener("notificationclick", (event) => {
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {
-        if (client.url.includes("/prayer") && "focus" in client) {
+        if (client.url && client.url.includes("/prayer") && "focus" in client) {
           if ("navigate" in client) {
             client.navigate(targetUrl);
           }
@@ -270,7 +287,7 @@ self.addEventListener("notificationclick", (event) => {
   );
 });
 
-// Handle incoming Web Push notifications from server
+// Handle incoming Web Push notifications from server across all mobile & desktop platforms
 self.addEventListener("push", (event) => {
   let data = {};
   if (event.data) {
@@ -285,15 +302,15 @@ self.addEventListener("push", (event) => {
   const voice = data.voice || "makkah";
   const prayerName = data.prayerName || "Namaz";
 
+  // Primary rich options
   const options = {
     body: data.body || `It is now time for ${prayerName}. May Allah accept your prayers!`,
-    icon: "/quran.svg",
-    badge: "/quran.svg",
-    vibrate: [500, 200, 500, 200, 500],
+    icon: data.icon || "/icon-192.png",
+    badge: data.badge || "/badge-72.png",
     tag: data.tag || `namaz-push-${prayerName}-${Date.now()}`,
     renotify: true,
     data: { 
-      url: "/prayer",
+      url: data.url || "/prayer",
       autoPlay: true,
       prayerName,
       voice,
@@ -302,9 +319,29 @@ self.addEventListener("push", (event) => {
       { action: "play", title: "▶ Play Azan" },
       { action: "open", title: "📖 Open App" },
     ],
-    requireInteraction: true,
   };
 
-  event.waitUntil(self.registration.showNotification(title, options));
+  // Safe delivery with automatic mobile fallback if actions or vibrations fail
+  event.waitUntil(
+    (async () => {
+      try {
+        await self.registration.showNotification(title, options);
+      } catch (err) {
+        console.warn("Mobile push: rich showNotification failed, retrying with standard mobile parameters:", err);
+        try {
+          await self.registration.showNotification(title, {
+            body: data.body || `It is now time for ${prayerName}.`,
+            icon: "/icon-192.png",
+            badge: "/badge-72.png",
+            tag: `namaz-${Date.now()}`,
+            data: { url: "/prayer", prayerName, voice },
+          });
+        } catch (fallbackErr) {
+          console.error("Critical: Service Worker failed to show mobile push notification:", fallbackErr);
+        }
+      }
+    })()
+  );
 });
+
 

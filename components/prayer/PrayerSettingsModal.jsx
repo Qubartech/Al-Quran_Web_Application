@@ -17,7 +17,12 @@ import {
   Music,
   Send,
   Clock,
-  Zap
+  Zap,
+  Smartphone,
+  Info,
+  Download,
+  AlertCircle,
+  CheckCircle2
 } from "lucide-react";
 import { usePrayerTracker } from "@/context/PrayerTrackerContext";
 import { CALCULATION_METHODS } from "@/lib/api/calculationMethods";
@@ -36,7 +41,45 @@ export default function PrayerSettingsModal({
 }) {
   const tracker = usePrayerTracker();
   const [searchQuery, setSearchQuery] = useState("");
-  const [customTime, setCustomTime] = useState("");
+  const [isIOSDevice, setIsIOSDevice] = useState(false);
+  const [isAndroidDevice, setIsAndroidDevice] = useState(false);
+  const [isStandaloneMode, setIsStandaloneMode] = useState(true);
+  const [permissionStatus, setPermissionStatus] = useState("default");
+  const [deferredInstallPrompt, setDeferredInstallPrompt] = useState(null);
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const android = /Android/i.test(navigator.userAgent);
+      const standalone = !!(window.navigator.standalone || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches));
+      
+      setIsIOSDevice(ios);
+      setIsAndroidDevice(android);
+      setIsStandaloneMode(standalone);
+
+      if ("Notification" in window) {
+        setPermissionStatus(Notification.permission);
+      }
+
+      const handleBeforeInstallPrompt = (e) => {
+        e.preventDefault();
+        setDeferredInstallPrompt(e);
+      };
+
+      window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    }
+  }, []);
+
+  const handleInstallApp = async () => {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      const choiceResult = await deferredInstallPrompt.userChoice;
+      if (choiceResult.outcome === "accepted") {
+        setDeferredInstallPrompt(null);
+      }
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -259,7 +302,7 @@ export default function PrayerSettingsModal({
                   Global Namaz Alerts
                 </span>
                 <span className="text-[11px] text-slate-400">
-                  Receive browser notifications at azan times
+                  Receive notifications & Azan on all devices
                 </span>
               </div>
               <button
@@ -276,6 +319,64 @@ export default function PrayerSettingsModal({
                 />
               </button>
             </div>
+
+            {/* iOS Standalone Mode Guidance Banner */}
+            {isIOSDevice && !isStandaloneMode && (
+              <div className="flex items-start gap-2.5 p-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-700 dark:text-sky-300 text-xs">
+                <Smartphone size={16} className="shrink-0 mt-0.5 text-sky-500" />
+                <div className="flex flex-col gap-0.5">
+                  <span className="font-bold">iPhone / iPad Push Setup</span>
+                  <span className="text-[11px] text-sky-600 dark:text-sky-400">
+                    To receive prayer notifications on iOS, tap the Safari Share button <span className="font-bold">⎙</span> and select <span className="font-bold">&quot;Add to Home Screen&quot;</span>, then launch the app from your home screen.
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Android Blocked Permission Warning Banner */}
+            {permissionStatus === "denied" && (
+              <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs">
+                <AlertCircle size={16} className="shrink-0 mt-0.5 text-amber-500" />
+                <div className="flex flex-col gap-0.5">
+                  <span className="font-bold">Notifications Blocked in Browser</span>
+                  <span className="text-[11px] text-amber-700 dark:text-amber-400">
+                    Tap the lock/settings icon <span className="font-bold">🔒</span> in the browser address bar &rarr; Permissions &rarr; <span className="font-bold">Notifications: Allow</span> to receive Azan alerts.
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Android 1-Tap PWA Install Banner */}
+            {isAndroidDevice && deferredInstallPrompt && !isStandaloneMode && (
+              <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs">
+                <div className="flex items-start gap-2 max-w-[70%]">
+                  <Download size={16} className="shrink-0 mt-0.5 text-emerald-500" />
+                  <div className="flex flex-col">
+                    <span className="font-bold text-slate-800 dark:text-slate-200">Install Android App</span>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Enable background Azan alerts when screen is locked
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleInstallApp}
+                  className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-md shadow-emerald-600/20 shrink-0"
+                >
+                  Install Now
+                </button>
+              </div>
+            )}
+
+            {/* Android Background Execution Tip */}
+            {isAndroidDevice && (
+              <div className="flex items-start gap-2 p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400">
+                <Info size={14} className="shrink-0 mt-0.5 text-emerald-500" />
+                <span>
+                  <strong className="text-slate-700 dark:text-slate-300">Android Tip:</strong> For reliable Azan alarms when screen is off, ensure battery optimization for Chrome or the installed app is set to <span className="font-semibold text-emerald-600 dark:text-emerald-400">&quot;Unrestricted&quot;</span>.
+                </span>
+              </div>
+            )}
 
             {/* Alert Sound Switch */}
             <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200/60 dark:border-slate-800">
