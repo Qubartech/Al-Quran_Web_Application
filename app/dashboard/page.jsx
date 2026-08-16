@@ -252,50 +252,50 @@ export default function DashboardPage() {
     <div className="min-h-screen pb-20 pt-6 px-4 md:px-6 w-full max-w-screen-2xl mx-auto flex flex-col gap-8 text-slate-900 dark:text-slate-100 transition-colors">
       
       {/* 1. Ultra Modern User Profile Hero Header */}
-      <div className="relative overflow-hidden p-6 md:p-10 rounded-3xl glass border border-emerald-500/15 dark:border-emerald-500/25 text-slate-900 dark:text-white shadow-sm w-full transition-all duration-500">
+      <div className="relative overflow-hidden p-6 md:p-10 rounded-3xl bg-white/80 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-white shadow-xl w-full transition-all duration-500 backdrop-blur-xl">
         
         {/* Decorative Background Accents */}
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-50/80 via-teal-50/60 to-cyan-50/70 dark:from-emerald-950/70 dark:via-slate-900/90 dark:to-teal-950/70 z-0"></div>
-        <div className="absolute right-0 top-0 translate-x-12 -translate-y-12 w-96 h-96 rounded-full bg-emerald-400/15 dark:bg-white/10 blur-3xl pointer-events-none z-0"></div>
-        <div className="absolute left-1/3 bottom-0 w-72 h-72 rounded-full bg-teal-400/15 dark:bg-teal-300/10 blur-2xl pointer-events-none z-0"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 dark:from-emerald-500/10 dark:via-slate-900/50 dark:to-teal-500/5 z-0 pointer-events-none"></div>
+        <div className="absolute right-0 top-0 translate-x-12 -translate-y-12 w-96 h-96 rounded-full bg-emerald-400/15 dark:bg-emerald-500/10 blur-3xl pointer-events-none z-0"></div>
+        <div className="absolute left-1/3 bottom-0 w-72 h-72 rounded-full bg-teal-400/15 dark:bg-teal-500/10 blur-2xl pointer-events-none z-0"></div>
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
           
           {/* User Avatar & Calligraphy Welcome */}
           <div className="flex flex-col gap-3 max-w-2xl">
             <div className="flex items-center gap-4">
-              <div className="h-16 w-16 md:h-20 md:w-20 rounded-3xl bg-emerald-600 dark:bg-white/20 backdrop-blur-md border-2 border-emerald-500/30 dark:border-white/40 flex items-center justify-center text-2xl md:text-3xl font-black text-white shadow-md shrink-0">
+              <div className="h-16 w-16 md:h-20 md:w-20 rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-600 dark:from-emerald-500 dark:to-teal-600 border-2 border-emerald-400/30 dark:border-emerald-400/40 flex items-center justify-center text-2xl md:text-3xl font-black text-white shadow-lg shadow-emerald-500/25 shrink-0">
                 {userInitial}
               </div>
 
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-white text-xs font-black backdrop-blur-md border border-emerald-200/50 dark:border-white/30 shadow-2xs">
-                    <Sparkles size={13} className="text-amber-500 dark:text-amber-300" /> Active Seeker
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-bold border border-emerald-500/20 dark:border-emerald-500/30 shadow-xs">
+                    <Sparkles size={13} className="text-amber-500 dark:text-amber-400" /> Active Seeker
                   </span>
                   
-                  <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-white text-xs font-black backdrop-blur-md border border-emerald-500/30 dark:border-white/30 shadow-2xs">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-700 shadow-xs">
                     <span>{userMasteryBadge.icon}</span>
                     <span>{userMasteryBadge.title}</span>
                   </span>
                 </div>
 
-                <h1 className="text-2xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white drop-shadow-2xs truncate max-w-lg">
+                <h1 className="text-2xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white drop-shadow-xs truncate max-w-lg">
                   {user.email}
                 </h1>
               </div>
             </div>
 
-            <p className="text-xs md:text-sm text-slate-600 dark:text-emerald-100 font-medium leading-relaxed">
+            <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
               Welcome to your personal Quran workspace. Review saved verses, track reading history, monitor Salah habit streaks, and complete Tajweed modules.
             </p>
           </div>
 
           {/* Daily Quran Goal Tracker Card */}
-          <div className="relative p-5 md:p-6 rounded-3xl bg-white/80 dark:bg-white/20 backdrop-blur-2xl border border-emerald-200/60 dark:border-white/35 shadow-xs flex flex-col gap-4 min-w-[320px] md:min-w-[370px]">
+          <div className="relative p-5 md:p-6 rounded-3xl bg-white/90 dark:bg-slate-800/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-700/80 shadow-lg flex flex-col gap-4 min-w-[320px] md:min-w-[370px]">
             <div className="flex items-center justify-between gap-4 flex-wrap">
-              <span className="text-xs font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-100 flex items-center gap-2 shrink-0">
-                <Target size={16} className="text-amber-500 dark:text-amber-300 shrink-0" />
+              <span className="text-xs font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center gap-2 shrink-0">
+                <Target size={16} className="text-amber-500 shrink-0" />
                 <span>Daily Quran Reading Goal</span>
               </span>
 
@@ -303,28 +303,28 @@ export default function DashboardPage() {
               <select
                 value={dailyGoal}
                 onChange={(e) => handleUpdateGoal(parseInt(e.target.value, 10))}
-                className="bg-white dark:bg-slate-900/60 hover:bg-slate-50 border border-emerald-200/60 dark:border-white/40 text-slate-800 dark:text-white text-xs font-bold rounded-xl px-3 py-1.5 focus:outline-none cursor-pointer shrink-0 transition-all shadow-2xs"
+                className="bg-slate-100 dark:bg-slate-900 hover:bg-slate-200/70 dark:hover:bg-slate-900/90 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl px-3 py-1.5 focus:outline-none cursor-pointer shrink-0 transition-all shadow-xs"
               >
-                <option value={3} className="text-slate-900">3 Verses / day</option>
-                <option value={5} className="text-slate-900">5 Verses / day</option>
-                <option value={10} className="text-slate-900">10 Verses / day</option>
-                <option value={20} className="text-slate-900">20 Verses / day</option>
+                <option value={3} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">3 Verses / day</option>
+                <option value={5} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">5 Verses / day</option>
+                <option value={10} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">10 Verses / day</option>
+                <option value={20} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">20 Verses / day</option>
               </select>
             </div>
 
             <div className="flex items-baseline justify-between text-slate-900 dark:text-white">
               <span className="text-2xl md:text-3xl font-black font-mono">
-                {todayAyahsRead} <span className="text-xs font-bold text-slate-500 dark:text-emerald-200">/ {dailyGoal} Verses</span>
+                {todayAyahsRead} <span className="text-xs font-bold text-slate-500 dark:text-slate-400">/ {dailyGoal} Verses</span>
               </span>
-              <span className="text-sm font-black font-mono text-emerald-600 dark:text-amber-300">
+              <span className="text-sm font-black font-mono text-emerald-600 dark:text-amber-400">
                 {goalProgressPercent}% Completed
               </span>
             </div>
 
             {/* Goal Progress Bar */}
-            <div className="w-full bg-slate-200 dark:bg-white/25 h-3 rounded-full overflow-hidden">
+            <div className="w-full bg-slate-200 dark:bg-slate-700/60 h-3 rounded-full overflow-hidden">
               <div
-                className="bg-gradient-to-r from-emerald-500 to-teal-400 dark:from-amber-300 dark:to-emerald-300 h-full rounded-full transition-all duration-700 shadow-2xs"
+                className="bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 dark:from-amber-400 dark:via-emerald-400 dark:to-teal-400 h-full rounded-full transition-all duration-700 shadow-xs"
                 style={{ width: `${goalProgressPercent}%` }}
               ></div>
             </div>
@@ -332,7 +332,7 @@ export default function DashboardPage() {
             {/* Logout Button */}
             <button
               onClick={() => signOut()}
-              className="mt-1 w-full py-2 rounded-xl bg-slate-100 hover:bg-rose-600 hover:text-white dark:bg-white/20 dark:hover:bg-rose-600/90 text-slate-700 dark:text-white text-xs font-black transition-all flex items-center justify-center gap-1.5 border border-slate-200 dark:border-white/30 shadow-2xs"
+              className="mt-1 w-full py-2.5 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 dark:bg-slate-900 dark:hover:bg-rose-950/40 dark:hover:text-rose-400 text-slate-700 dark:text-slate-300 text-xs font-black transition-all flex items-center justify-center gap-2 border border-slate-200/80 dark:border-slate-700/80 shadow-xs cursor-pointer"
             >
               <LogOut size={14} />
               Sign Out Account
@@ -342,22 +342,22 @@ export default function DashboardPage() {
         </div>
 
         {/* Hero Activity Counter Bar */}
-        <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 mt-8 pt-6 border-t border-emerald-200/50 dark:border-white/25">
+        <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 mt-8 pt-6 border-t border-slate-200/80 dark:border-slate-800">
           
           {/* Stat 1: Bookmarked Ayahs */}
           <div 
             onClick={() => setActiveTab("ayahs")}
             className={`p-4 rounded-2xl backdrop-blur-md transition-all cursor-pointer flex items-center gap-3.5 ${
               activeTab === "ayahs"
-                ? "bg-white dark:bg-white/30 border-2 border-emerald-500 dark:border-white/60 shadow-md scale-105"
-                : "bg-white/80 dark:bg-white/15 hover:bg-white dark:hover:bg-white/25 border border-emerald-100/80 dark:border-white/30 shadow-2xs"
+                ? "bg-white dark:bg-slate-800 border-2 border-emerald-500 dark:border-emerald-400 shadow-lg shadow-emerald-500/10 scale-105"
+                : "bg-white/70 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 shadow-xs"
             }`}
           >
-            <div className="h-10 w-10 rounded-xl bg-emerald-500/15 dark:bg-emerald-400/30 border border-emerald-500/20 text-emerald-600 dark:text-white flex items-center justify-center shrink-0 shadow-2xs">
+            <div className="h-10 w-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 shadow-xs">
               <BookOpen size={20} />
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-emerald-100">Saved Verses</span>
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Saved Verses</span>
               <span className="text-xl font-black text-slate-900 dark:text-white font-mono">{favoriteAyahs.length}</span>
             </div>
           </div>
@@ -367,15 +367,15 @@ export default function DashboardPage() {
             onClick={() => setActiveTab("juzs")}
             className={`p-4 rounded-2xl backdrop-blur-md transition-all cursor-pointer flex items-center gap-3.5 ${
               activeTab === "juzs"
-                ? "bg-white dark:bg-white/30 border-2 border-emerald-500 dark:border-white/60 shadow-md scale-105"
-                : "bg-white/80 dark:bg-white/15 hover:bg-white dark:hover:bg-white/25 border border-emerald-100/80 dark:border-white/30 shadow-2xs"
+                ? "bg-white dark:bg-slate-800 border-2 border-emerald-500 dark:border-emerald-400 shadow-lg shadow-emerald-500/10 scale-105"
+                : "bg-white/70 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 shadow-xs"
             }`}
           >
-            <div className="h-10 w-10 rounded-xl bg-cyan-500/15 dark:bg-cyan-400/30 border border-cyan-500/20 text-cyan-600 dark:text-white flex items-center justify-center shrink-0 shadow-2xs">
+            <div className="h-10 w-10 rounded-xl bg-cyan-500/10 dark:bg-cyan-500/20 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0 shadow-xs">
               <Bookmark size={20} />
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-emerald-100">Saved Juzs</span>
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Saved Juzs</span>
               <span className="text-xl font-black text-slate-900 dark:text-white font-mono">{favoriteJuzs.length}</span>
             </div>
           </div>
@@ -385,15 +385,15 @@ export default function DashboardPage() {
             onClick={() => setActiveTab("history")}
             className={`p-4 rounded-2xl backdrop-blur-md transition-all cursor-pointer flex items-center gap-3.5 ${
               activeTab === "history"
-                ? "bg-white dark:bg-white/30 border-2 border-emerald-500 dark:border-white/60 shadow-md scale-105"
-                : "bg-white/80 dark:bg-white/15 hover:bg-white dark:hover:bg-white/25 border border-emerald-100/80 dark:border-white/30 shadow-2xs"
+                ? "bg-white dark:bg-slate-800 border-2 border-emerald-500 dark:border-emerald-400 shadow-lg shadow-emerald-500/10 scale-105"
+                : "bg-white/70 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 shadow-xs"
             }`}
           >
-            <div className="h-10 w-10 rounded-xl bg-indigo-500/15 dark:bg-indigo-400/30 border border-indigo-500/20 text-indigo-600 dark:text-white flex items-center justify-center shrink-0 shadow-2xs">
+            <div className="h-10 w-10 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 shadow-xs">
               <History size={20} />
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-emerald-100">History Log</span>
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">History Log</span>
               <span className="text-xl font-black text-slate-900 dark:text-white font-mono">{recents.length}</span>
             </div>
           </div>
@@ -403,15 +403,15 @@ export default function DashboardPage() {
             onClick={() => setActiveTab("prayer")}
             className={`p-4 rounded-2xl backdrop-blur-md transition-all cursor-pointer flex items-center gap-3.5 ${
               activeTab === "prayer"
-                ? "bg-white dark:bg-white/30 border-2 border-emerald-500 dark:border-white/60 shadow-md scale-105"
-                : "bg-white/80 dark:bg-white/15 hover:bg-white dark:hover:bg-white/25 border border-emerald-100/80 dark:border-white/30 shadow-2xs"
+                ? "bg-white dark:bg-slate-800 border-2 border-emerald-500 dark:border-emerald-400 shadow-lg shadow-emerald-500/10 scale-105"
+                : "bg-white/70 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 shadow-xs"
             }`}
           >
-            <div className="h-10 w-10 rounded-xl bg-amber-500/15 dark:bg-amber-400/30 border border-amber-500/20 text-amber-600 dark:text-amber-200 flex items-center justify-center shrink-0 shadow-2xs">
+            <div className="h-10 w-10 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 shadow-xs">
               <Flame size={20} className="animate-pulse" />
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-emerald-100">Salah Streak</span>
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Salah Streak</span>
               <span className="text-xl font-black text-slate-900 dark:text-white font-mono">{streak} Days</span>
             </div>
           </div>
@@ -421,15 +421,15 @@ export default function DashboardPage() {
             onClick={() => setActiveTab("learning")}
             className={`p-4 rounded-2xl backdrop-blur-md transition-all cursor-pointer flex items-center gap-3.5 col-span-2 sm:col-span-1 ${
               activeTab === "learning"
-                ? "bg-white dark:bg-white/30 border-2 border-emerald-500 dark:border-white/60 shadow-md scale-105"
-                : "bg-white/80 dark:bg-white/15 hover:bg-white dark:hover:bg-white/25 border border-emerald-100/80 dark:border-white/30 shadow-2xs"
+                ? "bg-white dark:bg-slate-800 border-2 border-emerald-500 dark:border-emerald-400 shadow-lg shadow-emerald-500/10 scale-105"
+                : "bg-white/70 dark:bg-slate-800/40 hover:bg-white dark:hover:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 shadow-xs"
             }`}
           >
-            <div className="h-10 w-10 rounded-xl bg-purple-500/15 dark:bg-purple-400/30 border border-purple-500/20 text-purple-600 dark:text-purple-200 flex items-center justify-center shrink-0 shadow-2xs">
+            <div className="h-10 w-10 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 border border-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 shadow-xs">
               <GraduationCap size={20} />
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-emerald-100">Tajweed Score</span>
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Tajweed Score</span>
               <span className="text-xl font-black text-slate-900 dark:text-white font-mono">{completedModulesCount} Done</span>
             </div>
           </div>
