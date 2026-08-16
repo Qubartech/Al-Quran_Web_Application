@@ -279,13 +279,19 @@ export function PrayerTrackerProvider({ children }) {
 
   // Synchronize Push Subscription with PostgreSQL database
   const syncPushSubscription = useCallback(
-    async (enabled, currentReminders, voice) => {
-      if (typeof window === "undefined" || !swRegistration) return;
+    async (enabled, currentReminders, voice, isUserGesture = false) => {
+      if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
 
-      console.log("Web Push Sync: starting...", { enabled, voice });
+      console.log("Web Push Sync: starting...", { enabled, voice, isUserGesture });
 
       try {
-        const activeSub = await swRegistration.pushManager.getSubscription();
+        const reg = swRegistration || (navigator.serviceWorker && (await navigator.serviceWorker.ready));
+        if (!reg || !reg.pushManager) {
+          console.warn("Web Push Sync: PushManager not available on this device/browser");
+          return;
+        }
+
+        const activeSub = await reg.pushManager.getSubscription();
 
         if (!enabled) {
           if (activeSub) {
@@ -294,24 +300,39 @@ export function PrayerTrackerProvider({ children }) {
               method: "DELETE",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ endpoint: activeSub.endpoint }),
-            });
-            await activeSub.unsubscribe();
+            }).catch(() => {});
+            await activeSub.unsubscribe().catch(() => {});
             console.log("Web Push Sync: unsubscribed successfully.");
           }
           return;
         }
 
-        console.log("Web Push Sync: checking notification permission...");
+        // On mobile browsers, requestPermission MUST be in response to a direct user action
+        if (!("Notification" in window)) {
+          console.warn("Web Push Sync: Notification API not supported");
+          return;
+        }
+
         if (Notification.permission !== "granted") {
-          const perm = await Notification.requestPermission();
-          if (perm !== "granted") {
-            console.warn("Web Push Sync: notifications not granted by user");
+          if (isUserGesture) {
+            console.log("Web Push Sync: requesting permission with user gesture...");
+            try {
+              const perm = await Notification.requestPermission();
+              if (perm !== "granted") {
+                console.warn("Web Push Sync: notification permission denied or dismissed by user");
+                return;
+              }
+            } catch (permErr) {
+              console.error("Web Push Sync: requestPermission error:", permErr);
+              return;
+            }
+          } else {
+            console.log("Web Push Sync: notifications not granted yet, skipping background prompt until user gesture");
             return;
           }
         }
 
         const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-        console.log("Web Push Sync: loading VAPID Public Key...", vapidPublicKey);
         if (!vapidPublicKey) {
           console.warn("Web Push Sync: VAPID public key missing in environment");
           return;
@@ -321,7 +342,7 @@ export function PrayerTrackerProvider({ children }) {
         if (sub) {
           // Detect VAPID key changes and force re-subscription
           try {
-            const activeKey = sub.options.applicationServerKey;
+            const activeKey = sub.options?.applicationServerKey;
             if (activeKey) {
               const activeKeyUint8 = new Uint8Array(activeKey);
               const currentKeyUint8 = urlBase64ToUint8Array(vapidPublicKey);
@@ -337,28 +358,28 @@ export function PrayerTrackerProvider({ children }) {
               }
 
               if (!keyMatches) {
-                console.log("Web Push Sync: VAPID keys changed, clearing old subscription...");
+                console.log("Web Push Sync: VAPID keys changed, renewing subscription...");
                 await fetch("/api/push/subscribe", {
                   method: "DELETE",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ endpoint: sub.endpoint }),
-                });
-                await sub.unsubscribe();
+                }).catch(() => {});
+                await sub.unsubscribe().catch(() => {});
                 sub = null;
               }
             }
           } catch (keyErr) {
-            console.warn("Web Push Sync: error verifying subscription VAPID key compatibility:", keyErr);
+            console.warn("Web Push Sync: error checking existing VAPID key compatibility:", keyErr);
           }
         }
 
         if (!sub) {
           console.log("Web Push Sync: creating new push subscription...");
-          sub = await swRegistration.pushManager.subscribe({
+          sub = await reg.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
           });
-          console.log("Web Push Sync: new subscription created.");
+          console.log("Web Push Sync: new push subscription established.");
         }
 
         let savedManual = null;
@@ -377,8 +398,29 @@ export function PrayerTrackerProvider({ children }) {
           if (remindersToCheck[p]) activeRemindersList.push(p);
         });
 
+        // Robust key extraction across mobile & desktop browser implementations
+        const subJson = sub.toJSON ? sub.toJSON() : {};
+        const rawKeys = subJson.keys || {};
+        let p256dhKey = rawKeys.p256dh || "";
+        let authKey = rawKeys.auth || "";
+
+        if (!p256dhKey && sub.getKey) {
+          const pBuffer = sub.getKey("p256dh");
+          if (pBuffer) p256dhKey = btoa(String.fromCharCode.apply(null, new Uint8Array(pBuffer)));
+        }
+        if (!authKey && sub.getKey) {
+          const aBuffer = sub.getKey("auth");
+          if (aBuffer) authKey = btoa(String.fromCharCode.apply(null, new Uint8Array(aBuffer)));
+        }
+
         const subscribePayload = {
-          subscription: sub,
+          subscription: {
+            endpoint: sub.endpoint,
+            keys: {
+              p256dh: p256dhKey,
+              auth: authKey,
+            },
+          },
           userId: user?.id || null,
           city: savedManual?.city || "Dhaka",
           country: savedManual?.country || "Bangladesh",
@@ -388,7 +430,7 @@ export function PrayerTrackerProvider({ children }) {
           reminders: activeRemindersList.join(","),
         };
 
-        console.log("Web Push Sync: registering subscription on PostgreSQL backend...");
+        console.log("Web Push Sync: synchronizing subscription to database backend...");
         const res = await fetch("/api/push/subscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -408,16 +450,26 @@ export function PrayerTrackerProvider({ children }) {
     [swRegistration, prayerReminders, azanVoice, user?.id]
   );
 
-  // Sync push subscription state with PostgreSQL database automatically
+  // Sync push subscription state with database automatically (silent, gesture=false)
   useEffect(() => {
-    if (swRegistration) {
-      syncPushSubscription(remindersEnabled, prayerReminders, azanVoice);
+    if (swRegistration && remindersEnabled) {
+      syncPushSubscription(remindersEnabled, prayerReminders, azanVoice, false);
     }
   }, [remindersEnabled, prayerReminders, azanVoice, swRegistration, syncPushSubscription]);
 
   // Test Real Browser Notification & Sound (including Web Push API verification)
   const testNotification = useCallback(async () => {
     if (typeof window === "undefined") return;
+
+    // Check iOS PWA status
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.navigator.standalone || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+
+    if (isIOS && !isStandalone) {
+      toast.info("📱 On iPhone/iPad: Tap the Safari Share button -> 'Add to Home Screen' to enable Web Push notifications on iOS.", {
+        autoClose: 8000,
+      });
+    }
 
     if (!("Notification" in window)) {
       toast.error("Browser notifications are not supported in this browser.");
@@ -434,7 +486,7 @@ export function PrayerTrackerProvider({ children }) {
     }
 
     if (perm !== "granted") {
-      toast.warning("Notification permission not granted. Please allow notification permissions in your browser.");
+      toast.warning("Notification permission not granted. Please allow notification permissions in your browser or device settings.");
       return;
     }
 
@@ -443,11 +495,37 @@ export function PrayerTrackerProvider({ children }) {
 
     // Try sending a real server-side Web Push notification to test closed-tab pathway
     let webPushTriggered = false;
-    if (swRegistration) {
-      try {
-        const activeSub = await swRegistration.pushManager.getSubscription();
+    try {
+      const reg = swRegistration || (navigator.serviceWorker && (await navigator.serviceWorker.ready));
+      if (reg && reg.pushManager) {
+        let activeSub = await reg.pushManager.getSubscription();
+        if (!activeSub) {
+          const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+          if (vapidPublicKey) {
+            activeSub = await reg.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+            });
+            // Ensure DB record is updated
+            await syncPushSubscription(true, prayerReminders, azanVoice, true);
+          }
+        }
+
         if (activeSub) {
-          const keys = activeSub.toJSON().keys || {};
+          const subJson = activeSub.toJSON ? activeSub.toJSON() : {};
+          const rawKeys = subJson.keys || {};
+          let p256dhKey = rawKeys.p256dh || "";
+          let authKey = rawKeys.auth || "";
+
+          if (!p256dhKey && activeSub.getKey) {
+            const pBuf = activeSub.getKey("p256dh");
+            if (pBuf) p256dhKey = btoa(String.fromCharCode.apply(null, new Uint8Array(pBuf)));
+          }
+          if (!authKey && activeSub.getKey) {
+            const aBuf = activeSub.getKey("auth");
+            if (aBuf) authKey = btoa(String.fromCharCode.apply(null, new Uint8Array(aBuf)));
+          }
+
           const voiceLabel = azanVoice === "madinah" ? "Madinah Azan" : azanVoice === "fajr" ? "Fajr Azan" : azanVoice === "chime" ? "Soft Chime" : "Makkah Azan";
 
           const pushRes = await fetch("/api/push/send", {
@@ -455,52 +533,55 @@ export function PrayerTrackerProvider({ children }) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               endpoint: activeSub.endpoint,
-              p256dh: keys.p256dh || "",
-              auth: keys.auth || "",
+              p256dh: p256dhKey,
+              auth: authKey,
               title: `🔔 Real Web Push Test (${voiceLabel})`,
-              message: "This push notification was delivered from the PostgreSQL server. Background push works!",
+              message: "This push notification was delivered from the server. Background push alerts are active!",
               voice: azanVoice,
-              prayerName: "Test Push Alert"
+              prayerName: "Test Push Alert",
             }),
           });
+
           if (pushRes.ok) {
             webPushTriggered = true;
           } else if (pushRes.status === 410) {
-            console.log("Subscription was expired (410), automatically refreshing push subscription...");
+            console.log("Subscription was expired (410), renewing push subscription...");
             await activeSub.unsubscribe().catch(() => {});
-            await syncPushSubscription(true, prayerReminders, azanVoice);
+            await syncPushSubscription(true, prayerReminders, azanVoice, true);
           }
         }
-      } catch (pushErr) {
-        console.warn("Failed to trigger server-side test push:", pushErr);
       }
+    } catch (pushErr) {
+      console.warn("Failed to trigger server-side test push:", pushErr);
     }
 
     if (!webPushTriggered) {
       const voiceLabel = azanVoice === "madinah" ? "Madinah" : azanVoice === "fajr" ? "Fajr" : azanVoice === "chime" ? "Chime" : "Makkah";
       const title = `🔔 Local Test Namaz Alert (${voiceLabel})`;
       const options = {
-        body: "Local alerts are working! Server push was unavailable. Ensure notifications are enabled.",
-        icon: "/quran.svg",
-        badge: "/quran.svg",
+        body: "Local alerts are working! Background push notification is also configured.",
+        icon: "/icon-192.png",
+        badge: "/badge-72.png",
         tag: `namaz-test-${Date.now()}`,
         renotify: true,
         data: { url: "/prayer" },
-        requireInteraction: true,
       };
 
-      if (swRegistration && swRegistration.showNotification) {
-        swRegistration.showNotification(title, options).catch((err) => {
-          console.error("SW notification error, fallback to standard Notification:", err);
+      try {
+        const reg = swRegistration || (navigator.serviceWorker && (await navigator.serviceWorker.ready));
+        if (reg && reg.showNotification) {
+          await reg.showNotification(title, options);
+        } else {
           fallbackNotification(title, options);
-        });
-      } else {
+        }
+      } catch (err) {
+        console.error("SW notification error, fallback to standard Notification:", err);
         fallbackNotification(title, options);
       }
     }
 
     toast.success("Test notification triggered!");
-  }, [azanVoice, swRegistration, playAzanSound]);
+  }, [azanVoice, swRegistration, playAzanSound, prayerReminders, syncPushSubscription]);
 
   // Schedule a custom closed-tab test alarm (seconds or time string)
   const scheduleTestAlarm = useCallback(
@@ -728,21 +809,33 @@ export function PrayerTrackerProvider({ children }) {
   const toggleGlobalReminders = async (forcedValue) => {
     const nextVal = typeof forcedValue === "boolean" ? forcedValue : !remindersEnabled;
 
-    if (nextVal && typeof window !== "undefined" && "Notification" in window) {
-      if (Notification.permission !== "granted") {
-        try {
-          const perm = await Notification.requestPermission();
-          if (perm !== "granted") {
-            console.log("Notification permission not granted");
+    if (nextVal && typeof window !== "undefined") {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isStandalone = window.navigator.standalone || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+
+      if (isIOS && !isStandalone) {
+        toast.info("📱 On iPhone/iPad: To receive push notifications, tap Safari Share -> 'Add to Home Screen', then launch the app from your home screen!", {
+          autoClose: 9000,
+        });
+      }
+
+      if ("Notification" in window) {
+        if (Notification.permission !== "granted") {
+          try {
+            const perm = await Notification.requestPermission();
+            if (perm !== "granted") {
+              toast.warning("Notification permission not granted. Please allow notification permissions in your browser or device settings.");
+            }
+          } catch (err) {
+            console.error("Error requesting notification permission:", err);
           }
-        } catch (err) {
-          console.error("Error requesting notification permission:", err);
         }
       }
     }
 
     setRemindersEnabled(nextVal);
     saveSettings(nextVal, prayerReminders, reminderSound, azanVoice);
+    syncPushSubscription(nextVal, prayerReminders, azanVoice, true);
   };
 
   // Toggle Individual Prayer Reminder
@@ -941,12 +1034,11 @@ export function PrayerTrackerProvider({ children }) {
       const title = `Time for ${prayerName} Prayer! (Azan)`;
       const options = {
         body: `It is now time for ${prayerName} Salah. May Allah accept your prayers!`,
-        icon: "/quran.svg",
-        badge: "/quran.svg",
+        icon: "/icon-192.png",
+        badge: "/badge-72.png",
         tag: `namaz-notification-${prayerName}`,
         renotify: true,
         data: { url: "/prayer" },
-        requireInteraction: true,
       };
 
       if (swRegistration && swRegistration.showNotification) {
@@ -960,13 +1052,19 @@ export function PrayerTrackerProvider({ children }) {
     [notifiedMap, swRegistration, playAzanSound]
   );
 
-  function fallbackNotification(title, options) {
-    if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
-      try {
-        new Notification(title, options);
-      } catch (e) {
-        console.error("Web Notification error:", e);
+  async function fallbackNotification(title, options) {
+    if (typeof window === "undefined" || !("Notification" in window) || Notification.permission !== "granted") return;
+    try {
+      if ("serviceWorker" in navigator) {
+        const reg = await navigator.serviceWorker.ready;
+        if (reg && reg.showNotification) {
+          await reg.showNotification(title, options);
+          return;
+        }
       }
+      new Notification(title, options);
+    } catch (e) {
+      console.warn("Web Notification error:", e);
     }
   }
 
