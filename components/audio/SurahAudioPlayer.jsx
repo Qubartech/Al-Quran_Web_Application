@@ -398,9 +398,11 @@ function SurahAudioPlayer({
             <div className="min-w-0 flex flex-col">
               <h4 className="text-xs md:text-sm font-bold text-white group-hover/track:text-emerald-400 transition-colors truncate">
                 {title
-                  ? `${title} • Ayah ${
-                      activeAyahIndex >= 0 ? activeAyahIndex + 1 : "1"
-                    }`
+                  ? title.includes("Ayah") || title.includes(":")
+                    ? title
+                    : `${title} • Ayah ${
+                        activeAyahIndex >= 0 ? activeAyahIndex + 1 : "1"
+                      }`
                   : "Surah Recitation"}
               </h4>
               <p className="text-[11px] text-slate-400 truncate">

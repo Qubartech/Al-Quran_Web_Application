@@ -140,18 +140,20 @@ export default function HomeWelcome() {
   const handlePlayAyah = () => {
     if (!audio) return;
     const trackId = `ayah_${ayah.surahNum}_${ayah.ayahNum}`;
-    const isPlayingCurrent = audio.trackId === trackId && audio.isPlaying;
+    const isPlayingCurrent = audio.playlistId === trackId && !audio.paused;
 
     if (isPlayingCurrent) {
-      audio.togglePlay();
+      audio.pause();
     } else {
-      const audioUrl = `${QURANICAUDIO_BASE_URL}/qdc/mishari_al_afasy/murattal/${ayah.surahNum}.mp3`;
-      audio.playList([audioUrl], 0, trackId, `Surah ${ayah.surah} (${ayah.reference})`);
+      const surahPadded = String(ayah.surahNum).padStart(3, "0");
+      const ayahPadded = String(ayah.ayahNum).padStart(3, "0");
+      const singleAyahAudioUrl = `https://verses.quran.com/Alafasy/mp3/${surahPadded}${ayahPadded}.mp3`;
+      audio.playList([singleAyahAudioUrl], 0, trackId, `Surah ${ayah.surah} • Ayah ${ayah.ayahNum}`);
     }
   };
 
   const GreetingIcon = greetingInfo.icon;
-  const isAudioPlayingThis = audio?.trackId === `ayah_${ayah.surahNum}_${ayah.ayahNum}` && audio?.isPlaying;
+  const isAudioPlayingThis = audio?.playlistId === `ayah_${ayah.surahNum}_${ayah.ayahNum}` && !audio?.paused;
 
   return (
     <div className="flex flex-col gap-6 w-full mb-8">
