@@ -19,7 +19,8 @@ import {
   BellOff,
   CheckCircle2,
   Circle,
-  BarChart3
+  BarChart3,
+  Cloud
 } from "lucide-react";
 import PrayerSettingsModal from "./PrayerSettingsModal";
 import { CALCULATION_METHODS } from "@/lib/api/calculationMethods";
@@ -315,34 +316,35 @@ const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true, clas
   };
 
   return (
-    <div className={`relative w-full rounded-3xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/80 shadow-xl p-5 md:p-6 flex flex-col justify-between gap-4 overflow-hidden transition-all duration-300 ${className}`}>
+    <div className={`relative w-full rounded-3xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/80 shadow-xl p-4 sm:p-5 md:p-6 flex flex-col justify-between gap-3.5 sm:gap-4 overflow-hidden transition-all duration-300 ${className}`}>
       
       {/* Background Soft Glow Effect */}
       <div className="absolute -top-24 -right-24 w-60 h-60 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none"></div>
 
       {/* Header */}
       <div className="flex flex-col gap-2 border-b border-slate-200/50 dark:border-slate-800/80 pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-black bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 dark:from-emerald-400 dark:to-teal-300 bg-clip-text text-transparent">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap min-w-0">
+            <h2 className="text-base sm:text-lg font-black bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 dark:from-emerald-400 dark:to-teal-300 bg-clip-text text-transparent whitespace-nowrap">
               Namaz Timings
             </h2>
             {activeLocation?.isGps && (
-              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <span className="text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 whitespace-nowrap">
                 GPS
               </span>
             )}
             {tracker?.isSyncedWithAccount && (
-              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-500 dark:text-sky-400 border border-sky-500/30 flex items-center gap-1" title="Synced with your account">
-                Cloud Synced
+              <span className="text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-500 dark:text-sky-400 border border-sky-500/30 flex items-center gap-1 whitespace-nowrap" title="Synced with your account">
+                <Cloud size={10} className="shrink-0" />
+                <span>Synced</span>
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1 shrink-0 ml-auto">
             <button
               onClick={() => tracker?.toggleGlobalReminders()}
-              className={`p-2 rounded-xl transition-all flex items-center gap-1 text-xs font-bold ${
+              className={`p-1.5 sm:p-2 rounded-xl transition-all flex items-center gap-1 text-xs font-bold shrink-0 ${
                 tracker?.remindersEnabled
                   ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
                   : "text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -354,24 +356,28 @@ const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true, clas
 
             <button
               onClick={() => setShowSettings(true)}
-              className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600 transition-colors"
+              className="p-1.5 sm:p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-emerald-600 transition-colors shrink-0"
               title="Configure settings"
             >
-              <SlidersHorizontal size={16} />
+              <SlidersHorizontal size={15} />
             </button>
           </div>
         </div>
 
         {/* Location & Hijri Date */}
-        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
-          <div className="flex items-center gap-1.5 truncate max-w-[220px]">
-            <MapPin size={14} className="text-emerald-500 shrink-0" />
-            <span className="truncate font-semibold text-slate-700 dark:text-slate-300">
+        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium gap-2 pt-0.5">
+          <div className="flex items-center gap-1.5 truncate min-w-0 flex-1">
+            <MapPin size={13} className="text-emerald-500 shrink-0" />
+            <span className="truncate font-semibold text-slate-700 dark:text-slate-300 text-[11px] sm:text-xs">
               {activeLocation ? activeLocation.city : "Loading..."}
               {activeLocation?.country && `, ${activeLocation.country}`}
             </span>
           </div>
-          {hijriDate && <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-xs">{hijriDate}</span>}
+          {hijriDate && (
+            <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-[11px] sm:text-xs shrink-0 whitespace-nowrap">
+              {hijriDate}
+            </span>
+          )}
         </div>
       </div>
 
@@ -405,23 +411,23 @@ const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true, clas
           
           {/* Live Countdown Banner */}
           {prayerStatus && (
-            <div className="relative overflow-hidden p-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white shadow-lg shadow-emerald-500/15 flex items-center justify-between">
-              <div className="flex flex-col gap-0.5 z-10">
-                <span className="text-[11px] font-black uppercase tracking-wider text-emerald-100">
+            <div className="relative overflow-hidden p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white shadow-lg shadow-emerald-500/15 flex items-center justify-between gap-2 sm:gap-4">
+              <div className="flex flex-col gap-0.5 z-10 min-w-0">
+                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-emerald-100 truncate">
                   Next: {prayerStatus.nextPrayer}
                 </span>
-                <span className="text-xs text-white/90 font-medium">
+                <span className="text-[11px] sm:text-xs text-white/90 font-medium truncate">
                   Active: <strong className="text-white font-bold">{prayerStatus.activePrayer}</strong>
                 </span>
               </div>
-              <div className="text-xl font-black font-mono tracking-tight text-white drop-shadow z-10">
+              <div className="text-lg sm:text-xl font-black font-mono tracking-tight text-white drop-shadow z-10 shrink-0">
                 {prayerStatus.countdown}
               </div>
             </div>
           )}
 
           {/* Timings List - Flex 1 & Distribute evenly */}
-          <div className="flex-1 flex flex-col justify-between gap-2">
+          <div className="flex-1 flex flex-col justify-between gap-1.5 sm:gap-2">
             {Object.keys(PRAYER_METADATA).map((key) => {
               const item = PRAYER_METADATA[key];
               const timeRaw = timings[key];
@@ -434,7 +440,7 @@ const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true, clas
               return (
                 <div
                   key={key}
-                  className={`flex items-center justify-between p-3 rounded-2xl transition-all duration-200 ${
+                  className={`flex items-center justify-between p-2.5 sm:p-3 rounded-2xl transition-all duration-200 ${
                     isActive
                       ? "bg-emerald-500/15 border-2 border-emerald-500 dark:bg-emerald-950/40 shadow-md scale-[1.01]"
                       : key === "Sunrise"
@@ -442,19 +448,19 @@ const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true, clas
                       : "bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/40 hover:bg-white dark:hover:bg-slate-800/70"
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2.5 rounded-xl transition-colors ${
+                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                    <div className={`p-2 sm:p-2.5 rounded-xl transition-colors shrink-0 ${
                       isActive
                         ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30"
                         : key === "Sunrise"
                         ? "bg-amber-500/20 text-amber-600 dark:text-amber-400"
                         : "bg-slate-200/60 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300"
                     }`}>
-                      <Icon size={16} />
+                      <Icon size={15} />
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs md:text-sm font-bold ${
+                    <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                      <span className={`text-xs sm:text-sm font-bold truncate ${
                         isActive
                           ? "text-emerald-700 dark:text-emerald-400"
                           : key === "Sunrise"
@@ -464,15 +470,15 @@ const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true, clas
                         {item.label}
                       </span>
                       {key === "Sunrise" && (
-                        <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25">
+                        <span className="text-[8px] sm:text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25 shrink-0">
                           Shuruq
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <span className={`text-xs md:text-sm font-black font-mono ${
+                  <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                    <span className={`text-xs sm:text-sm font-black font-mono ${
                       isActive
                         ? "text-emerald-600 dark:text-emerald-400"
                         : key === "Sunrise"

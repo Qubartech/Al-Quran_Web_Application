@@ -14,7 +14,7 @@ async function Surah({ params }) {
   }
 
   // Read language and translation identifier from cookies to persist across refreshes
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const langCode = cookieStore.get("__language__")?.value || "bn";
   const editionIdentifier = cookieStore.get(
     "__translation_identifier__"

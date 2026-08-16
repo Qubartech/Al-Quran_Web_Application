@@ -22,10 +22,6 @@ export const metadata = {
   author: `Qubartech, ${process.env.name}, Tahir Ahmad`,
   keywords: [`Quran`, `Namaz`, `Azan`, `Prayer Times`, `Islam`],
   manifest: "/manifest.json",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#111827" },
-  ],
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -52,8 +48,16 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
-  const themeCookie = cookies().get("__theme__")?.value;
+export const viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#111827" },
+  ],
+};
+
+export default async function RootLayout({ children }) {
+  const cookieStore = await cookies();
+  const themeCookie = cookieStore.get("__theme__")?.value;
   const isDark =
     themeCookie === "dark" ? true : themeCookie === "light" ? false : undefined;
 

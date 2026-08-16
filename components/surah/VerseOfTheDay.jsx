@@ -38,12 +38,31 @@ function getDailyIndex() {
   return seed % CURATED_AYAHS.length;
 }
 
+import { useAudio } from "@/context/AudioProvider";
+import { Play, Pause } from "lucide-react";
+
 export default function VerseOfTheDay() {
   const [verse, setVerse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [copied, setCopied] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(getDailyIndex());
+  const audio = useAudio();
+
+  const trackId = verse ? `ayah_${verse.surahNumber}_${verse.ayahNumber}` : "";
+  const isPlayingThis = audio?.playlistId === trackId && !audio?.paused;
+
+  const handlePlay = () => {
+    if (!audio || !verse) return;
+    if (isPlayingThis) {
+      audio.pause();
+    } else {
+      const surahPadded = String(verse.surahNumber).padStart(3, "0");
+      const ayahPadded = String(verse.ayahNumber).padStart(3, "0");
+      const singleAyahAudioUrl = `https://verses.quran.com/Alafasy/mp3/${surahPadded}${ayahPadded}.mp3`;
+      audio.playList([singleAyahAudioUrl], 0, trackId, `Surah ${verse.surahName} • Ayah ${verse.ayahNumber}`);
+    }
+  };
 
   const fetchVerse = async (index) => {
     setLoading(true);
@@ -113,6 +132,19 @@ export default function VerseOfTheDay() {
             Verse of the Day
           </h3>
           <div className="flex items-center gap-1.5">
+            {verse && (
+              <button
+                onClick={handlePlay}
+                className={`p-2 rounded-lg transition-all border ${
+                  isPlayingThis
+                    ? "bg-primaryColor text-white border-primaryColor shadow-sm"
+                    : "bg-white/30 dark:bg-slate-900/30 text-gray-500 hover:text-primaryColor hover:bg-primaryColor/10 border-transparent hover:border-primaryColor/20"
+                }`}
+                title={isPlayingThis ? "Pause audio" : "Play verse recitation"}
+              >
+                {isPlayingThis ? <Pause size={13} fill="currentColor" /> : <Play size={13} fill="currentColor" />}
+              </button>
+            )}
             <button
               onClick={handleCopy}
               className="p-2 rounded-lg bg-white/30 dark:bg-slate-900/30 text-gray-500 hover:text-primaryColor hover:bg-primaryColor/10 transition-all border border-transparent hover:border-primaryColor/20"

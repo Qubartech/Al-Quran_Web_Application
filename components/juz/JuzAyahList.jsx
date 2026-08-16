@@ -416,7 +416,8 @@ export default function JuzAyahList({
   };
 
   const shareAyah = async (ayah, idx) => {
-    const url = typeof window !== "undefined" ? `${window.location.origin}/surah/${ayah?.surahNumber}#sura_${ayah?.surahNumber}_ayah_${ayah?.verseKey?.split(":")[1] || idx + 1}` : "";
+    const ayahNum = ayah?.verseKey?.split(":")[1] || idx + 1;
+    const url = typeof window !== "undefined" ? `${window.location.origin}/surah/${ayah?.surahNumber}?ayah=${ayahNum}` : "";
     const arabicText = ayah?.text || (ayah?.words || []).map((w) => w.text_uthmani || w.text).join(" ");
     const translationText = englishTrans[idx]?.text || "";
     const shareData = {
