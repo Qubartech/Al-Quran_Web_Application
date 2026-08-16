@@ -234,36 +234,36 @@
 }
 
 .audio-slider-input::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #10b981; /* emerald-500 */
-  border: 2px solid #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  transition: all 0.15s ease-in-out;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 13px !important;
+  height: 13px !important;
+  border-radius: 50% !important;
+  background: #10b981 !important; /* emerald-500 */
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4) !important;
+  transition: transform 0.15s ease-in-out !important;
 }
 
 .audio-slider-input::-webkit-slider-thumb:hover {
-  transform: scale(1.35);
-  background: #059669; /* emerald-600 */
+  transform: scale(1.3) !important;
+  background: #059669 !important; /* emerald-600 */
 }
 
 .audio-slider-input::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #10b981;
-  border: 2px solid #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  transition: all 0.15s ease-in-out;
-  cursor: pointer;
+  width: 13px !important;
+  height: 13px !important;
+  border-radius: 50% !important;
+  background: #10b981 !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4) !important;
+  transition: transform 0.15s ease-in-out !important;
+  cursor: pointer !important;
 }
 
 .audio-slider-input::-moz-range-thumb:hover {
-  transform: scale(1.35);
-  background: #059669;
+  transform: scale(1.3) !important;
+  background: #059669 !important;
 }
 
 /* Bouncing audio visualizer wave animation */

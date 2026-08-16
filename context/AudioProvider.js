@@ -281,6 +281,7 @@ export default function AudioProvider({ children }) {
           onPause={pause}
           onPlay={resume}
           title={title}
+          playlistId={playlistId}
           currentIndex={currentIndex}
           pauseTick={pauseTick}
           playTick={playTick}

@@ -73,12 +73,14 @@ export default function LeftBar({ data }) {
 
   const handleScrollToVerse = (verseIndex) => {
     if (activeSurahNumber !== selectedSurahNumber) {
-      window.location.href = `/surah/${selectedSurahNumber}#sura_${selectedSurahNumber}_ayah_${verseIndex}`;
+      window.location.href = `/surah/${selectedSurahNumber}?ayah=${verseIndex}`;
     } else {
       const el = document.getElementById(`sura_${selectedSurahNumber}_ayah_${verseIndex}`);
       if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-        el.focus();
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (typeof window !== "undefined") {
+          window.history.replaceState(null, "", `/surah/${selectedSurahNumber}?ayah=${verseIndex}`);
+        }
       }
     }
   };

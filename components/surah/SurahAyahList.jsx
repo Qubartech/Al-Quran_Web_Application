@@ -298,8 +298,31 @@ const SurahAyahList = ({
     }
   };
 
+  // Handle ?ayah=X or ?verse=X clean query params on page load
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetAyah = urlParams.get("ayah") || urlParams.get("verse");
+    if (targetAyah) {
+      const num = parseInt(targetAyah, 10);
+      if (!isNaN(num) && num > 0) {
+        const elId = `sura_${pageId}_ayah_${num}`;
+        setTimeout(() => {
+          const el = document.getElementById(elId);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+            el.classList.remove("ring-2", "ring-emerald-500");
+            void el.offsetWidth;
+            el.classList.add("ring-2", "ring-emerald-500", "transition-all", "duration-500");
+            setTimeout(() => el.classList.remove("ring-2", "ring-emerald-500"), 2000);
+          }
+        }, 350);
+      }
+    }
+  }, [pageId]);
+
   const shareAyah = async (ayah, idx) => {
-    const url = typeof window !== "undefined" ? `${window.location.origin}/surah/${pageId}#sura_${pageId}_ayah_${idx + 1}` : "";
+    const url = typeof window !== "undefined" ? `${window.location.origin}/surah/${pageId}?ayah=${idx + 1}` : "";
     const arabicText = ayah?.text || (ayah?.words || []).map((w) => w.text_uthmani || w.text).join(" ");
     const translationText = englishTrans[idx]?.text || "";
     const shareData = {
