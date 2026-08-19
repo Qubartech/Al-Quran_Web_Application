@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
-import { QURAN_API_BASE_URL } from "@/lib/api/config";
+import { QURAN_API_BASE_URL, getWordAudioUrl } from "@/lib/api/config";
 import { useAudio } from "@/context/AudioProvider";
 import { useUser } from "@/context/UserProvider";
 import { Bookmark, Copy, Check, Repeat1, Share2 } from "lucide-react";
@@ -28,8 +28,11 @@ export default function JuzAyahList({
   const wordAudioRef = useRef(null);
   const [arabicTextType, setArabicTextType] = useState("uthmani");
 
-  const playWordAudio = (word, wordIdx, ayahIdx) => {
-    if (!word?.audio_url) return;
+  const playWordAudio = (word, wordIdx, ayahIdx, ayahObj) => {
+    const sNum = ayahObj?.surahNumber || (ayahObj?.verseKey ? ayahObj.verseKey.split(":")[0] : null);
+    const aNum = ayahObj?.numberInSurah || (ayahObj?.verseKey ? ayahObj.verseKey.split(":")[1] : ayahIdx + 1);
+    const audioUrl = getWordAudioUrl(word, sNum, aNum, wordIdx);
+    if (!audioUrl) return;
 
     if (wordAudioRef.current) {
       wordAudioRef.current.pause();
@@ -38,12 +41,6 @@ export default function JuzAyahList({
     if (audio && typeof audio.pause === "function" && !audio.paused) {
       audio.pause();
     }
-
-    const audioUrl = word.audio_url.startsWith("http")
-      ? word.audio_url
-      : word.audio_url.startsWith("//")
-      ? `https:${word.audio_url}`
-      : `https://audio.qurancdn.com/${word.audio_url}`;
 
     const newAudio = new Audio(audioUrl);
     wordAudioRef.current = newAudio;
@@ -633,7 +630,7 @@ export default function JuzAyahList({
                       return (
                         <div
                           key={wIdx}
-                          onClick={() => isWord && playWordAudio(word, wIdx, idx)}
+                          onClick={() => isWord && playWordAudio(word, wIdx, idx, ayah)}
                           className={`relative flex flex-col items-center justify-center px-0.5 sm:px-0.5 py-0.5 rounded-lg transition-all duration-200 group cursor-pointer outline-none focus:outline-none ${
                             isCurrentlyHighlighted
                               ? "z-10 bg-emerald-50/50 dark:bg-slate-800/40"

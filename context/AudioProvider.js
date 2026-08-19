@@ -62,15 +62,24 @@ export default function AudioProvider({ children }) {
 
   // Update resolved reciter name based on active reciter ID
   useEffect(() => {
-    const savedId = typeof window !== "undefined" ? localStorage.getItem("app_reciter_id") || "7" : "7";
-    const match = reciters.find((r) => String(r.id) === String(savedId));
-    if (match) {
-      const name = match.translated_name?.name || match.reciter_name;
-      const style = match.style ? ` (${match.style})` : "";
-      setReciterName(`${name}${style}`);
-    } else {
-      setReciterName(savedId === "7" ? "Mishary Rashid Alafasy" : `Reciter ${savedId}`);
-    }
+    const updateReciter = () => {
+      const savedId = typeof window !== "undefined" ? localStorage.getItem("app_reciter_id") || "7" : "7";
+      const match = reciters.find((r) => String(r.id) === String(savedId));
+      if (match) {
+        const name = match.translated_name?.name || match.reciter_name || "";
+        const style = match.style ? ` (${match.style})` : "";
+        setReciterName(`${name}${style}`);
+      } else {
+        setReciterName(savedId === "7" ? "Mishari Rashid al-`Afasy" : `Reciter ${savedId}`);
+      }
+    };
+    updateReciter();
+    window.addEventListener("quran-reciter-change", updateReciter);
+    window.addEventListener("storage", updateReciter);
+    return () => {
+      window.removeEventListener("quran-reciter-change", updateReciter);
+      window.removeEventListener("storage", updateReciter);
+    };
   }, [reciters, src]);
 
   const play = (newSrc) => {
@@ -123,17 +132,20 @@ export default function AudioProvider({ children }) {
     }
 
     // Direct CDN URL mapping for instant synchronous playback inside user gesture
+    const numPad3 = String(num).padStart(3, "0");
     const reciterCdnMap = {
       "1": `${QURANICAUDIO_BASE_URL}/qdc/abdul_baset/mujawwad/${num}.mp3`,
       "2": `${QURANICAUDIO_BASE_URL}/qdc/abdul_baset/murattal/${num}.mp3`,
-      "3": `${QURANICAUDIO_BASE_URL}/qdc/abu_bakr_shatri/murattal/${num}.mp3`,
-      "4": `${QURANICAUDIO_BASE_URL}/qdc/hani_ar_rifai/murattal/${num}.mp3`,
-      "5": `${QURANICAUDIO_BASE_URL}/qdc/khalil_al_husary/murattal/${num}.mp3`,
-      "6": `${QURANICAUDIO_BASE_URL}/qdc/siddiq_minshawi/murattal/${num}.mp3`,
+      "3": `${QURANICAUDIO_BASE_URL}/qdc/abdurrahmaan_as_sudais/murattal/${num}.mp3`,
+      "4": `${QURANICAUDIO_BASE_URL}/qdc/abu_bakr_shatri/murattal/${num}.mp3`,
+      "5": `${QURANICAUDIO_BASE_URL}/qdc/hani_ar_rifai/murattal/${num}.mp3`,
+      "6": `${QURANICAUDIO_BASE_URL}/qdc/khalil_al_husary/murattal/${num}.mp3`,
       "7": `${QURANICAUDIO_BASE_URL}/qdc/mishari_al_afasy/murattal/${num}.mp3`,
-      "8": `${QURANICAUDIO_BASE_URL}/qdc/saud_ash_shuraym/murattal/${num}.mp3`,
-      "9": `${QURANICAUDIO_BASE_URL}/qdc/siddiq_minshawi/mujawwad/${num}.mp3`,
-      "10": `${QURANICAUDIO_BASE_URL}/qdc/saad_al_ghamdi/murattal/${num}.mp3`,
+      "8": `${QURANICAUDIO_BASE_URL}/qdc/siddiq_al-minshawi/mujawwad/${numPad3}.mp3`,
+      "9": `${QURANICAUDIO_BASE_URL}/qdc/siddiq_minshawi/murattal/${num}.mp3`,
+      "10": `${QURANICAUDIO_BASE_URL}/qdc/saud_ash-shuraym/murattal/${numPad3}.mp3`,
+      "11": `${QURANICAUDIO_BASE_URL}/quran/abdul_muhsin_alqasim/${numPad3}.mp3`,
+      "12": `${QURANICAUDIO_BASE_URL}/qdc/khalil_al_husary/muallim/${num}.mp3`,
     };
 
     const initialUrl = reciterCdnMap[reciterId] || `${QURANICAUDIO_BASE_URL}/qdc/mishari_al_afasy/murattal/${num}.mp3`;
