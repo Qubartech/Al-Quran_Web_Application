@@ -490,8 +490,8 @@ export default function JuzAyahList({
               tabIndex={-1}
               className={`px-4 md:px-6 py-4 md:py-5 flex flex-col gap-3.5 w-full transition-all duration-300 rounded-2xl ${
                 isPlaying
-                  ? "bg-primaryColor/5 border border-primaryColor/20 shadow-sm dark:bg-emerald-500/10"
-                  : "bg-white/20 dark:bg-slate-900/10 border border-gray-200/20 dark:border-slate-800/20 hover:border-gray-300/30 dark:hover:border-slate-700/30"
+                  ? "bg-emerald-500/10 dark:bg-emerald-500/[0.08] border-2 border-emerald-500/50 dark:border-emerald-500/40 verse-active-glow shadow-md shadow-emerald-500/5"
+                  : "bg-white/80 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800/60 hover:border-emerald-500/40 hover:bg-white dark:hover:bg-slate-900/70 shadow-xs"
               }`}
             >
               

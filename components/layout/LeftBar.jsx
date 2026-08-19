@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Search, X, Volume2 } from "lucide-react";
+import { Search, X, Volume2, BookOpen, Layers, FileText, Hash } from "lucide-react";
 import { useAudio } from "@/context/AudioProvider";
 import { useSidebar } from "@/context/SidebarProvider";
 
@@ -86,66 +86,69 @@ export default function LeftBar({ data }) {
   };
 
   return (
-    <div className="p-4 text-gray-900 dark:text-gray-100 transition-colors bg-transparent flex flex-col h-full">
+    <div className="p-3.5 sm:p-4 text-slate-800 dark:text-slate-100 transition-colors bg-transparent flex flex-col h-full">
       {/* Sticky Header Section */}
-      <div className="bg-transparent border-b border-gray-200/20 dark:border-slate-800/80 pb-3.5 mb-3 flex flex-col gap-3 shrink-0">
+      <div className="bg-transparent border-b border-slate-200/80 dark:border-slate-800/80 pb-3 mb-2.5 flex flex-col gap-2.5 shrink-0">
         
-        {/* Title Header matching user screenshot */}
-        <div className="flex flex-col gap-2.5">
-          <div className="flex items-center justify-between w-full">
-            <h2 className="text-xl font-bold text-emerald-400 tracking-tight">
-              Surah List
+        {/* Title Header */}
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-2">
+            <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-xs font-black shadow-sm shadow-emerald-500/20">
+              <BookOpen size={15} />
+            </span>
+            <h2 className="text-base font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+              Quran Navigation
             </h2>
-            {/* Close button on mobile */}
+          </div>
+          {/* Close button for drawer/mobile */}
+          <button
+            onClick={toggleSidebar}
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors cursor-pointer"
+            title="Close Navigation"
+          >
+            <X size={17} />
+          </button>
+        </div>
+        
+        {/* Top Navigation Mode Pills */}
+        <div className="flex items-center justify-between w-full bg-slate-100/90 dark:bg-slate-900/90 p-1 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-xs font-bold">
+          {[
+            { id: "surah", label: "Surah" },
+            { id: "verse", label: "Verse" },
+            { id: "juz", label: "Juz" },
+            { id: "page", label: "Page" },
+          ].map((tab) => (
             <button
-              onClick={toggleSidebar}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors cursor-pointer"
-              title="Close Sidebar"
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 py-1.5 rounded-xl transition-all duration-200 cursor-pointer text-center text-xs ${
+                activeTab === tab.id
+                  ? "bg-white dark:bg-emerald-500 text-emerald-600 dark:text-slate-950 font-black shadow-xs"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-semibold"
+              }`}
             >
-              <X size={18} />
+              {tab.label}
             </button>
-          </div>
-          
-          {/* Top Navigation Mode Pills */}
-          <div className="flex items-center justify-between w-full bg-slate-900/80 p-1 rounded-xl border border-slate-800/80 text-xs font-bold">
-            {[
-              { id: "surah", label: "Surah" },
-              { id: "verse", label: "Verse" },
-              { id: "juz", label: "Juz" },
-              { id: "page", label: "Page" },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 py-1 rounded-lg transition-all duration-200 cursor-pointer text-center ${
-                  activeTab === tab.id
-                    ? "bg-emerald-500 text-slate-950 font-black shadow-xs"
-                    : "text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
 
-        {/* Search Header for SURAH Tab (Matching user screenshot) */}
+        {/* Search Header for SURAH Tab */}
         {activeTab === "surah" && (
           <div className="relative w-full">
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search Surah..."
-              className="w-full pl-9 pr-8 py-2.5 rounded-xl border border-slate-800/90 bg-slate-900/80 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500/60 text-xs font-medium transition-all"
+              placeholder="Search Surah by name or number..."
+              className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/70 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-xs font-semibold shadow-2xs transition-all"
             />
-            <Search className="absolute left-3 top-3 text-slate-500" size={14} />
+            <Search className="absolute left-3 top-2.5 text-slate-400" size={14} />
             {query && (
               <button
                 onClick={() => setQuery("")}
-                className="absolute right-2.5 top-2.5 p-1 rounded-full hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors"
+                className="absolute right-2.5 top-2 p-0.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 transition-colors"
               >
-                <X size={12} />
+                <X size={13} />
               </button>
             )}
           </div>
@@ -160,17 +163,17 @@ export default function LeftBar({ data }) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search Surah..."
-                className="w-full pl-8 pr-3 py-2 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500/60 text-xs font-medium"
+                className="w-full pl-8 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/70 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-xs font-semibold shadow-2xs"
               />
-              <Search className="absolute left-2.5 top-2.5 text-slate-500" size={14} />
+              <Search className="absolute left-2.5 top-2.5 text-slate-400" size={14} />
             </div>
             <div className="col-span-4 relative">
               <input
                 type="text"
                 value={verseQuery}
                 onChange={(e) => setVerseQuery(e.target.value)}
-                placeholder="Verse"
-                className="w-full px-2.5 py-2 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500/60 text-xs font-medium text-center"
+                placeholder="Verse #"
+                className="w-full px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/70 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-xs font-semibold text-center shadow-2xs"
               />
             </div>
           </div>
@@ -183,16 +186,16 @@ export default function LeftBar({ data }) {
               type="text"
               value={pageQuery}
               onChange={(e) => setPageQuery(e.target.value)}
-              placeholder="Search Page..."
-              className="w-full pl-9 pr-8 py-2.5 rounded-xl border border-slate-800/90 bg-slate-900/80 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500/60 text-xs font-medium transition-all"
+              placeholder="Search Page (1 - 604)..."
+              className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/70 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-xs font-semibold shadow-2xs transition-all"
             />
-            <Search className="absolute left-3 top-3 text-slate-500" size={14} />
+            <Search className="absolute left-3 top-2.5 text-slate-400" size={14} />
             {pageQuery && (
               <button
                 onClick={() => setPageQuery("")}
-                className="absolute right-2.5 top-2.5 p-1 rounded-full hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors"
+                className="absolute right-2.5 top-2 p-0.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 transition-colors"
               >
-                <X size={12} />
+                <X size={13} />
               </button>
             )}
           </div>
@@ -203,7 +206,7 @@ export default function LeftBar({ data }) {
       {/* Main Tab Body Content */}
       <div className="flex-1 min-h-0 overflow-y-auto px-0.5 py-0.5 hover-scrollbar">
         
-        {/* ── 1. SURAH TAB (Exact design matching user screenshot) ── */}
+        {/* ── 1. SURAH TAB ── */}
         {activeTab === "surah" && (
           <div className="flex flex-col gap-2">
             {filteredSurahs.map((surah) => {
@@ -214,34 +217,36 @@ export default function LeftBar({ data }) {
                   href={`/surah/${surah?.number}`}
                   key={surah?.number}
                   onClick={() => setSelectedSurahNumber(surah?.number)}
-                  className="w-full"
+                  className="w-full group"
                 >
                   <div
-                    className={`w-full p-3 rounded-2xl border flex items-center justify-between transition-all duration-200 group cursor-pointer ${
+                    className={`w-full p-2.5 sm:p-3 rounded-2xl border flex items-center justify-between transition-all duration-200 cursor-pointer ${
                       isActive
-                        ? "bg-emerald-950/20 border-emerald-500/80 shadow-md shadow-emerald-500/10"
+                        ? "bg-emerald-500/10 dark:bg-emerald-950/40 border-2 border-emerald-500 text-emerald-900 dark:text-emerald-200 shadow-md shadow-emerald-500/10"
                         : isPlayingSurah
-                        ? "border-amber-500/40 bg-amber-500/10"
-                        : "border-slate-800/60 bg-slate-900/40 text-slate-200 hover:bg-slate-800/60 hover:border-emerald-500/40"
+                        ? "border-amber-500/60 bg-amber-500/10 text-amber-900 dark:text-amber-200 shadow-md shadow-amber-500/10"
+                        : "border-slate-200/80 dark:border-slate-800/70 bg-white/70 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-800/60 hover:border-emerald-500/40 hover:shadow-md text-slate-800 dark:text-slate-200"
                     }`}
                   >
                     {/* Left Section: Number Badge + English Name & Translation */}
-                    <div className="flex items-center gap-3 truncate min-w-0">
+                    <div className="flex items-center gap-2.5 truncate min-w-0">
                       <div
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 transition-all ${
+                        className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 transition-all ${
                           isActive
-                            ? "bg-emerald-500 text-slate-950 font-black shadow-sm shadow-emerald-500/20"
-                            : "bg-emerald-950/40 text-emerald-400 border border-emerald-500/20 font-bold"
+                            ? "bg-emerald-600 text-white font-black shadow-sm shadow-emerald-600/30"
+                            : isPlayingSurah
+                            ? "bg-amber-500 text-white font-black shadow-sm"
+                            : "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-black font-mono"
                         }`}
                       >
-                        {isPlayingSurah ? <Volume2 size={15} className="text-amber-400" /> : surah?.number}
+                        {isPlayingSurah ? <Volume2 size={15} className="text-white animate-pulse" /> : surah?.number}
                       </div>
 
                       <div className="flex flex-col truncate min-w-0">
-                        <span className="text-sm font-extrabold text-slate-100 group-hover:text-emerald-400 transition-colors truncate">
+                        <span className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
                           {surah?.englishName}
                         </span>
-                        <span className="text-xs text-gray-400 dark:text-gray-400 font-medium truncate">
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
                           {surah?.englishNameTranslation || `Chapter ${surah?.number}`}
                         </span>
                       </div>
@@ -249,10 +254,10 @@ export default function LeftBar({ data }) {
 
                     {/* Right Section: Arabic Name & Ayah Count */}
                     <div className="flex flex-col items-end shrink-0 pl-2">
-                      <span className="font-arabic text-sm text-slate-200 font-medium text-right">
+                      <span className="font-arabic text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 text-right">
                         {surah?.name}
                       </span>
-                      <span className="text-[11px] font-bold text-emerald-400 text-right mt-0.5">
+                      <span className="text-[10px] sm:text-[11px] font-bold text-emerald-600 dark:text-emerald-400 text-right mt-0.5">
                         {surah?.numberOfAyahs || 0} Ayahs
                       </span>
                     </div>
@@ -275,12 +280,12 @@ export default function LeftBar({ data }) {
                     onClick={() => setSelectedSurahNumber(surah?.number)}
                     className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-left transition-all duration-200 cursor-pointer ${
                       isSelected
-                        ? "bg-emerald-950/30 text-white border-emerald-500/60 font-extrabold shadow-sm"
-                        : "border-slate-800/40 text-slate-300 hover:bg-slate-800/40"
+                        ? "bg-emerald-500/10 dark:bg-emerald-950/40 border-2 border-emerald-500 text-emerald-900 dark:text-emerald-200 font-black shadow-sm"
+                        : "border-slate-200/80 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/40 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800/60"
                     }`}
                   >
-                    <div className="flex items-center gap-2.5 truncate">
-                      <span className="text-xs font-mono font-bold w-5 text-emerald-400 shrink-0">
+                    <div className="flex items-center gap-2 truncate">
+                      <span className="text-xs font-mono font-black w-5 text-emerald-600 dark:text-emerald-400 shrink-0">
                         {surah?.number}
                       </span>
                       <span className="text-xs font-bold truncate">
@@ -292,12 +297,12 @@ export default function LeftBar({ data }) {
               })}
             </div>
 
-            <div className="col-span-4 flex flex-col gap-1.5 border-l border-slate-800/60 pl-1.5 overflow-y-auto hover-scrollbar">
+            <div className="col-span-4 flex flex-col gap-1.5 border-l border-slate-200 dark:border-slate-800/60 pl-1.5 overflow-y-auto hover-scrollbar">
               {filteredVerseNumbers.map((vNum) => (
                 <button
                   key={vNum}
                   onClick={() => handleScrollToVerse(vNum)}
-                  className="w-full py-2 rounded-xl text-xs font-mono font-bold text-center transition-all bg-slate-900/60 border border-slate-800 hover:bg-emerald-500 hover:text-slate-950 hover:border-emerald-400 text-slate-200 cursor-pointer"
+                  className="w-full py-2 rounded-xl text-xs font-mono font-bold text-center transition-all bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-slate-950 hover:border-emerald-500 text-slate-800 dark:text-slate-200 cursor-pointer shadow-2xs"
                 >
                   {vNum}
                 </button>
@@ -310,17 +315,17 @@ export default function LeftBar({ data }) {
         {activeTab === "juz" && (
           <div className="flex flex-col gap-2">
             {Array.from({ length: 30 }, (_, i) => i + 1).map((jNum) => (
-              <Link href={`/juz/${jNum}`} key={jNum} className="w-full">
-                <div className="p-3 rounded-2xl border border-slate-800/60 bg-slate-900/40 hover:bg-slate-800/60 hover:border-emerald-500/40 flex items-center justify-between transition-all group">
+              <Link href={`/juz/${jNum}`} key={jNum} className="w-full group">
+                <div className="p-2.5 sm:p-3 rounded-2xl border border-slate-200/80 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-800/60 hover:border-emerald-500/40 hover:shadow-md flex items-center justify-between transition-all">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-950/40 border border-emerald-500/20 text-emerald-400 font-extrabold text-xs flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-black text-xs flex items-center justify-center">
                       {jNum}
                     </div>
-                    <span className="text-xs font-bold text-slate-200 group-hover:text-emerald-400">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
                       Juz {jNum}
                     </span>
                   </div>
-                  <span className="text-[10px] text-slate-400">&rarr;</span>
+                  <span className="text-xs font-bold text-slate-400 group-hover:text-emerald-500 transition-colors">&rarr;</span>
                 </div>
               </Link>
             ))}
@@ -333,15 +338,18 @@ export default function LeftBar({ data }) {
             {filteredPages.map((pNum) => {
               const isPageActive = params?.id && String(params.id) === String(pNum);
               return (
-                <Link href={`/page/${pNum}`} key={pNum} className="w-full">
+                <Link href={`/page/${pNum}`} key={pNum} className="w-full group">
                   <div
                     className={`w-full p-2.5 rounded-xl border flex items-center justify-between transition-all duration-200 cursor-pointer ${
                       isPageActive
-                        ? "bg-emerald-950/30 text-white border-emerald-500/80 font-extrabold shadow-sm"
-                        : "border-slate-800/40 text-slate-300 hover:bg-slate-800/40 hover:border-slate-700"
+                        ? "bg-emerald-500/10 dark:bg-emerald-950/30 text-emerald-900 dark:text-white border-2 border-emerald-500 font-extrabold shadow-sm"
+                        : "border-slate-200/80 dark:border-slate-800/40 bg-white/70 dark:bg-slate-900/40 text-slate-800 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800/40 hover:border-emerald-500/40 hover:shadow-sm"
                     }`}
                   >
-                    <span className="text-xs font-bold">Page {pNum}</span>
+                    <span className="text-xs font-bold group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      Page {pNum}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-mono">Mushaf</span>
                   </div>
                 </Link>
               );
@@ -353,3 +361,4 @@ export default function LeftBar({ data }) {
     </div>
   );
 }
+

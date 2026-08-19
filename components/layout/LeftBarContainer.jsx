@@ -19,17 +19,17 @@ export default function LeftBarContainer({ data, children }) {
 
       {/* LeftBar Sidebar Drawer */}
       <div className={`
-        fixed inset-y-0 left-0 z-[20000] w-80 max-w-[calc(100vw-40px)] h-screen bg-slate-950 text-slate-100 border-r border-slate-800 shadow-2xl flex flex-col
+        fixed inset-y-0 left-0 z-[20000] w-80 max-w-[calc(100vw-40px)] h-screen bg-white/95 dark:bg-slate-950/95 backdrop-blur-2xl text-slate-900 dark:text-slate-100 border-r border-slate-200/80 dark:border-slate-800 shadow-2xl flex flex-col
         transition-all duration-300 ease-in-out
         ${isLeftBarOpen ? "translate-x-0 opacity-100 visible" : "-translate-x-full opacity-0 invisible"}
-        md:relative md:translate-x-0 md:opacity-100 md:visible md:inset-auto md:z-0 md:w-96 md:h-[calc(100vh-130px)] md:bg-transparent md:border-none md:shadow-none md:rounded-2xl md:glass md:shrink-0 md:overflow-hidden
+        md:relative md:translate-x-0 md:opacity-100 md:visible md:inset-auto md:z-0 md:w-96 md:h-[calc(100vh-130px)] md:bg-white/70 md:dark:bg-slate-900/60 md:border md:border-slate-200/80 md:dark:border-slate-800/80 md:backdrop-blur-xl md:shadow-xl md:rounded-3xl md:shrink-0 md:overflow-hidden
         ${isLeftBarOpen ? "md:flex" : "md:hidden"}
       `}>
         <LeftBar data={data} />
       </div>
 
       {/* Main Reading Pane */}
-      <div className="w-full rounded-2xl h-[calc(100vh-130px)] overflow-y-auto scroll-smooth duration-700 glass hover-scrollbar flex-1 relative">
+      <div className="w-full rounded-3xl h-[calc(100vh-130px)] overflow-y-auto scroll-smooth duration-700 bg-white/70 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80 backdrop-blur-xl shadow-xl hover-scrollbar flex-1 relative">
         {children}
       </div>
     </div>

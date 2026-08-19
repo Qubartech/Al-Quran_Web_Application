@@ -9,12 +9,16 @@ import { PrayerTrackerProvider } from "@/context/PrayerTrackerContext";
 import NoFlashThemeScript from "@/components/theme/NoFlashThemeScript";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { cookies } from "next/headers";
 import { arabicFont } from './fonts';
 import { Analytics } from "@vercel/analytics/next";
 
-const inter = Inter({ subsets: ["latin"] });
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-sans",
+});
 
 export const metadata = {
   title: "Quran Application - Al-Quran & Namaz Reminders",
@@ -75,7 +79,7 @@ export default async function RootLayout({ children }) {
         ></script>
       </head>
       <body
-        className={`${inter.className} bg-gray-100 dark:bg-[#111827]`}
+        className={`${jakarta.className} ${jakarta.variable} bg-slate-50 text-slate-900 dark:bg-[#0b1120] dark:text-slate-100 antialiased selection:bg-emerald-500 selection:text-white`}
         suppressHydrationWarning
       >
         <AppThemeProvider
