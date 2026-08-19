@@ -523,19 +523,20 @@ const SurahAyahList = ({
       </div>
 
       {viewMode === "reading" ? (
-        /* ── Quran.com Reading Mode (Continuous Mushaf Style Arabic Text with Generous Spacing & RTL Right Alignment) ── */
+        /* ── Quran.com Reading Mode (Continuous Mushaf Style Arabic Text with Dynamic Font Sizing & RTL Right Alignment) ── */
         <div
-          className="p-4 sm:p-8 md:p-12 rounded-3xl glass border border-emerald-500/25 leading-[2.8] sm:leading-[3.2] md:leading-[3.6] text-right font-arabic text-xl sm:text-2xl md:text-3.5xl text-slate-900 dark:text-slate-100 flex flex-wrap gap-x-3 md:gap-x-4 gap-y-6 md:gap-y-8 shadow-xl justify-start w-full text-end"
+          className="p-4 sm:p-8 md:p-12 rounded-3xl glass border border-emerald-500/25 leading-[2.6] sm:leading-[3.0] md:leading-[3.4] text-right font-arabic text-slate-900 dark:text-slate-100 flex flex-wrap gap-x-2.5 sm:gap-x-3.5 md:gap-x-4 gap-y-5 sm:gap-y-7 md:gap-y-9 shadow-xl justify-start w-full text-end ayah-arabic-text"
           dir="rtl"
-          style={{ textAlign: "right", direction: "rtl" }}
+          style={{ textAlign: "right", direction: "rtl", fontSize: "var(--ayah-arabic-font-size)" }}
         >
           {arabicAyah.map((ayah, idx) => {
             return (
               <span
                 key={idx}
                 id={`sura_${pageId}_ayah_${idx + 1}`}
-                className="inline-flex items-center flex-wrap select-none tracking-wide text-right"
+                className="inline-flex items-center flex-wrap select-none tracking-wide text-right font-arabic ayah-arabic-text"
                 dir="rtl"
+                style={{ fontSize: "var(--ayah-arabic-font-size)" }}
               >
                 {ayah.words && ayah.words.length > 0 ? (
                   ayah.words.map((word, wIdx) => {
@@ -552,11 +553,12 @@ const SurahAyahList = ({
                       <span
                         key={wIdx}
                         onClick={() => isWord && playWordAudio(word, wIdx, idx, ayah)}
-                        className={`transition-all duration-150 cursor-pointer ${
+                        className={`transition-all duration-150 cursor-pointer font-arabic ayah-arabic-text ${
                           isWordAudioPlaying
                             ? "text-emerald-500 dark:text-emerald-400 font-bold scale-110 drop-shadow-[0_2px_10px_rgba(16,185,129,0.4)]"
                             : "hover:text-emerald-500 dark:hover:text-emerald-400"
                         }`}
+                        style={{ fontSize: "var(--ayah-arabic-font-size)" }}
                       >
                         {arabicTextType === "tajweed" ? (
                           <span dangerouslySetInnerHTML={{ __html: wordText }} />
@@ -568,7 +570,9 @@ const SurahAyahList = ({
                     );
                   })
                 ) : (
-                  <span>{ayah.text}</span>
+                  <span className="font-arabic ayah-arabic-text" style={{ fontSize: "var(--ayah-arabic-font-size)" }}>
+                    {ayah.text}
+                  </span>
                 )}
               </span>
             );
