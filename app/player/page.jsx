@@ -121,7 +121,7 @@ export default function AudioPlayerPage() {
       }
     }
 
-    const textUrl = `${QURAN_API_BASE_URL}/verses/by_chapter/${activeSurahNum}?per_page=300&translations=${translationId}&words=true&word_fields=text_qpc_hafs,text_indopak,text_uthmani,code_v1,code_v2`;
+    const textUrl = `${QURAN_API_BASE_URL}/verses/by_chapter/${activeSurahNum}?per_page=300&translations=${translationId}&words=true&word_fields=location,text_qpc_hafs,text_indopak,text_uthmani,code_v1,code_v2`;
     const segmentsUrl = `${QURAN_API_BASE_URL}/chapter_recitations/${reciterId}/${activeSurahNum}?segments=true`;
     const chapterUrl = `${QURAN_API_BASE_URL}/chapters/${activeSurahNum}?language=en`;
 
