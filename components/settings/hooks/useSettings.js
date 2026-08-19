@@ -317,6 +317,8 @@ export default function useSettings() {
       }
     }
 
+    window.dispatchEvent(new CustomEvent("quran-reciter-change", { detail: { reciterId: stringVal } }));
+
     setTimeout(() => {
       try {
         router.refresh();
@@ -377,6 +379,7 @@ export default function useSettings() {
     arabicFontSize,
     arabicFontFamily,
     arabicTextType,
+    reciterId,
     showWordTooltip: audio?.showWordTooltip ?? true,
     // handlers
     handleThemeChange,
