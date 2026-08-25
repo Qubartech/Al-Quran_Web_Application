@@ -44,22 +44,27 @@ async function Surah({ params }) {
         versesCount={versesCount}
       />
 
-      {/* ── Ornamental Divider ── */}
-      <div className="ornamental-divider my-4 mx-4 md:mx-8">
-        <svg width="20" height="20" viewBox="0 0 20 20" className="text-primaryColor/50 dark:text-primaryColor-light/50 shrink-0" fill="currentColor">
-          <polygon points="10,0 13,7 20,7 14.5,11.5 16.5,19 10,14.5 3.5,19 5.5,11.5 0,7 7,7" />
-        </svg>
-      </div>
-
-      {/* ── Bismillah Decoration ── */}
+      {/* ── Bismillah Illuminated Manuscript Frame ── */}
       {showBismillah && (
-        <div className="text-center py-6 md:py-8 animate-fadeIn" style={{ animationDelay: '0.15s' }}>
-          <p className="bismillah-text font-arabic text-primaryColor dark:text-primaryColor-light opacity-80 select-none">
-            بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
-          </p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 font-medium italic">
-            In the name of Allah, the Most Gracious, the Most Merciful
-          </p>
+        <div className="flex justify-center my-6 animate-fadeIn" style={{ animationDelay: '0.15s' }}>
+          <div className="relative py-6 px-8 md:px-16 rounded-3xl glass border border-emerald-500/20 dark:border-emerald-500/30 text-center max-w-xl w-full shadow-lg overflow-hidden group">
+            {/* Ambient inner glow */}
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-teal-500/10 to-amber-500/5 dark:from-emerald-400/5 dark:via-teal-400/10 dark:to-amber-400/5 pointer-events-none" />
+            
+            {/* Ornamental side brackets */}
+            <div className="relative z-10 flex items-center justify-center gap-4">
+              <span className="text-emerald-500/40 dark:text-emerald-400/40 text-xl font-arabic select-none">
+                ﷽
+              </span>
+            </div>
+
+            <p className="relative z-10 bismillah-text font-arabic text-2xl sm:text-3xl md:text-4xl text-slate-800 dark:text-slate-100 font-bold tracking-wide select-none drop-shadow-sm my-1">
+              بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+            </p>
+            <p className="relative z-10 text-xs sm:text-sm text-emerald-700/80 dark:text-emerald-400/80 font-medium italic mt-1.5">
+              In the Name of Allah—the Most Compassionate, Most Merciful
+            </p>
+          </div>
         </div>
       )}
 

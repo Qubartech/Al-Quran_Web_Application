@@ -11,9 +11,10 @@ async function SurahReadLayout({ children }) {
       <LeftBarContainer data={data}>
         {children}
       </LeftBarContainer>
-      <SurahPrevNextNav />
+      <SurahPrevNextNav surahList={data} />
     </>
   );
 }
 
 export default SurahReadLayout;
+
