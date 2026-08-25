@@ -66,7 +66,7 @@ export default function SurahHeroHeader({
     <>
       {/* ── 1. Main Hero Banner Content ── */}
       <div className="relative py-10 md:py-12 px-6 md:px-10 rounded-3xl overflow-hidden glass shadow-sm mb-4 border border-emerald-500/15 dark:border-emerald-500/30 animate-fadeIn transition-all duration-300">
-        
+
         {/* Islamic Ambient Glows & Mesh Gradients */}
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-50/80 via-teal-50/60 to-cyan-50/70 dark:from-emerald-950/70 dark:via-slate-900/90 dark:to-teal-950/70 z-0 pointer-events-none" />
         <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-80 h-80 bg-emerald-500/15 dark:bg-emerald-400/20 rounded-full blur-3xl z-0 pointer-events-none" />
@@ -103,7 +103,7 @@ export default function SurahHeroHeader({
 
         {/* Main Content */}
         <div className="relative z-10 flex flex-col items-center text-center gap-5">
-          
+
           {/* Islamic Star Number Badge */}
           <div
             onClick={handlePlaySurah}
@@ -142,11 +142,10 @@ export default function SurahHeroHeader({
             {/* Quick Play Button */}
             <button
               onClick={handlePlaySurah}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-extrabold text-xs md:text-sm transition-all duration-300 shadow-xl cursor-pointer ${
-                isCurrentSurahPlaying
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-extrabold text-xs md:text-sm transition-all duration-300 shadow-xl cursor-pointer ${isCurrentSurahPlaying
                   ? "bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/30 scale-105"
                   : "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-emerald-500/30 hover:scale-105"
-              }`}
+                }`}
             >
               {isCurrentSurahPlaying ? (
                 <>
@@ -219,11 +218,10 @@ export default function SurahHeroHeader({
       {/* ── 2. Compact Sticky Header Bar on Scroll (Quran.com Style) ── */}
       <div
         ref={containerRef}
-        className={`sticky top-0 z-40 transition-all duration-300 transform ${
-          isScrolled
+        className={`sticky top-0 z-40 transition-all duration-300 transform ${isScrolled
             ? "translate-y-0 opacity-100 pointer-events-auto shadow-lg py-2.5 my-0 rounded-b-2xl border-b"
             : "-translate-y-4 opacity-0 pointer-events-none h-0 overflow-hidden py-0 my-0 border-none"
-        } bg-white/85 dark:bg-slate-900/90 backdrop-blur-xl border-emerald-500/20 dark:border-emerald-500/30 px-4 flex items-center justify-between gap-3`}
+          } bg-white/85 dark:bg-slate-900/90 backdrop-blur-xl border-emerald-500/20 dark:border-emerald-500/30 px-4 flex items-center justify-between gap-3`}
       >
         {/* Left: Badge + Surah Names */}
         <div className="flex items-center gap-2.5 min-w-0">
@@ -289,11 +287,10 @@ export default function SurahHeroHeader({
           {/* Play Full Surah Button */}
           <button
             onClick={handlePlaySurah}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs transition-all shadow-sm ${
-              isCurrentSurahPlaying
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs transition-all shadow-sm ${isCurrentSurahPlaying
                 ? "bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20"
                 : "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-emerald-500/20"
-            }`}
+              }`}
           >
             {isCurrentSurahPlaying ? (
               <>

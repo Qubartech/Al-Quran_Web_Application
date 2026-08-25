@@ -52,7 +52,7 @@ const SurahAyahList = ({
 
     const newAudio = new Audio(audioUrl);
     wordAudioRef.current = newAudio;
-    
+
     const activeKey = `${ayahIdx}_${wordIdx}`;
     setPlayingWordAudio(activeKey);
 
@@ -289,7 +289,7 @@ const SurahAyahList = ({
       const arabicText = ayah?.text || (ayah?.words || []).map((w) => w.text_uthmani || w.text).join(" ");
       const translationText = englishTrans[idx]?.text || "";
       const textToCopy = `Surah ${surahName ? surahName + " " : ""}(${pageId}:${idx + 1})\n\n${arabicText}\n\n${translationText}`;
-      
+
       navigator.clipboard.writeText(textToCopy);
       setCopiedAyahIdx(idx);
       setTimeout(() => setCopiedAyahIdx(null), 2000);
@@ -373,7 +373,7 @@ const SurahAyahList = ({
       setAudioCurrentTime(seekTime);
       // Load and play full Surah starting from exact Ayah timestamp
       audio?.playSurah(pageId, surahName, seekTime);
-      
+
       // Log to Recently Played
       if (user && session?.access_token) {
         fetch("/api/recent", {
@@ -499,22 +499,20 @@ const SurahAyahList = ({
         <div className="flex items-center p-1 bg-gray-200/50 dark:bg-slate-800/60 rounded-xl border border-gray-200/40 dark:border-slate-700/50 text-xs font-bold">
           <button
             onClick={() => setViewMode("verse")}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all cursor-pointer ${
-              viewMode === "verse"
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all cursor-pointer ${viewMode === "verse"
                 ? "bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-xs font-black"
                 : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
-            }`}
+              }`}
           >
             <List size={14} />
             <span>Verse by Verse</span>
           </button>
           <button
             onClick={() => setViewMode("reading")}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all cursor-pointer ${
-              viewMode === "reading"
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all cursor-pointer ${viewMode === "reading"
                 ? "bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-xs font-black"
                 : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
-            }`}
+              }`}
           >
             <BookMarked size={14} />
             <span>Reading Mode</span>
@@ -545,19 +543,18 @@ const SurahAyahList = ({
                       arabicTextType === "indopak"
                         ? word.text_indopak || word.text
                         : arabicTextType === "tajweed"
-                        ? word.text_uthmani_tajweed || word.text_qpc_hafs || word.text
-                        : word.text_qpc_hafs || word.text_uthmani || word.text;
+                          ? word.text_uthmani_tajweed || word.text_qpc_hafs || word.text
+                          : word.text_qpc_hafs || word.text_uthmani || word.text;
                     const isWordAudioPlaying = playingWordAudio === `${idx}_${wIdx}`;
-                    
+
                     return (
                       <span
                         key={wIdx}
                         onClick={() => isWord && playWordAudio(word, wIdx, idx, ayah)}
-                        className={`transition-all duration-150 cursor-pointer font-arabic ayah-arabic-text ${
-                          isWordAudioPlaying
+                        className={`transition-all duration-150 cursor-pointer font-arabic ayah-arabic-text ${isWordAudioPlaying
                             ? "text-emerald-500 dark:text-emerald-400 font-bold scale-110 drop-shadow-[0_2px_10px_rgba(16,185,129,0.4)]"
                             : "hover:text-emerald-500 dark:hover:text-emerald-400"
-                        }`}
+                          }`}
                         style={{ fontSize: "var(--ayah-arabic-font-size)" }}
                       >
                         {arabicTextType === "tajweed" ? (
@@ -585,10 +582,10 @@ const SurahAyahList = ({
             const isPlaying =
               (audio?.playlistId === pageId || audio?.playlistId === `surah_${pageId}`) && activeAyahIndex === idx;
             const { text } = ayah || {};
-            
+
             // Stagger animation delay for first 10 visible verses
             const animDelay = idx < 10 ? `${idx * 0.04}s` : '0s';
-            
+
             return (
               <div
                 key={idx}
@@ -597,24 +594,22 @@ const SurahAyahList = ({
                 tabIndex={-1}
                 style={{ animationDelay: animDelay }}
               >
-                <div className={`px-4 md:px-6 py-4 md:py-5 flex flex-col gap-3.5 w-full transition-all duration-300 rounded-2xl verse-card outline-none focus:outline-none ${
-                  isPlaying
+                <div className={`px-4 md:px-6 py-4 md:py-5 flex flex-col gap-3.5 w-full transition-all duration-300 rounded-2xl verse-card outline-none focus:outline-none ${isPlaying
                     ? "bg-emerald-500/10 dark:bg-emerald-500/[0.08] border-2 border-emerald-500/50 dark:border-emerald-500/40 verse-active-glow shadow-md shadow-emerald-500/5"
                     : "bg-white/80 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800/60 hover:border-emerald-500/40 hover:bg-white dark:hover:bg-slate-900/70 shadow-xs"
-                }`}>
-                  
+                  }`}>
+
                   {/* ── Top Header Action Bar (Quran.com Style) ── */}
                   <div className="flex items-center justify-between w-full border-b border-gray-200/15 dark:border-slate-800/40 pb-3">
-                    
+
                     {/* Left Controls: Ayah Badge, Play, Bookmark */}
                     <div className="flex items-center gap-2 md:gap-2.5">
                       {/* Islamic Star Ayah Badge */}
                       <div
-                        className={`ayah-badge w-8 h-8 md:w-9 md:h-9 shrink-0 transition-all flex items-center justify-center ${
-                          isPlaying
+                        className={`ayah-badge w-8 h-8 md:w-9 md:h-9 shrink-0 transition-all flex items-center justify-center ${isPlaying
                             ? "bg-primaryColor dark:bg-emerald-500 shadow-md shadow-emerald-500/20 text-white font-black"
                             : "bg-primaryColor/10 dark:bg-emerald-500/10 text-primaryColor dark:text-primaryColor-light font-bold"
-                        }`}
+                          }`}
                       >
                         <span className="text-[8px] md:text-[9.5px] font-black leading-none select-none">
                           {pageId}:{idx + 1}
@@ -623,13 +618,10 @@ const SurahAyahList = ({
 
                       {/* Play Button */}
                       <SurahPlayBtn
-                        key={`spb_${idx}_pid_${audio?.playlistId ?? "-"}_ci_${
-                          audio?.currentIndex ?? -1
-                        }_open_${audio?.open ? 1 : 0}_paused_${
-                          audio?.paused ? 1 : 0
-                        }_play_${audio?.playTick ?? 0}_pause_${
-                          audio?.pauseTick ?? 0
-                        }_active_${activeAyahIndex === idx ? 1 : 0}_src_${audio?.src ?? "-"}`}
+                        key={`spb_${idx}_pid_${audio?.playlistId ?? "-"}_ci_${audio?.currentIndex ?? -1
+                          }_open_${audio?.open ? 1 : 0}_paused_${audio?.paused ? 1 : 0
+                          }_play_${audio?.playTick ?? 0}_pause_${audio?.pauseTick ?? 0
+                          }_active_${activeAyahIndex === idx ? 1 : 0}_src_${audio?.src ?? "-"}`}
                         isPlaying={
                           audio?.open &&
                           (audio?.playlistId === pageId || audio?.playlistId === `surah_${pageId}`) &&
@@ -643,11 +635,10 @@ const SurahAyahList = ({
                       {/* Bookmark Button */}
                       <button
                         onClick={() => toggleBookmark(idx)}
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer ${
-                          bookmarks[`${pageId}_${idx + 1}`]
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer ${bookmarks[`${pageId}_${idx + 1}`]
                             ? "text-emerald-500 bg-emerald-500/10"
                             : "text-gray-400 hover:text-emerald-500 hover:bg-emerald-500/10"
-                        }`}
+                          }`}
                         title="Bookmark Ayah"
                       >
                         <Bookmark size={15} fill={bookmarks[`${pageId}_${idx + 1}`] ? "currentColor" : "none"} className="shrink-0" />
@@ -659,11 +650,10 @@ const SurahAyahList = ({
                       {/* Single Ayah Repeat Button */}
                       <button
                         onClick={() => toggleRepeatSingleAyah(idx)}
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer relative ${
-                          repeatAyahIndex === idx
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer relative ${repeatAyahIndex === idx
                             ? "text-amber-500 bg-amber-500/15 border border-amber-500/30 shadow-sm"
                             : "text-gray-400 hover:text-amber-500 hover:bg-amber-500/10"
-                        }`}
+                          }`}
                         title={repeatAyahIndex === idx ? "Single Ayah Repeat ON" : "Repeat single Ayah loop"}
                       >
                         <Repeat1 size={15} className="shrink-0" />
@@ -677,11 +667,10 @@ const SurahAyahList = ({
                       {/* Copy Ayah Button */}
                       <button
                         onClick={() => copyAyahText(ayah, idx)}
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer ${
-                          copiedAyahIdx === idx
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer ${copiedAyahIdx === idx
                             ? "text-emerald-500 bg-emerald-500/15 border border-emerald-500/30"
                             : "text-gray-400 hover:text-emerald-500 hover:bg-emerald-500/10"
-                        }`}
+                          }`}
                         title={copiedAyahIdx === idx ? "Copied!" : "Copy Ayah Text & Translation"}
                       >
                         {copiedAyahIdx === idx ? (
@@ -694,11 +683,10 @@ const SurahAyahList = ({
                       {/* Share Ayah Button */}
                       <button
                         onClick={() => shareAyah(ayah, idx)}
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer ${
-                          sharedAyahIdx === idx
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer ${sharedAyahIdx === idx
                             ? "text-emerald-500 bg-emerald-500/15 border border-emerald-500/30"
                             : "text-gray-400 hover:text-teal-500 hover:bg-teal-500/10"
-                        }`}
+                          }`}
                         title={sharedAyahIdx === idx ? "Link Copied!" : "Share Ayah"}
                       >
                         {sharedAyahIdx === idx ? (
@@ -726,52 +714,49 @@ const SurahAyahList = ({
                                 arabicTextType === "indopak"
                                   ? word.text_indopak || word.text
                                   : arabicTextType === "tajweed"
-                                  ? word.text_uthmani_tajweed || word.text_qpc_hafs || word.text
-                                  : word.text_qpc_hafs || word.text_uthmani || word.text;
+                                    ? word.text_uthmani_tajweed || word.text_qpc_hafs || word.text
+                                    : word.text_qpc_hafs || word.text_uthmani || word.text;
                               const wordTrans = word.translation?.text;
                               const wordTranslit = word.transliteration?.text;
 
                               const isActiveWord = isPlaying && activeWordIndex === wIdx;
                               const isWordAudioPlaying = playingWordAudio === `${idx}_${wIdx}`;
                               const isCurrentlyHighlighted = isActiveWord || isWordAudioPlaying;
-                              
+
                               const isDimmedStyle = isPlaying && activeWordIndex !== -1 && !isCurrentlyHighlighted;
                               const shouldShowAutoTooltip = isActiveWord && (audio?.showWordTooltip ?? true);
- 
+
                               return (
                                 <div
                                   key={wIdx}
                                   onClick={() => isWord && playWordAudio(word, wIdx, idx, ayah)}
-                                  className={`relative flex flex-col items-center justify-center px-0.5 sm:px-0.5 py-0.5 rounded-lg transition-all duration-200 group cursor-pointer outline-none focus:outline-none ${
-                                    isCurrentlyHighlighted
+                                  className={`relative flex flex-col items-center justify-center px-0.5 sm:px-0.5 py-0.5 rounded-lg transition-all duration-200 group cursor-pointer outline-none focus:outline-none ${isCurrentlyHighlighted
                                       ? "z-10 bg-emerald-50/50 dark:bg-slate-800/40"
                                       : isDimmedStyle
-                                      ? "opacity-40 hover:opacity-100"
-                                      : "hover:bg-gray-100/70 dark:hover:bg-slate-800/40"
-                                  }`}
+                                        ? "opacity-40 hover:opacity-100"
+                                        : "hover:bg-gray-100/70 dark:hover:bg-slate-800/40"
+                                    }`}
                                 >
                                   {/* Arabic word */}
                                   {arabicTextType === "tajweed" ? (
                                     <span
-                                      className={`font-semibold select-none transition-all duration-150 font-arabic ayah-arabic-text ${
-                                        isCurrentlyHighlighted
+                                      className={`font-semibold select-none transition-all duration-150 font-arabic ayah-arabic-text ${isCurrentlyHighlighted
                                           ? "text-emerald-500 dark:text-emerald-400 font-bold scale-110 drop-shadow-[0_2px_10px_rgba(16,185,129,0.4)]"
                                           : isDimmedStyle
-                                          ? "text-gray-900/30 dark:text-gray-100/30"
-                                          : "text-gray-900 dark:text-gray-100 group-hover:text-primaryColor"
-                                      }`}
+                                            ? "text-gray-900/30 dark:text-gray-100/30"
+                                            : "text-gray-900 dark:text-gray-100 group-hover:text-primaryColor"
+                                        }`}
                                       dir="rtl"
                                       dangerouslySetInnerHTML={{ __html: wordText }}
                                     />
                                   ) : (
                                     <span
-                                      className={`font-semibold select-none transition-all duration-150 font-arabic ayah-arabic-text ${
-                                        isCurrentlyHighlighted
+                                      className={`font-semibold select-none transition-all duration-150 font-arabic ayah-arabic-text ${isCurrentlyHighlighted
                                           ? "text-emerald-500 dark:text-emerald-400 font-bold scale-110 drop-shadow-[0_2px_10px_rgba(16,185,129,0.4)]"
                                           : isDimmedStyle
-                                          ? "text-gray-900/30 dark:text-gray-100/30"
-                                          : "text-gray-900 dark:text-gray-100 group-hover:text-primaryColor"
-                                      }`}
+                                            ? "text-gray-900/30 dark:text-gray-100/30"
+                                            : "text-gray-900 dark:text-gray-100 group-hover:text-primaryColor"
+                                        }`}
                                       dir="rtl"
                                     >
                                       {wordText}
@@ -780,9 +765,8 @@ const SurahAyahList = ({
 
                                   {/* Tooltip on Hover OR when Word is Active */}
                                   {isWord && (wordTrans || wordTranslit) && (
-                                    <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2.5 flex-col items-center bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white text-[11px] p-2 rounded-xl shadow-2xl z-30 pointer-events-none whitespace-nowrap min-w-[65px] border border-emerald-500/30 transition-all duration-200 ${
-                                      shouldShowAutoTooltip ? "flex animate-fadeIn" : "hidden group-hover:flex"
-                                    }`}>
+                                    <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2.5 flex-col items-center bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white text-[11px] p-2 rounded-xl shadow-2xl z-30 pointer-events-none whitespace-nowrap min-w-[65px] border border-emerald-500/30 transition-all duration-200 ${shouldShowAutoTooltip ? "flex animate-fadeIn" : "hidden group-hover:flex"
+                                      }`}>
                                       {wordTranslit && (
                                         <span className="font-bold text-emerald-300 font-sans tracking-wide mb-0.5" dir="ltr">
                                           {wordTranslit}
@@ -804,20 +788,19 @@ const SurahAyahList = ({
                       })()
                     ) : (
                       <div
-                        className={`font-semibold text-end font-arabic ayah-arabic-text pb-5 ${
-                          isPlaying
+                        className={`font-semibold text-end font-arabic ayah-arabic-text pb-5 ${isPlaying
                             ? "text-primaryColor"
                             : "text-gray-900 dark:text-gray-100"
-                        }`}
+                          }`}
                         style={isPlaying ? ayahAnim : {}}
                       >
                         {text}
                       </div>
                     )}
-                    
+
                     {/* Gradient fade divider */}
                     <div className="verse-divider my-2"></div>
-                    
+
                     {/* Multi-Translation List */}
                     <div className="flex flex-col gap-3 pt-2">
                       {Array.isArray(englishTrans[idx]) ? (
