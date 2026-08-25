@@ -427,56 +427,6 @@ export default function PrayerSettingsModal({
               </div>
             </div>
 
-            {/* Closed-Tab Background Notification Tester Box */}
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 via-indigo-500/5 to-emerald-500/10 border border-purple-500/20 flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-extrabold text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
-                  <Zap size={14} className="text-purple-500 fill-purple-500/20" /> Closed-Tab Background Alarm Tester
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                Set a test timer, then <strong>close or exit this website tab</strong>. The Azan notification will fire automatically at the scheduled time!
-              </p>
-
-              {/* Quick Presets */}
-              <div className="grid grid-cols-4 gap-1.5">
-                {[
-                  { label: "10 Sec", sec: 10 },
-                  { label: "30 Sec", sec: 30 },
-                  { label: "1 Min", sec: 60 },
-                  { label: "2 Min", sec: 120 }
-                ].map((item) => (
-                  <button
-                    key={item.sec}
-                    type="button"
-                    onClick={() => tracker?.scheduleTestAlarm(item.sec, `Closed-Tab ${item.label} Test`)}
-                    className="py-1.5 px-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-extrabold shadow-sm transition-all text-center"
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Custom Time Input */}
-              <form onSubmit={handleScheduleCustomTest} className="flex gap-2 pt-1 border-t border-purple-500/10">
-                <div className="relative flex-1">
-                  <input
-                    type="time"
-                    value={customTime}
-                    onChange={(e) => setCustomTime(e.target.value)}
-                    className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={!customTime}
-                  className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1"
-                >
-                  <Clock size={12} /> Set Time
-                </button>
-              </form>
-            </div>
-
             {/* Individual Prayer Reminders */}
             <div className="flex flex-col gap-2">
               <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">

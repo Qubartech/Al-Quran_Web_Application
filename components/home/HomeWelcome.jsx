@@ -14,13 +14,17 @@ import {
   Moon, 
   Sunrise, 
   Sunset,
-  ArrowRight
+  ArrowRight,
+  Search,
+  Volume2,
+  Share2,
+  Compass,
+  Bookmark
 } from "lucide-react";
 import NamazTimeWrapper from "@/components/NamazTimeWrapper";
 import QuickAccessCard from "./QuickAccessCard";
 import TodayCalendarCard from "./TodayCalendarCard";
 import { useAudio } from "@/context/AudioProvider";
-import { QURANICAUDIO_BASE_URL } from "@/lib/api/config";
 
 const INSPIRATIONAL_AYAHS = [
   {
@@ -89,6 +93,15 @@ const INSPIRATIONAL_AYAHS = [
   }
 ];
 
+const POPULAR_QUICK_SURAHS = [
+  { number: 1, name: "Al-Fatihah", arabic: "الفاتحة" },
+  { number: 2, name: "Al-Baqarah", arabic: "البقرة" },
+  { number: 18, name: "Al-Kahf", arabic: "الكهف" },
+  { number: 36, name: "Ya-Sin", arabic: "يس" },
+  { number: 55, name: "Ar-Rahman", arabic: "الرحمن" },
+  { number: 67, name: "Al-Mulk", arabic: "الملك" },
+];
+
 export default function HomeWelcome() {
   const audio = useAudio();
   const [greetingInfo, setGreetingInfo] = useState({ text: "Assalamu Alaikum", icon: Sun });
@@ -140,7 +153,7 @@ export default function HomeWelcome() {
   const handlePlayAyah = () => {
     if (!audio) return;
     const trackId = `ayah_${ayah.surahNum}_${ayah.ayahNum}`;
-    const isPlayingCurrent = audio.playlistId === trackId && !audio.paused;
+    const isPlayingCurrent = (audio.playlistId === trackId || audio.trackId === trackId) && !audio.paused;
 
     if (isPlayingCurrent) {
       audio.pause();
@@ -153,98 +166,154 @@ export default function HomeWelcome() {
   };
 
   const GreetingIcon = greetingInfo.icon;
-  const isAudioPlayingThis = audio?.playlistId === `ayah_${ayah.surahNum}_${ayah.ayahNum}` && !audio?.paused;
+  const isAudioPlayingThis = 
+    (audio?.playlistId === `ayah_${ayah.surahNum}_${ayah.ayahNum}` || audio?.trackId === `ayah_${ayah.surahNum}_${ayah.ayahNum}`) && 
+    !audio?.paused;
+
+  const openGlobalSearch = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("quran-open-global-search"));
+    }
+  };
 
   return (
     <div className="flex flex-col gap-6 w-full mb-8">
       
-      {/* 1. Hero Welcome Banner */}
-      <div className="relative overflow-hidden p-6 md:p-8 rounded-3xl glass border border-emerald-500/15 dark:border-emerald-500/20 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300">
+      {/* ── 1. Luxury Hero Welcome Banner ── */}
+      <div className="relative overflow-hidden p-6 sm:p-8 md:p-10 rounded-3xl glass border border-emerald-500/20 dark:border-emerald-500/30 shadow-xl transition-all duration-300 animate-fadeIn">
         
         {/* Background Gradient & Ambient Glow */}
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-50/80 via-teal-50/60 to-cyan-50/70 dark:from-emerald-950/70 dark:via-slate-900/90 dark:to-teal-950/70 z-0"></div>
-        <div className="absolute right-0 top-0 translate-x-10 -translate-y-10 w-72 h-72 rounded-full bg-emerald-400/15 dark:bg-white/10 blur-3xl pointer-events-none z-0"></div>
-        <div className="absolute left-1/3 bottom-0 w-56 h-56 rounded-full bg-teal-400/15 dark:bg-teal-300/10 blur-2xl pointer-events-none z-0"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/90 via-teal-50/70 to-emerald-100/40 dark:from-slate-950/95 dark:via-emerald-950/40 dark:to-slate-900/90 z-0 pointer-events-none" />
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-emerald-500/15 dark:bg-emerald-400/10 rounded-full blur-3xl z-0 pointer-events-none" />
+        <div className="absolute -bottom-24 -left-20 w-80 h-80 bg-teal-500/15 dark:bg-teal-400/10 rounded-full blur-3xl z-0 pointer-events-none" />
+        <div className="absolute -bottom-24 -right-20 w-80 h-80 bg-amber-500/15 dark:bg-amber-400/10 rounded-full blur-3xl z-0 pointer-events-none" />
 
+        {/* Islamic Arabesque Geometric Pattern */}
+        <div className="absolute inset-0 opacity-[0.035] dark:opacity-[0.06] pointer-events-none z-0 overflow-hidden flex items-center justify-center">
+          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="islamicHomePattern" width="70" height="70" patternUnits="userSpaceOnUse">
+                <g fill="none" stroke="currentColor" strokeWidth="1.2" className="text-emerald-600 dark:text-emerald-400">
+                  <polygon points="35,0 45.5,10.5 59.5,10.5 59.5,24.5 70,35 59.5,45.5 59.5,59.5 45.5,59.5 35,70 24.5,59.5 10.5,59.5 10.5,45.5 0,35 10.5,24.5 10.5,10.5 24.5,10.5" />
+                  <circle cx="35" cy="35" r="14" />
+                  <circle cx="35" cy="35" r="6" />
+                  <path d="M 0,0 L 70,70 M 70,0 L 0,70" />
+                </g>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#islamicHomePattern)" />
+          </svg>
+        </div>
+
+        {/* Banner Content */}
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex flex-col gap-2 max-w-2xl">
+          <div className="flex flex-col gap-2.5 max-w-2xl">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 text-xs font-extrabold backdrop-blur-md border border-emerald-200/50 dark:border-slate-800 shadow-xs">
-                <GreetingIcon size={14} className="text-amber-500 dark:text-amber-300 animate-pulse" /> {greetingInfo.text}
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 text-xs font-extrabold backdrop-blur-md border border-emerald-200/50 dark:border-slate-800 shadow-2xs">
+                <GreetingIcon size={14} className="text-amber-500 animate-pulse" /> {greetingInfo.text}
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-xs font-extrabold backdrop-blur-md border border-emerald-500/20 shadow-xs">
-                <Sparkles size={14} className="text-emerald-600 dark:text-amber-300" /> Al-Quran Divine Portal
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-xs font-extrabold backdrop-blur-md border border-emerald-500/20 shadow-2xs">
+                <Sparkles size={14} className="text-emerald-600 dark:text-emerald-400" /> Al-Quran Divine Portal
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white drop-shadow-xs">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-slate-900 dark:text-white drop-shadow-xs">
               Assalamu Alaikum Wa Rahmatullah
             </h1>
-            <p className="text-xs md:text-sm text-slate-600 dark:text-emerald-100/90 font-medium leading-relaxed">
-              Read, listen, memorize, and reflect upon the Holy Quran with word-by-word guidance, audio recitations, and daily prayer tracking.
+            <p className="text-xs sm:text-sm md:text-base text-slate-600 dark:text-slate-300 font-medium leading-relaxed max-w-xl">
+              Read, listen, memorize, and reflect upon the Holy Quran with word-by-word translations, studio-quality recitations, and daily prayer tracking.
             </p>
+
+            {/* Quick Popular Surah Jump Pills */}
+            <div className="flex items-center gap-1.5 flex-wrap pt-2">
+              <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 mr-1">
+                Quick Jump:
+              </span>
+              {POPULAR_QUICK_SURAHS.map((s) => (
+                <Link
+                  key={s.number}
+                  href={`/surah/${s.number}`}
+                  className="px-2.5 py-1 rounded-xl bg-white/70 dark:bg-slate-900/70 hover:bg-emerald-500/15 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border border-slate-200/60 dark:border-slate-800 text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 group"
+                >
+                  <span className="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold">
+                    #{s.number}
+                  </span>
+                  <span>{s.name}</span>
+                </Link>
+              ))}
+            </div>
           </div>
 
-          {/* Quick Action Badges */}
-          <div className="flex items-center gap-3 shrink-0">
+          {/* Quick Action Buttons */}
+          <div className="flex flex-col sm:flex-row md:flex-col gap-2.5 shrink-0">
             <Link
-              href="/learn"
-              className="px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black transition-all shadow-md hover:scale-105 flex items-center gap-1.5"
+              href="/surah/1"
+              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-black transition-all shadow-lg shadow-emerald-500/25 hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer"
             >
-              <BookOpen size={15} className="text-white" />
-              Learn Tajweed
+              <BookOpen size={16} />
+              Start Reading (Surah 1)
             </Link>
 
-            <Link
-              href="/player"
-              className="px-4 py-2.5 rounded-2xl bg-white/80 hover:bg-white dark:bg-slate-900/60 dark:hover:bg-slate-900 text-slate-800 dark:text-white text-xs font-black backdrop-blur-md border border-emerald-200/60 dark:border-slate-700 transition-all flex items-center gap-1.5 shadow-xs"
+            <button
+              onClick={openGlobalSearch}
+              className="px-5 py-3 rounded-2xl bg-white/80 hover:bg-white dark:bg-slate-900/80 dark:hover:bg-slate-900 text-slate-800 dark:text-white text-xs font-black backdrop-blur-md border border-emerald-500/30 dark:border-slate-700 transition-all flex items-center justify-center gap-2 shadow-2xs hover:scale-[1.02] cursor-pointer"
             >
-              <Play size={15} className="fill-emerald-600 dark:fill-white text-emerald-600 dark:text-white" />
-              Audio Player
-            </Link>
+              <Search size={16} className="text-emerald-500" />
+              <span>Search Quran</span>
+              <kbd className="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-gray-100 dark:bg-slate-800 rounded border border-gray-200 dark:border-slate-700 text-gray-500 dark:text-gray-400 ml-1">
+                ⌘K
+              </kbd>
+            </button>
           </div>
         </div>
 
       </div>
 
-      {/* 2. Interactive Verse of the Day Card */}
+      {/* ── 2. Interactive Verse of the Day Card ── */}
       <div className="w-full">
-        <div className="p-5 sm:p-6 md:p-8 rounded-3xl glass border border-emerald-100/80 dark:border-slate-800 shadow-xs relative overflow-hidden flex flex-col justify-between group transition-all duration-300">
+        <div className="p-5 sm:p-6 md:p-8 rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-emerald-500/20 dark:border-emerald-500/30 shadow-lg relative overflow-hidden flex flex-col justify-between group transition-all duration-300">
           
-          <div className="absolute -right-20 -top-20 w-52 h-52 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-700"></div>
+          <div className="absolute -right-20 -top-20 w-60 h-60 rounded-full bg-emerald-500/10 dark:bg-emerald-400/5 blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-700" />
 
           {/* Header Row */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-emerald-100/60 dark:border-slate-800 pb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-gray-200/50 dark:border-slate-800 pb-3">
             <span className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
-              <BookOpen size={16} />
-              Verse of the Day & Inspiration
+              <Sparkles size={16} />
+              Verse of the Day & Contemplation
             </span>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={handlePlayAyah}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
                   isAudioPlayingThis
-                    ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30"
-                    : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
+                    ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/30 ring-2 ring-emerald-400/40"
+                    : "bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
                 }`}
                 title="Play Audio Recitation"
               >
                 {isAudioPlayingThis ? (
                   <>
-                    <Pause size={14} className="fill-white" /> Playing
+                    <div className="flex items-center gap-0.5 h-3">
+                      <span className="w-0.5 h-3 bg-white rounded-full animate-bounce [animation-delay:0ms]" />
+                      <span className="w-0.5 h-3 bg-white rounded-full animate-bounce [animation-delay:150ms]" />
+                      <span className="w-0.5 h-3 bg-white rounded-full animate-bounce [animation-delay:300ms]" />
+                    </div>
+                    <Pause size={13} />
+                    <span>Playing</span>
                   </>
                 ) : (
                   <>
-                    <Play size={14} className="fill-emerald-600 dark:fill-emerald-400" /> Listen Audio
+                    <Play size={13} className="fill-current" />
+                    <span>Listen Audio</span>
                   </>
                 )}
               </button>
 
               <button
                 onClick={handleCopy}
-                className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-emerald-600 transition-colors"
-                title="Copy Verse"
+                className="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-500 dark:text-gray-400 hover:text-emerald-600 transition-colors cursor-pointer"
+                title="Copy Verse with Translation"
               >
                 {copied ? <Check size={16} className="text-emerald-500" /> : <Copy size={16} />}
               </button>
@@ -252,7 +321,7 @@ export default function HomeWelcome() {
               <button
                 onClick={handleRefreshAyah}
                 disabled={rotating}
-                className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-emerald-600 transition-colors"
+                className="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-500 dark:text-gray-400 hover:text-emerald-600 transition-colors cursor-pointer"
                 title="Inspire Me (Shuffle Verse)"
               >
                 <RefreshCw size={16} className={rotating ? "animate-spin text-emerald-600" : ""} />
@@ -261,27 +330,27 @@ export default function HomeWelcome() {
           </div>
 
           {/* Ayah Content */}
-          <div className="my-3 flex flex-col gap-5">
-            <p className="font-arabic text-2xl md:text-4xl text-right leading-loose text-slate-900 dark:text-slate-100 font-semibold select-none min-h-[56px] drop-shadow-xs" dir="rtl">
+          <div className="my-3 flex flex-col gap-4">
+            <p className="font-arabic text-2xl sm:text-3xl md:text-4xl text-right leading-loose text-slate-900 dark:text-slate-100 font-semibold select-none min-h-[56px] drop-shadow-xs" dir="rtl">
               {ayah.arabic}
             </p>
 
-            <p className="text-sm md:text-base italic text-slate-700 dark:text-slate-300 leading-relaxed font-sans font-medium">
-              &quot;{ayah.translation}&quot;
+            <p className="text-sm sm:text-base italic text-slate-700 dark:text-slate-300 leading-relaxed font-sans font-medium">
+              &ldquo;{ayah.translation}&rdquo;
             </p>
           </div>
 
           {/* Footer Metadata */}
-          <div className="mt-4 border-t border-emerald-100/60 dark:border-slate-800 pt-4 flex justify-between items-center text-xs font-bold text-slate-500 dark:text-slate-400">
+          <div className="mt-4 border-t border-gray-200/50 dark:border-slate-800 pt-4 flex justify-between items-center text-xs font-bold text-gray-500 dark:text-gray-400">
             <Link
               href={`/surah/${ayah.surahNum}`}
-              className="hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-1 transition-colors"
+              className="hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-1.5 transition-colors group"
             >
-              <span>Surah {ayah.surah}</span>
-              <ArrowRight size={13} />
+              <span>Read Full Surah {ayah.surah}</span>
+              <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
             </Link>
 
-            <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20 font-mono">
+            <span className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/20 font-mono font-black">
               Verse {ayah.reference}
             </span>
           </div>
@@ -289,10 +358,10 @@ export default function HomeWelcome() {
         </div>
       </div>
 
-      {/* 3. Today's Calendar & Prayer Habits Widget */}
+      {/* ── 3. Today's Calendar & Prayer Habits Widget ── */}
       <TodayCalendarCard />
 
-      {/* 4. Equal Height Quick Access Grid & Namaz Widget */}
+      {/* ── 4. Equal Height Quick Access Grid & Namaz Widget ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         <QuickAccessCard className="h-full" />
         <NamazTimeWrapper className="h-full" />

@@ -13,7 +13,8 @@ import {
   Sparkles,
   X,
   BookOpen,
-  Volume2
+  Volume2,
+  ChevronDown,
 } from "lucide-react";
 import { useAudio } from "@/context/AudioProvider";
 
@@ -132,26 +133,32 @@ export default function SurahList({ data }) {
           <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
             
             {/* Sort selection */}
-            <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="bg-transparent text-slate-700 dark:text-slate-200 text-xs font-bold focus:outline-none px-2 py-1 cursor-pointer"
-              >
-                <option value="number" className="dark:bg-slate-900">Sort by Number</option>
-                <option value="ayahs" className="dark:bg-slate-900">Sort by Verses</option>
-                <option value="name" className="dark:bg-slate-900">Sort by Name</option>
-              </select>
+            <div className="relative flex items-center bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 gap-1 shadow-2xs">
+              <div className="relative flex items-center">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="bg-transparent text-slate-700 dark:text-slate-200 text-xs font-bold border-0 !border-none outline-none !outline-none focus:outline-none focus:ring-0 focus:border-0 pl-1 pr-5 py-1 cursor-pointer appearance-none shadow-none"
+                >
+                  <option value="number" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Sort by Number</option>
+                  <option value="ayahs" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Sort by Verses</option>
+                  <option value="name" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Sort by Name</option>
+                </select>
+                <ChevronDown size={13} className="absolute right-0.5 text-slate-400 pointer-events-none" />
+              </div>
+
+              <div className="w-px h-3.5 bg-slate-300 dark:bg-slate-700 mx-0.5" />
+
               <button
                 onClick={toggleSortOrder}
-                className={`p-1.5 rounded-xl transition-all ${
+                className={`p-1.5 rounded-xl transition-all cursor-pointer ${
                   sortOrder === "desc"
                     ? "bg-emerald-600 text-white shadow-sm"
-                    : "text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                    : "text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50"
                 }`}
                 title={`Sort ${sortOrder === "asc" ? "Ascending" : "Descending"}`}
               >
-                <ArrowUpDown size={14} className={sortOrder === "desc" ? "rotate-180 transition-transform" : "transition-transform"} />
+                <ArrowUpDown size={13} className={sortOrder === "desc" ? "rotate-180 transition-transform" : "transition-transform"} />
               </button>
             </div>
 
@@ -252,7 +259,7 @@ export default function SurahList({ data }) {
       {viewMode === "grid" ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredAndSortedSurahs.map((surah) => {
-            const isPlayingThis = audio?.trackId === `surah_${surah.number}` && audio?.isPlaying;
+            const isPlayingThis = (audio?.trackId === `surah_${surah.number}` || audio?.playlistId === `surah_${surah.number}`) && !audio?.paused;
             const isMakki = (surah.revelationType || "").toLowerCase().includes("makkah") || (surah.revelationType || "").toLowerCase().includes("meccan");
 
             return (
@@ -261,52 +268,65 @@ export default function SurahList({ data }) {
                 href={`/surah/${surah.number}`}
                 className={`group relative p-5 rounded-3xl border transition-all duration-300 flex flex-col justify-between gap-4 overflow-hidden ${
                   isPlayingThis
-                    ? "bg-emerald-500/10 border-2 border-emerald-500 shadow-xl shadow-emerald-500/10 scale-[1.01]"
-                    : "bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-slate-200/70 dark:border-slate-800/80 hover:border-emerald-500/40 hover:bg-white dark:hover:bg-slate-900 hover:shadow-xl"
+                    ? "bg-emerald-500/10 dark:bg-emerald-950/40 border-2 border-emerald-500/80 dark:border-emerald-400/80 shadow-xl shadow-emerald-500/15 scale-[1.01]"
+                    : "bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-slate-200/80 dark:border-slate-800/80 hover:border-emerald-500/40 hover:bg-white dark:hover:bg-slate-900/90 shadow-sm hover:shadow-xl hover:-translate-y-0.5"
                 }`}
               >
                 {/* Background Ambient Glow */}
-                <div className="absolute -right-10 -bottom-10 w-28 h-28 rounded-full bg-emerald-500/5 group-hover:scale-150 transition-transform pointer-events-none"></div>
+                <div className="absolute -right-10 -bottom-10 w-28 h-28 rounded-full bg-emerald-500/5 group-hover:scale-150 transition-transform pointer-events-none" />
 
-                {/* Top Row: Number Badge & Arabic Title */}
-                <div className="flex items-center justify-between z-10">
-                  <div className="flex items-center gap-3">
-                    {/* Star Geometric Badge */}
-                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black font-mono text-xs transition-all shadow-sm ${
-                      isPlayingThis
-                        ? "bg-emerald-600 text-white shadow-emerald-600/30"
-                        : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 group-hover:bg-emerald-500/10 group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
-                    }`}>
-                      {surah.number}
+                {/* Top Row: SVG Islamic Star Badge & Surah Titles */}
+                <div className="flex items-center justify-between z-10 gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {/* 8-Point Rub el Hizb SVG Medallion */}
+                    <div className="relative w-10 h-10 shrink-0 flex items-center justify-center transition-transform group-hover:scale-105">
+                      <svg viewBox="0 0 100 100" className="w-full h-full">
+                        {isPlayingThis ? (
+                          <>
+                            <rect x="16" y="16" width="68" height="68" rx="10" fill="#10b981" stroke="#34d399" strokeWidth="2.5" />
+                            <rect x="16" y="16" width="68" height="68" rx="10" transform="rotate(45 50 50)" fill="#10b981" stroke="#34d399" strokeWidth="2.5" />
+                          </>
+                        ) : (
+                          <>
+                            <rect x="16" y="16" width="68" height="68" rx="10" className="fill-slate-100 dark:fill-slate-800 stroke-slate-200/80 dark:stroke-slate-700/80 group-hover:stroke-emerald-500/40 transition-colors" strokeWidth="2.5" />
+                            <rect x="16" y="16" width="68" height="68" rx="10" transform="rotate(45 50 50)" className="fill-slate-100 dark:fill-slate-800 stroke-slate-200/80 dark:stroke-slate-700/80 group-hover:stroke-emerald-500/40 transition-colors" strokeWidth="2.5" />
+                          </>
+                        )}
+                      </svg>
+                      <span className={`absolute inset-0 flex items-center justify-center font-mono font-black text-xs select-none ${
+                        isPlayingThis ? "text-white" : "text-slate-700 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
+                      }`}>
+                        {surah.number}
+                      </span>
                     </div>
 
-                    <div className="flex flex-col">
-                      <span className="text-sm font-black text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-sm font-black text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
                         {surah.englishName}
                       </span>
-                      <span className="text-xs text-slate-400 font-medium truncate max-w-[130px]">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 font-medium truncate">
                         {surah.englishNameTranslation}
                       </span>
                     </div>
                   </div>
 
-                  {/* Arabic Name */}
-                  <span className="font-arabic text-xl font-bold text-slate-800 dark:text-slate-200 group-hover:scale-105 transition-transform" dir="rtl">
+                  {/* Arabic Calligraphy */}
+                  <span className="font-arabic text-xl sm:text-2xl font-bold text-emerald-600/80 dark:text-emerald-400/80 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:scale-105 transition-all shrink-0 select-none" dir="rtl">
                     {surah.name}
                   </span>
                 </div>
 
-                {/* Bottom Row: Metadata & Audio Trigger */}
-                <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800/80 z-10">
+                {/* Bottom Row: Metadata Chips & Audio Trigger */}
+                <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-slate-800/80 z-10">
                   <div className="flex items-center gap-2 text-[11px] font-bold">
                     <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono">
                       {surah.numberOfAyahs} Verses
                     </span>
 
-                    <span className={`px-2.5 py-0.5 rounded-full ${
+                    <span className={`px-2.5 py-0.5 rounded-full font-bold ${
                       isMakki
-                        ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
-                        : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                        ? "bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20"
+                        : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20"
                     }`}>
                       {isMakki ? "Makki" : "Madani"}
                     </span>
@@ -316,14 +336,22 @@ export default function SurahList({ data }) {
                   <button
                     type="button"
                     onClick={(e) => handlePlaySurah(e, surah)}
-                    className={`p-2 rounded-xl transition-all ${
+                    className={`p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1 ${
                       isPlayingThis
-                        ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30 animate-pulse"
-                        : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white"
+                        ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/30 ring-2 ring-emerald-400/40"
+                        : "bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white"
                     }`}
-                    title={isPlayingThis ? "Pause" : "Listen Audio"}
+                    title={isPlayingThis ? "Pause Recitation" : "Play Full Surah"}
                   >
-                    {isPlayingThis ? <Pause size={14} className="fill-white" /> : <Play size={14} className="fill-emerald-600 dark:fill-emerald-400 group-hover:fill-white" />}
+                    {isPlayingThis ? (
+                      <div className="flex items-center gap-0.5 h-3 px-0.5">
+                        <span className="w-0.5 h-3 bg-white rounded-full animate-bounce [animation-delay:0ms]" />
+                        <span className="w-0.5 h-3 bg-white rounded-full animate-bounce [animation-delay:150ms]" />
+                        <span className="w-0.5 h-3 bg-white rounded-full animate-bounce [animation-delay:300ms]" />
+                      </div>
+                    ) : (
+                      <Play size={13} className="fill-current ml-0.5" />
+                    )}
                   </button>
                 </div>
 
@@ -335,7 +363,7 @@ export default function SurahList({ data }) {
         /* List View Directory */
         <div className="flex flex-col gap-2.5">
           {filteredAndSortedSurahs.map((surah) => {
-            const isPlayingThis = audio?.trackId === `surah_${surah.number}` && audio?.isPlaying;
+            const isPlayingThis = (audio?.trackId === `surah_${surah.number}` || audio?.playlistId === `surah_${surah.number}`) && !audio?.paused;
             const isMakki = (surah.revelationType || "").toLowerCase().includes("makkah") || (surah.revelationType || "").toLowerCase().includes("meccan");
 
             return (
@@ -344,43 +372,43 @@ export default function SurahList({ data }) {
                 href={`/surah/${surah.number}`}
                 className={`group p-4 rounded-2xl border transition-all duration-200 flex items-center justify-between gap-4 ${
                   isPlayingThis
-                    ? "bg-emerald-500/10 border-2 border-emerald-500 shadow-md"
-                    : "bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-slate-200/70 dark:border-slate-800/80 hover:border-emerald-500/40 hover:bg-white dark:hover:bg-slate-900"
+                    ? "bg-emerald-500/10 dark:bg-emerald-950/40 border-2 border-emerald-500/80 dark:border-emerald-400/80 shadow-md"
+                    : "bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-slate-200/80 dark:border-slate-800/80 hover:border-emerald-500/40 hover:bg-white dark:hover:bg-slate-900 shadow-xs"
                 }`}
               >
-                <div className="flex items-center gap-4">
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-black font-mono text-xs ${
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-black font-mono text-xs shrink-0 ${
                     isPlayingThis
-                      ? "bg-emerald-600 text-white"
-                      : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+                      ? "bg-emerald-500 text-white shadow-sm"
+                      : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 group-hover:bg-emerald-500/10 group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
                   }`}>
                     {surah.number}
                   </div>
 
-                  <div className="flex flex-col">
-                    <span className="text-sm font-black text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm font-black text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
                       {surah.englishName}
                     </span>
-                    <span className="text-xs text-slate-400 font-medium">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 font-medium truncate">
                       {surah.englishNameTranslation}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-6">
-                  <span className="font-arabic text-lg font-bold text-slate-800 dark:text-slate-200">
+                <div className="flex items-center gap-4 sm:gap-6 shrink-0">
+                  <span className="font-arabic text-lg sm:text-xl font-bold text-emerald-600/80 dark:text-emerald-400/80 select-none">
                     {surah.name}
                   </span>
 
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-bold text-slate-500 font-mono hidden sm:inline">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <span className="text-xs font-bold text-gray-500 dark:text-gray-400 font-mono hidden sm:inline">
                       {surah.numberOfAyahs} Verses
                     </span>
 
-                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full hidden sm:inline ${
                       isMakki
-                        ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                        : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                        ? "bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20"
+                        : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20"
                     }`}>
                       {isMakki ? "Makki" : "Madani"}
                     </span>
@@ -388,13 +416,22 @@ export default function SurahList({ data }) {
                     <button
                       type="button"
                       onClick={(e) => handlePlaySurah(e, surah)}
-                      className={`p-2 rounded-xl transition-all ${
+                      className={`p-2 rounded-xl transition-all cursor-pointer ${
                         isPlayingThis
-                          ? "bg-emerald-600 text-white"
-                          : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white"
+                          ? "bg-emerald-500 text-white shadow-sm ring-2 ring-emerald-400/40"
+                          : "bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white"
                       }`}
+                      title={isPlayingThis ? "Pause" : "Play Full Surah"}
                     >
-                      {isPlayingThis ? <Pause size={14} className="fill-white" /> : <Play size={14} className="fill-emerald-600 dark:fill-emerald-400 group-hover:fill-white" />}
+                      {isPlayingThis ? (
+                        <div className="flex items-center gap-0.5 h-3 px-0.5">
+                          <span className="w-0.5 h-3 bg-white rounded-full animate-bounce [animation-delay:0ms]" />
+                          <span className="w-0.5 h-3 bg-white rounded-full animate-bounce [animation-delay:150ms]" />
+                          <span className="w-0.5 h-3 bg-white rounded-full animate-bounce [animation-delay:300ms]" />
+                        </div>
+                      ) : (
+                        <Play size={13} className="fill-current ml-0.5" />
+                      )}
                     </button>
                   </div>
                 </div>
