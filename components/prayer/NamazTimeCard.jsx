@@ -22,6 +22,7 @@ import {
   BarChart3,
   Cloud
 } from "lucide-react";
+import { normalizeLocation } from "@/lib/getLocation";
 import PrayerSettingsModal from "./PrayerSettingsModal";
 import { CALCULATION_METHODS } from "@/lib/api/calculationMethods";
 
@@ -150,7 +151,7 @@ const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true, clas
     if (savedManual) {
       try {
         const parsed = JSON.parse(savedManual);
-        setActiveLocation(parsed);
+        setActiveLocation(normalizeLocation(parsed));
         setIsManual(true);
       } catch (e) {
         console.error("Failed to parse manual location", e);
@@ -164,13 +165,13 @@ const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true, clas
 
     if (gpsLocation && !gpsLocation.loading) {
       if (!gpsLocation.error && gpsLocation.latitude && gpsLocation.longitude) {
-        setActiveLocation({
+        setActiveLocation(normalizeLocation({
           city: gpsLocation.city || "Detected Location",
           country: gpsLocation.country || "",
           latitude: gpsLocation.latitude,
           longitude: gpsLocation.longitude,
           isGps: true
-        });
+        }));
       } else {
         setActiveLocation(defaultLocation);
       }
@@ -369,8 +370,12 @@ const NamazTimeCard = ({ gpsLocation, compact = false, showFullLink = true, clas
           <div className="flex items-center gap-1.5 truncate min-w-0 flex-1">
             <MapPin size={13} className="text-emerald-500 shrink-0" />
             <span className="truncate font-semibold text-slate-700 dark:text-slate-300 text-[11px] sm:text-xs">
-              {activeLocation ? activeLocation.city : "Loading..."}
-              {activeLocation?.country && `, ${activeLocation.country}`}
+              {typeof activeLocation?.city === "object"
+                ? activeLocation?.city?.city
+                : activeLocation?.city || "Loading..."}
+              {activeLocation?.country && typeof activeLocation.country === "string"
+                ? `, ${activeLocation.country}`
+                : ""}
             </span>
           </div>
           {hijriDate && (

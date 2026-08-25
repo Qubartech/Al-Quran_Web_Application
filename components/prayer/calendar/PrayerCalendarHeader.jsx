@@ -18,7 +18,8 @@ import {
   Sparkles,
   Navigation,
   Globe,
-  Moon
+  Moon,
+  Check,
 } from "lucide-react";
 
 const MONTHS = [
@@ -26,16 +27,19 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December"
 ];
 
-const QUICK_CITIES = [
-  { city: "Makkah", country: "Saudi Arabia" },
-  { city: "Madinah", country: "Saudi Arabia" },
-  { city: "Dhaka", country: "Bangladesh" },
-  { city: "London", country: "United Kingdom" },
-  { city: "New York", country: "United States" },
-  { city: "Cairo", country: "Egypt" },
-  { city: "Istanbul", country: "Turkey" },
-  { city: "Dubai", country: "United Arab Emirates" },
-  { city: "Kuala Lumpur", country: "Malaysia" }
+export const QUICK_CITIES = [
+  { city: "Makkah", country: "Saudi Arabia", latitude: 21.4225, longitude: 39.8262 },
+  { city: "Madinah", country: "Saudi Arabia", latitude: 24.4672, longitude: 39.6111 },
+  { city: "Dhaka", country: "Bangladesh", latitude: 23.8103, longitude: 90.4125 },
+  { city: "London", country: "United Kingdom", latitude: 51.5074, longitude: -0.1278 },
+  { city: "New York", country: "United States", latitude: 40.7128, longitude: -74.0060 },
+  { city: "Cairo", country: "Egypt", latitude: 30.0444, longitude: 31.2357 },
+  { city: "Istanbul", country: "Turkey", latitude: 41.0082, longitude: 28.9784 },
+  { city: "Dubai", country: "United Arab Emirates", latitude: 25.2048, longitude: 55.2708 },
+  { city: "Kuala Lumpur", country: "Malaysia", latitude: 3.1390, longitude: 101.6869 },
+  { city: "Toronto", country: "Canada", latitude: 43.6532, longitude: -79.3832 },
+  { city: "Jakarta", country: "Indonesia", latitude: -6.2088, longitude: 106.8456 },
+  { city: "Karachi", country: "Pakistan", latitude: 24.8607, longitude: 67.0011 }
 ];
 
 export default function PrayerCalendarHeader({
@@ -87,58 +91,78 @@ export default function PrayerCalendarHeader({
     e.preventDefault();
     if (!searchInput.trim()) return;
     onSearchLocation(searchInput.trim());
+    setSearchInput("");
   };
 
   return (
     <div className="flex flex-col gap-4 sm:gap-6 w-full print:hidden">
       
-      {/* Top Banner / Hero Title */}
-      <div className="relative overflow-hidden rounded-3xl glass border border-emerald-500/15 dark:border-emerald-500/25 p-5 sm:p-6 md:p-8 text-slate-900 dark:text-white shadow-sm transition-all duration-500">
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-50/80 via-teal-50/60 to-cyan-50/70 dark:from-emerald-950/70 dark:via-slate-900/90 dark:to-teal-950/70 z-0" />
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-72 h-72 rounded-full bg-emerald-400/15 dark:bg-emerald-500/10 blur-3xl pointer-events-none z-0" />
-        <div className="absolute bottom-0 left-1/3 -mb-10 w-56 h-56 rounded-full bg-teal-400/15 dark:bg-teal-500/10 blur-2xl pointer-events-none z-0" />
+      {/* ── Top Luxury Hero Banner ── */}
+      <div className="relative overflow-hidden rounded-3xl glass border border-emerald-500/20 dark:border-emerald-500/30 p-6 sm:p-8 md:p-10 text-slate-900 dark:text-white shadow-xl transition-all duration-300 animate-fadeIn">
+        
+        {/* Ambient Gradients & Glows */}
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/90 via-teal-50/70 to-emerald-100/40 dark:from-slate-950/95 dark:via-emerald-950/40 dark:to-slate-900/90 z-0 pointer-events-none" />
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-emerald-500/15 dark:bg-emerald-400/10 rounded-full blur-3xl z-0 pointer-events-none" />
+        <div className="absolute -bottom-24 -left-20 w-80 h-80 bg-teal-500/15 dark:bg-teal-400/10 rounded-full blur-3xl z-0 pointer-events-none" />
+        <div className="absolute -bottom-24 -right-20 w-80 h-80 bg-amber-500/15 dark:bg-amber-400/10 rounded-full blur-3xl z-0 pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-extrabold tracking-wider uppercase shadow-2xs">
-              <Sparkles size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span>AlAdhan Calculation Engine</span>
-            </div>
-            
+        {/* Islamic Arabesque Geometric Pattern Backdrop */}
+        <div className="absolute inset-0 opacity-[0.035] dark:opacity-[0.06] pointer-events-none z-0 overflow-hidden flex items-center justify-center">
+          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="calHeaderPattern" width="70" height="70" patternUnits="userSpaceOnUse">
+                <g fill="none" stroke="currentColor" strokeWidth="1.2" className="text-emerald-600 dark:text-emerald-400">
+                  <polygon points="35,0 45.5,10.5 59.5,10.5 59.5,24.5 70,35 59.5,45.5 59.5,59.5 45.5,59.5 35,70 24.5,59.5 10.5,59.5 10.5,45.5 0,35 10.5,24.5 10.5,10.5 24.5,10.5" />
+                  <circle cx="35" cy="35" r="14" />
+                </g>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#calHeaderPattern)" />
+          </svg>
+        </div>
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-2.5 max-w-2xl">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white drop-shadow-2xs">
-                Prayer Times Calendar
-              </h1>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-extrabold tracking-wider uppercase shadow-2xs">
+                <Sparkles size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span>AlAdhan Astronomical Engine</span>
+              </span>
+
               {tracker?.user ? (
                 tracker?.isSyncedWithAccount ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-200 text-[10px] font-black border border-emerald-500/30 backdrop-blur-md shadow-2xs" title="Calendar is synced with your account">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-[10px] font-black border border-emerald-500/30 backdrop-blur-md shadow-2xs">
                     Account Synced
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-200 text-[10px] font-black border border-amber-500/30 backdrop-blur-md animate-pulse" title="Syncing calendar with your account...">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 text-[10px] font-black border border-amber-500/30 backdrop-blur-md animate-pulse">
                     Syncing...
                   </span>
                 )
               ) : (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 dark:bg-white/10 text-slate-700 dark:text-slate-300 text-[10px] font-bold border border-emerald-200/50 dark:border-white/15 backdrop-blur-md" title="Guest mode: logs saved in local storage. Log in to sync to cloud.">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-200/60 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 text-[10px] font-bold border border-slate-300/40 dark:border-slate-700 backdrop-blur-md">
                   Local Storage (Guest)
                 </span>
               )}
             </div>
             
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-slate-900 dark:text-white drop-shadow-xs">
+              Prayer Times Calendar
+            </h1>
+            
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed font-medium">
-              Comprehensive monthly timetable with accurate Fajr, Dhuhr, Asr, Maghrib, Isha, Tahajjud times, and Hijri dates.
+              Complete monthly and yearly timetables with accurate Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha, and fasting durations.
             </p>
           </div>
 
-          {/* Quick Location & Controls */}
-          <div className="flex items-center gap-2.5 flex-wrap">
+          {/* Quick Location & Settings Controls */}
+          <div className="flex items-center gap-2.5 flex-wrap shrink-0">
             {/* Location Badge */}
-            <div className="flex-1 sm:flex-initial flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/80 dark:bg-slate-900/60 backdrop-blur-md border border-emerald-200/50 dark:border-white/15 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 min-w-0 shadow-2xs">
-              <MapPin size={17} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <div className="flex-1 sm:flex-initial flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-emerald-500/20 dark:border-slate-800 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 min-w-0 shadow-sm">
+              <MapPin size={18} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
               <div className="flex flex-col min-w-0">
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider leading-tight">Location</span>
-                <span className="font-extrabold text-slate-900 dark:text-white truncate max-w-[130px] sm:max-w-[190px]">
+                <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-extrabold tracking-wider leading-tight">Current Location</span>
+                <span className="font-black text-slate-900 dark:text-white truncate max-w-[130px] sm:max-w-[190px]">
                   {activeLocation ? `${activeLocation.city}${activeLocation.country ? `, ${activeLocation.country}` : ""}` : "Loading..."}
                 </span>
               </div>
@@ -146,224 +170,224 @@ export default function PrayerCalendarHeader({
 
             {/* GPS Reset Button */}
             <button
+              type="button"
               onClick={onResetGps}
               title="Use GPS Geolocation"
-              className="p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 hover:bg-white dark:hover:bg-slate-900 border border-emerald-200/50 dark:border-white/15 text-slate-700 dark:text-slate-200 hover:text-emerald-600 transition-all cursor-pointer shrink-0 shadow-2xs"
+              className="p-3 rounded-2xl bg-white/80 dark:bg-slate-900/80 hover:bg-emerald-50 dark:hover:bg-slate-800 border border-emerald-500/20 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:text-emerald-600 transition-all cursor-pointer shrink-0 shadow-sm"
             >
-              <Navigation size={16} />
+              <Navigation size={18} />
             </button>
 
             {/* Calculation Settings Button */}
             <button
+              type="button"
               onClick={onOpenSettings}
-              className="px-4 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white transition-all text-xs sm:text-sm font-extrabold cursor-pointer shrink-0 shadow-sm flex items-center gap-2"
+              className="px-4 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white transition-all text-xs sm:text-sm font-black cursor-pointer shrink-0 shadow-md shadow-emerald-600/20 flex items-center gap-2"
             >
-              <SlidersHorizontal size={16} />
+              <SlidersHorizontal size={17} />
               <span>Settings</span>
             </button>
           </div>
         </div>
 
-        {/* Quick Cities Bar */}
-        <div className="mt-5 pt-4 border-t border-emerald-200/50 dark:border-white/10 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-          <span className="text-[11px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap mr-1 flex items-center gap-1 shrink-0">
+        {/* ── Quick Cities Bar (Fully Interactive & Fixed) ── */}
+        <div className="mt-6 pt-4 border-t border-emerald-200/50 dark:border-slate-800/80 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <span className="text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider whitespace-nowrap mr-1 flex items-center gap-1.5 shrink-0 bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20">
             <Globe size={13} /> Quick City:
           </span>
-          {QUICK_CITIES.map((loc) => (
-            <button
-              key={loc.city}
-              onClick={() => onSearchLocation(loc.city)}
-              className="px-3 py-1.5 rounded-xl bg-white/80 dark:bg-slate-900/60 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 text-xs text-slate-700 dark:text-slate-200 transition-all border border-emerald-200/50 dark:border-white/15 whitespace-nowrap shrink-0 cursor-pointer font-semibold shadow-2xs"
-            >
-              {loc.city}
-            </button>
-          ))}
+          {QUICK_CITIES.map((loc) => {
+            const isSelected =
+              activeLocation?.city?.toLowerCase() === loc.city.toLowerCase();
+
+            return (
+              <button
+                key={loc.city}
+                type="button"
+                onClick={() => onSearchLocation(loc)}
+                className={`px-3.5 py-1.5 rounded-xl text-xs transition-all border whitespace-nowrap shrink-0 cursor-pointer font-bold shadow-2xs flex items-center gap-1.5 ${
+                  isSelected
+                    ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20 font-black"
+                    : "bg-white/80 dark:bg-slate-900/80 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-600 text-slate-700 dark:text-slate-200 border-slate-200/80 dark:border-slate-800"
+                }`}
+              >
+                {isSelected && <Check size={12} className="stroke-[3]" />}
+                {loc.city}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Main Control Strip Panel - Compact & Sleek */}
-      <div className="flex flex-col gap-3 p-3 sm:p-3.5 rounded-2xl glass border border-emerald-100/80 dark:border-slate-800 shadow-xs backdrop-blur-xl">
+      {/* ── Main Control Strip Panel - Month / Year Nav & View Modes ── */}
+      <div className="flex flex-col gap-3 p-3.5 sm:p-4 rounded-3xl bg-white/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800/80 shadow-sm backdrop-blur-xl">
         
         {/* Row 1: Month/Year Controls + Hijri Summary Pill */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 w-full">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
           
           {/* Navigation Controls Group */}
-          <div className="flex items-center justify-between sm:justify-start gap-1.5 w-full sm:w-auto overflow-x-auto pb-0.5 scrollbar-none">
+          <div className="flex items-center justify-between sm:justify-start gap-2 w-full sm:w-auto overflow-x-auto pb-0.5 scrollbar-none">
             <button
               onClick={handlePrevMonth}
-              className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-white transition-all shrink-0 cursor-pointer shadow-sm"
+              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all shrink-0 cursor-pointer shadow-2xs"
               title="Previous Month"
             >
               <ChevronLeft size={16} />
             </button>
 
             {/* Month Dropdown */}
-            <select
-              value={month}
-              onChange={(e) => setMonth(parseInt(e.target.value, 10))}
-              className="px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/90 text-slate-800 dark:text-white font-extrabold text-xs border border-slate-200 dark:border-slate-700/90 hover:border-emerald-500 focus:border-emerald-500 focus:outline-none transition-all cursor-pointer shrink-0 shadow-sm"
-            >
-              {MONTHS.map((m, idx) => (
-                <option key={m} value={idx + 1}>
-                  {m}
-                </option>
-              ))}
-            </select>
+            <div className="relative flex items-center">
+              <select
+                value={month}
+                onChange={(e) => setMonth(parseInt(e.target.value, 10))}
+                className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white font-extrabold text-xs border border-slate-200 dark:border-slate-700 hover:border-emerald-500 focus:outline-none transition-all cursor-pointer shrink-0 shadow-2xs"
+              >
+                {MONTHS.map((m, idx) => (
+                  <option key={m} value={idx + 1} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             {/* Year Selector */}
-            <select
-              value={year}
-              onChange={(e) => setYear(parseInt(e.target.value, 10))}
-              className="px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/90 text-slate-800 dark:text-white font-extrabold text-xs border border-slate-200 dark:border-slate-700/90 hover:border-emerald-500 focus:border-emerald-500 focus:outline-none transition-all cursor-pointer shrink-0 shadow-sm"
-            >
-              {Array.from({ length: 11 }, (_, i) => 2024 + i).map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
+            <div className="relative flex items-center">
+              <select
+                value={year}
+                onChange={(e) => setYear(parseInt(e.target.value, 10))}
+                className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white font-extrabold text-xs border border-slate-200 dark:border-slate-700 hover:border-emerald-500 focus:outline-none transition-all cursor-pointer shrink-0 shadow-2xs"
+              >
+                {Array.from({ length: 11 }, (_, i) => 2024 + i).map((y) => (
+                  <option key={y} value={y} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+                    {y}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             <button
               onClick={handleNextMonth}
-              className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-white transition-all shrink-0 cursor-pointer shadow-sm"
+              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all shrink-0 cursor-pointer shadow-2xs"
               title="Next Month"
             >
               <ChevronRight size={16} />
             </button>
 
-             <button
+            <button
               onClick={handleToday}
-              className="px-3 py-1.5 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 font-extrabold text-xs hover:bg-emerald-500/20 dark:hover:bg-emerald-500/30 transition-all border border-emerald-500/20 dark:border-emerald-500/35 shrink-0 cursor-pointer shadow-sm"
+              className="px-3.5 py-2 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs hover:bg-emerald-500/20 transition-all border border-emerald-500/20 shrink-0 cursor-pointer shadow-2xs"
             >
               Today
             </button>
           </div>
 
-          {/* Hijri Month Banner */}
+          {/* Hijri Month Summary Banner */}
           {hijriSummary && (
-            <div className="px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-extrabold flex items-center justify-center gap-1.5 shrink-0 shadow-sm">
-              <CalendarIcon size={14} className="text-amber-400 shrink-0" />
+            <div className="px-3.5 py-2 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-black flex items-center justify-center gap-1.5 shrink-0 shadow-2xs">
+              <CalendarIcon size={14} className="text-amber-500 shrink-0" />
               <span className="truncate">{hijriSummary}</span>
             </div>
           )}
         </div>
 
-        {/* Single Unified Row: Left (Search Input) | Right (View Mode Tabs + Export Button) */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5 w-full">
+        {/* Row 2: Search Bar + View Switcher + Export Buttons */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
           
-          {/* Left Side: Search City Form */}
-          <form onSubmit={handleSearchSubmit} className="relative flex-1 min-w-[200px] md:max-w-md">
+          {/* Custom Search Form */}
+          <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-sm">
             <input
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Search city (e.g. Makkah, London, Cairo)..."
-              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800/90 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 border border-slate-200 dark:border-slate-700/80 focus:border-emerald-500 focus:outline-none transition-colors shadow-inner"
+              placeholder="Search any custom city/country..."
+              className="w-full pl-9 pr-8 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-inner"
             />
-            <Search size={14} className="absolute left-2.5 top-2.5 text-slate-500 dark:text-slate-400 pointer-events-none" />
+            <Search size={14} className="absolute left-3 top-2.5 text-slate-400" />
+            <button
+              type="submit"
+              disabled={!searchInput.trim()}
+              className="absolute right-1.5 top-1.5 px-2 py-1 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white rounded-lg text-[10px] font-bold transition-all cursor-pointer"
+            >
+              Go
+            </button>
           </form>
 
-          {/* Right Side: View Mode Tabs + Export Button */}
-          <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap justify-between sm:justify-end">
-            
-            {/* View Mode Segmented Controls */}
-            <div className="inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 shrink-0 gap-1 shadow-inner overflow-x-auto scrollbar-none">
-              <button
-                onClick={() => setViewMode("table")}
-                title="Table View"
-                className={`py-1.5 px-3 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                  viewMode === "table"
-                    ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25 ring-1 ring-emerald-400/40"
-                    : "text-slate-550 dark:text-slate-400 hover:text-slate-850 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800/70"
-                }`}
-              >
-                <List size={13} />
-                <span>Table</span>
-              </button>
-
-              <button
-                onClick={() => setViewMode("grid")}
-                title="Grid View"
-                className={`py-1.5 px-3 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                  viewMode === "grid"
-                    ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25 ring-1 ring-emerald-400/40"
-                    : "text-slate-550 dark:text-slate-400 hover:text-slate-850 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800/70"
-                }`}
-              >
-                <LayoutGrid size={13} />
-                <span>Grid</span>
-              </button>
-
-              <button
-                onClick={() => setViewMode("year")}
-                title="Year View"
-                className={`py-1.5 px-3 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                  viewMode === "year"
-                    ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25 ring-1 ring-emerald-400/40"
-                    : "text-slate-550 dark:text-slate-400 hover:text-slate-850 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800/70"
-                }`}
-              >
-                <CalendarDays size={13} />
-                <span>Year</span>
-              </button>
-
-              <button
-                onClick={() => setViewMode("hijri")}
-                title="Hijri View"
-                className={`py-1.5 px-3 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                  viewMode === "hijri"
-                    ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/25 ring-1 ring-amber-400/40"
-                    : "text-slate-550 dark:text-slate-400 hover:text-slate-850 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800/70"
-                }`}
-              >
-                <Moon size={13} className={viewMode === "hijri" ? "text-slate-950" : "text-amber-500"} />
-                <span>Hijri</span>
-              </button>
+          {/* View Modes & Export Trigger */}
+          <div className="flex items-center gap-2 justify-between sm:justify-end flex-wrap">
+            {/* View Mode Toggle Pill */}
+            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+              {[
+                { id: "grid", label: "Grid", icon: LayoutGrid },
+                { id: "table", label: "Table", icon: List },
+                { id: "year", label: "Year", icon: CalendarDays },
+                { id: "hijri", label: "Hijri", icon: Moon }
+              ].map((vm) => {
+                const Icon = vm.icon;
+                const isActive = viewMode === vm.id;
+                return (
+                  <button
+                    key={vm.id}
+                    onClick={() => setViewMode(vm.id)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${
+                      isActive
+                        ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30"
+                        : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                    }`}
+                  >
+                    <Icon size={14} />
+                    <span className="hidden sm:inline">{vm.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Export Dropdown Button */}
-            <div className="relative shrink-0">
+            {/* Export & Print Controls */}
+            <div className="relative flex items-center gap-1.5">
               <button
-                onClick={() => setShowExportMenu(!showExportMenu)}
-                className="flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 font-extrabold text-xs transition-all shadow-md shadow-emerald-950/50 cursor-pointer"
+                type="button"
+                onClick={onPrint}
+                className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                title="Print Timetable"
               >
-                <Download size={14} />
+                <Printer size={15} />
+                <span className="hidden md:inline">Print</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowExportMenu(!showExportMenu)}
+                className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+              >
+                <Download size={15} />
                 <span>Export</span>
               </button>
 
+              {/* Export Dropdown Menu */}
               {showExportMenu && (
                 <div
-                  className="absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl z-50 p-1.5 text-xs flex flex-col gap-1 animate-in fade-in zoom-in-95 duration-150"
+                  className="absolute right-0 top-full mt-2 w-48 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl z-50 p-1.5 flex flex-col gap-1 animate-in fade-in"
                   onClick={() => setShowExportMenu(false)}
                 >
                   <button
-                    onClick={onPrint}
-                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-left transition-colors cursor-pointer"
-                  >
-                    <Printer size={14} className="text-emerald-500 dark:text-emerald-400" />
-                    <span>Print / Save PDF</span>
-                  </button>
-
-                  <button
+                    type="button"
                     onClick={onExportCSV}
-                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-left transition-colors cursor-pointer"
+                    className="w-full px-3 py-2 text-xs font-bold text-left rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer"
                   >
-                    <FileSpreadsheet size={14} className="text-teal-500 dark:text-teal-400" />
-                    <span>Export CSV</span>
+                    <FileSpreadsheet size={15} className="text-emerald-500" />
+                    <span>Export as CSV</span>
                   </button>
-
                   <button
+                    type="button"
                     onClick={onExportICS}
-                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-left transition-colors cursor-pointer"
+                    className="w-full px-3 py-2 text-xs font-bold text-left rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer"
                   >
-                    <CalendarIcon size={14} className="text-sky-500 dark:text-sky-400" />
-                    <span>Export iCal (.ics)</span>
+                    <CalendarDays size={15} className="text-sky-500" />
+                    <span>Export to iCal (.ics)</span>
                   </button>
                 </div>
               )}
             </div>
-
           </div>
+
         </div>
 
       </div>

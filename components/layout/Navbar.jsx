@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import SettingsDrawer from "@/components/settings/SettingsDrawer";
 import AuthModal from "@/components/auth/AuthModal";
 import ProfileEditModal from "@/components/auth/ProfileEditModal";
+import GlobalSearchModal from "@/components/search/GlobalSearchModal";
 import { useUser } from "@/context/UserProvider";
 import { useSidebar } from "@/context/SidebarProvider";
 import {
@@ -23,7 +24,8 @@ import {
   UserCheck,
   PanelLeft,
   Clock,
-  Calendar
+  Calendar,
+  Search,
 } from "lucide-react";
 
 function Navbar() {
@@ -32,6 +34,7 @@ function Navbar() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -52,12 +55,18 @@ function Navbar() {
       setMobileMenuOpen(false);
       setAuthModalOpen(true);
     };
+    const handleOpenSearch = () => {
+      setMobileMenuOpen(false);
+      setSearchModalOpen(true);
+    };
 
     window.addEventListener("quran-open-settings", handleOpenSettings);
     window.addEventListener("quran-open-auth", handleOpenAuth);
+    window.addEventListener("quran-open-global-search", handleOpenSearch);
     return () => {
       window.removeEventListener("quran-open-settings", handleOpenSettings);
       window.removeEventListener("quran-open-auth", handleOpenAuth);
+      window.removeEventListener("quran-open-global-search", handleOpenSearch);
     };
   }, []);
 
@@ -129,7 +138,22 @@ function Navbar() {
         </div>
 
         {/* Buttons & Profile */}
-        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          {/* Global Search Trigger Button */}
+          <button
+            onClick={() => setSearchModalOpen(true)}
+            aria-label="Search Quran"
+            className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-xs font-semibold text-foreground/70 hover:text-foreground border border-border/40 hover:border-emerald-500/30 transition-all cursor-pointer shadow-2xs"
+            title="Search Quran (⌘K / Ctrl+K)"
+          >
+            <Search size={15} className="text-emerald-500 shrink-0" />
+            <span className="hidden xl:inline text-xs">Search Quran...</span>
+            <span className="hidden sm:inline xl:hidden text-xs">Search</span>
+            <kbd className="hidden md:inline-flex items-center px-1.5 py-0.5 text-[9.5px] font-bold bg-background/80 border border-border rounded-md text-muted-foreground ml-0.5">
+              ⌘K
+            </kbd>
+          </button>
+
           {/* Settings Button */}
           <button
             onClick={openSettings}
@@ -258,6 +282,21 @@ function Navbar() {
 
               {/* Drawer Links */}
               <div className="flex flex-col gap-2">
+                {/* Mobile Quick Search Button */}
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setSearchModalOpen(true);
+                  }}
+                  className="flex items-center gap-3 w-full p-3 rounded-2xl bg-slate-900 border border-emerald-500/30 text-slate-300 text-xs font-bold transition-all hover:bg-slate-800 cursor-pointer shadow-sm mb-2"
+                >
+                  <Search size={16} className="text-emerald-400 shrink-0" />
+                  <span className="truncate">Search Surahs, Verses, Tools...</span>
+                  <kbd className="ml-auto px-1.5 py-0.5 text-[9px] font-bold bg-slate-800 border border-slate-700 rounded-md text-slate-400 shrink-0">
+                    ⌘K
+                  </kbd>
+                </button>
+
                 <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 px-3 mb-1">
                   Main Menu
                 </span>
@@ -365,6 +404,9 @@ function Navbar() {
 
       {/* Profile Edit Modal */}
       <ProfileEditModal isOpen={profileModalOpen} onClose={() => setProfileModalOpen(false)} />
+
+      {/* Global Search Modal */}
+      <GlobalSearchModal isOpen={searchModalOpen} onClose={() => setSearchModalOpen(false)} />
     </nav>
   );
 }

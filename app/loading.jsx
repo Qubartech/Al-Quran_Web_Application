@@ -134,7 +134,7 @@ export default function Loading() {
             <div className="flex flex-col gap-3">
               <div className="h-3 w-20 bg-gray-300 dark:bg-slate-700 rounded-full"></div>
               {Array.from({ length: 2 }).map((_, i) => (
-                <div key={i} className="h-14 w-full bg-white/10 dark:bg-slate-900/10 border border-gray-200/20 dark:border-slate-850/20 rounded-xl"></div>
+                <div key={i} className="h-14 w-full bg-white/10 dark:bg-slate-900/10 border border-gray-200/20 dark:border-slate-800/40 rounded-xl"></div>
               ))}
             </div>
           </div>

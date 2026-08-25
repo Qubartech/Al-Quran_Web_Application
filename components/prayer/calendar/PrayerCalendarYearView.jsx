@@ -48,7 +48,7 @@ export default function PrayerCalendarYearView({
               className={`group relative p-5 rounded-3xl border transition-all cursor-pointer flex flex-col justify-between overflow-hidden ${
                 isCurrent
                   ? "bg-gradient-to-br from-emerald-500/15 via-teal-500/10 to-slate-900 border-emerald-500/60 shadow-xl shadow-emerald-500/15 ring-2 ring-emerald-500/30"
-                  : "bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 hover:border-emerald-500/40 hover:shadow-md dark:hover:bg-slate-850"
+                  : "bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 hover:border-emerald-500/40 hover:shadow-md dark:hover:bg-slate-800"
               }`}
             >
               <div>

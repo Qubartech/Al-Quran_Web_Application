@@ -234,7 +234,7 @@ export default function SurahPageWidgets() {
                   {recents.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center justify-between p-2 rounded-xl bg-white/20 dark:bg-slate-900/10 border border-gray-150/20 dark:border-slate-850/20"
+                      className="flex items-center justify-between p-2 rounded-xl bg-white/20 dark:bg-slate-900/40 border border-slate-200/40 dark:border-slate-800/60"
                     >
                       <div className="min-w-0 pr-2">
                         <h4 className="text-[10px] font-bold text-slate-800 dark:text-slate-200 truncate">
@@ -278,7 +278,7 @@ export default function SurahPageWidgets() {
                     <Link
                       key={item.id}
                       href={`/surah/${item.surahNumber}`}
-                      className="block p-2.5 rounded-xl bg-white/20 dark:bg-slate-900/10 border border-gray-150/20 dark:border-slate-850/20 hover:border-primaryColor/30 dark:hover:border-emerald-500/30 transition-all"
+                      className="block p-2.5 rounded-xl bg-white/20 dark:bg-slate-900/40 border border-slate-200/40 dark:border-slate-800/60 hover:border-primaryColor/30 dark:hover:border-emerald-500/30 transition-all"
                     >
                       <div className="flex justify-between items-center text-[8px] text-gray-400 dark:text-gray-500 font-bold mb-1">
                         <span>{item.surahName}</span>

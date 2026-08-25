@@ -72,7 +72,7 @@ export default function HijriCalendarView({
               <span className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                 <ArrowRightLeft size={18} />
               </span>
-              <h3 className="text-lg font-extrabold text-slate-850 dark:text-white">
+              <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">
                 Gregorian &lt;–&gt; Hijri Date Converter
               </h3>
             </div>
@@ -119,7 +119,7 @@ export default function HijriCalendarView({
               <span className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                 <Moon size={18} />
               </span>
-              <h3 className="text-lg font-extrabold text-slate-850 dark:text-white">
+              <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">
                 Moonsighting Offset
               </h3>
             </div>
@@ -187,15 +187,19 @@ export default function HijriCalendarView({
                       isToday
                         ? "bg-emerald-500/10 dark:bg-emerald-500/20 font-bold border-l-4 border-l-emerald-500"
                         : isFriday
-                        ? "bg-slate-50 dark:bg-slate-850"
+                        ? "bg-emerald-50/50 dark:bg-emerald-950/20"
                         : idx % 2 === 1
-                        ? "bg-slate-100/50 dark:bg-slate-950/40"
+                        ? "bg-slate-50/60 dark:bg-slate-950/40"
                         : "bg-white dark:bg-slate-900"
                     }`}
                   >
                     {/* Day Number (Sticky on scroll) */}
                     <td className={`py-4 px-4 text-center font-black sticky left-0 z-10 shadow-sm ${
-                      isToday ? "bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-300" : isFriday ? "bg-slate-50 dark:bg-slate-850 text-slate-800 dark:text-white" : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200"
+                      isToday
+                        ? "bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-300"
+                        : isFriday
+                        ? "bg-emerald-50 dark:bg-slate-900 text-emerald-700 dark:text-emerald-300"
+                        : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200"
                     }`}>
                       <div className="flex items-center justify-center gap-1.5">
                         {isToday && <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-ping" />}
@@ -271,7 +275,7 @@ export default function HijriCalendarView({
       <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <Sparkles className="text-amber-500 dark:text-amber-400" size={20} />
-          <h3 className="text-lg font-extrabold text-slate-850 dark:text-white">
+          <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">
             The 12 Hijri Months of the Islamic Calendar
           </h3>
         </div>

@@ -13,7 +13,10 @@ import {
   X,
   Repeat,
   Loader2,
-  Languages
+  Languages,
+  Check,
+  Music,
+  ExternalLink
 } from "lucide-react";
 
 function SurahAudioPlayer({
@@ -219,7 +222,7 @@ function SurahAudioPlayer({
 
     // Propagate custom timeupdate event for page verse highlights
     const event = new CustomEvent("quran-audio-timeupdate", {
-      detail: { currentTime: audioEl.currentTime },
+      detail: { currentTime: audioEl.currentTime, duration: audioEl.duration },
     });
     window.dispatchEvent(event);
   };
@@ -297,7 +300,7 @@ function SurahAudioPlayer({
 
   // Helper: format duration in mm:ss
   const formatTime = (time) => {
-    if (isNaN(time)) return "00:00";
+    if (isNaN(time) || time < 0) return "00:00";
     const mins = Math.floor(time / 60);
     const secs = Math.floor(time % 60);
     return `${mins.toString().padStart(2, "0")}:${secs
@@ -318,7 +321,7 @@ function SurahAudioPlayer({
   };
 
   function fillGradient(percent, darkTheme) {
-    const bgTrack = darkTheme ? "rgba(51, 65, 85, 0.6)" : "rgba(226, 232, 240, 0.8)";
+    const bgTrack = darkTheme ? "rgba(51, 65, 85, 0.7)" : "rgba(203, 213, 225, 0.9)";
     return `linear-gradient(to right, #10b981 0%, #10b981 ${percent}%, ${bgTrack} ${percent}%, ${bgTrack} 100%)`;
   }
 
@@ -354,7 +357,14 @@ function SurahAudioPlayer({
   };
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[94%] max-w-5xl z-50 transition-all duration-300">
+    <div className="fixed bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl z-50 transition-all duration-300 animate-fadeIn">
+      
+      {/* Outer Ambient Glowing Blur Orbs */}
+      <div className="absolute -inset-1.5 bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-emerald-600/20 rounded-3xl md:rounded-full blur-xl opacity-80 dark:opacity-60 pointer-events-none transition-all duration-500" />
+      {isPlaying && (
+        <div className="absolute -inset-3 bg-gradient-to-r from-emerald-400/25 via-teal-400/20 to-emerald-500/25 rounded-3xl md:rounded-full blur-2xl opacity-90 animate-pulse pointer-events-none" />
+      )}
+
       {/* Native HTML5 Audio Element */}
       <audio
         ref={audioRef}
@@ -369,100 +379,113 @@ function SurahAudioPlayer({
         onPlaying={() => setIsLoading(false)}
       />
 
-      {/* Floating Glassmorphic Player Card */}
-      <div className="bg-slate-900/95 text-slate-100 border border-emerald-500/30 backdrop-blur-2xl shadow-2xl shadow-black/50 rounded-2xl md:rounded-full px-4 py-3 md:py-2.5 md:px-6 relative flex flex-col gap-2.5 md:gap-0 md:flex-row md:items-center md:justify-between transition-all">
+      {/* Floating Glassmorphic Capsule */}
+      <div className="relative overflow-hidden bg-white/80 dark:bg-slate-950/80 text-slate-900 dark:text-slate-100 border border-white/60 dark:border-emerald-500/30 backdrop-blur-3xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.12)] dark:shadow-[0_25px_60px_-12px_rgba(0,0,0,0.85)] ring-1 ring-slate-900/5 dark:ring-white/10 rounded-3xl md:rounded-full px-4 py-3 md:py-2.5 md:px-6 flex flex-col gap-2.5 md:gap-0 md:flex-row md:items-center md:justify-between transition-all">
         
-        {/* 1. Track Info (Click to jump to active verse) */}
-        <div className="flex items-center justify-between md:justify-start min-w-0 md:w-[30%] gap-3">
-          
+        {/* Subtle Ambient Backlight Glow inside Capsule */}
+        <div className="absolute -top-12 left-1/4 w-72 h-24 bg-emerald-500/20 dark:bg-emerald-400/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-10 right-1/4 w-72 h-20 bg-teal-500/15 dark:bg-teal-400/10 rounded-full blur-3xl pointer-events-none" />
+
+        {/* ── 1. Track Info (Left) ── */}
+        <div className="flex items-center justify-between md:justify-start min-w-0 md:w-[32%] gap-3 z-10">
           <button
+            type="button"
             onClick={handleJumpToActiveVerse}
             className="flex items-center min-w-0 group/track text-left cursor-pointer hover:opacity-90 transition-opacity"
-            title="Click to go to currently playing verse"
+            title="Jump to active verse"
           >
-            {/* Animated Equalizer Wave */}
-            {isPlaying ? (
-              <div className="flex items-end gap-0.5 h-4 w-4 mr-2.5 flex-shrink-0">
-                <span className="w-1 bg-emerald-400 rounded-full animate-bounce [animation-delay:-0.3s] h-full"></span>
-                <span className="w-1 bg-teal-300 rounded-full animate-bounce [animation-delay:-0.15s] h-3"></span>
-                <span className="w-1 bg-emerald-500 rounded-full animate-bounce [animation-delay:-0.45s] h-4"></span>
-              </div>
-            ) : (
-              <div className="flex items-end gap-0.5 h-4 w-4 mr-2.5 flex-shrink-0 opacity-40">
-                <span className="w-1 bg-emerald-400 rounded-full h-1"></span>
-                <span className="w-1 bg-teal-300 rounded-full h-1.5"></span>
-                <span className="w-1 bg-emerald-500 rounded-full h-1"></span>
-              </div>
-            )}
+            {/* Animated Audio Waveform Equalizer Icon */}
+            <div className="flex items-end gap-0.5 h-6 w-6 mr-2.5 shrink-0 p-1 rounded-xl bg-emerald-50/90 dark:bg-emerald-500/15 border border-emerald-200/70 dark:border-emerald-500/30 shadow-2xs backdrop-blur-md">
+              <span
+                className={`w-1 bg-emerald-600 dark:bg-emerald-400 rounded-full transition-all ${
+                  isPlaying ? "animate-bounce [animation-delay:0ms] h-full" : "h-1 opacity-50"
+                }`}
+              />
+              <span
+                className={`w-1 bg-teal-500 dark:bg-teal-300 rounded-full transition-all ${
+                  isPlaying ? "animate-bounce [animation-delay:150ms] h-3/4" : "h-1.5 opacity-50"
+                }`}
+              />
+              <span
+                className={`w-1 bg-emerald-600 dark:bg-emerald-400 rounded-full transition-all ${
+                  isPlaying ? "animate-bounce [animation-delay:300ms] h-full" : "h-1 opacity-50"
+                }`}
+              />
+            </div>
 
             <div className="min-w-0 flex flex-col">
-              <h4 className="text-xs md:text-sm font-bold text-white group-hover/track:text-emerald-400 transition-colors truncate">
-                {title
-                  ? title.includes("Ayah") || title.includes(":")
-                    ? title
-                    : `${title} • Ayah ${
-                        activeAyahIndex >= 0 ? activeAyahIndex + 1 : "1"
-                      }`
-                  : "Surah Recitation"}
-              </h4>
-              <p className="text-[11px] text-slate-400 truncate">
-                {reciterName || "Mishary Rashid Alafasy"}
+              <div className="flex items-center gap-1.5 min-w-0">
+                <h4 className="text-xs md:text-sm font-black text-slate-900 dark:text-white group-hover/track:text-emerald-600 dark:group-hover/track:text-emerald-400 transition-colors truncate">
+                  {title
+                    ? title.includes("Ayah") || title.includes(":")
+                      ? title
+                      : `${title} • Ayah ${activeAyahIndex >= 0 ? activeAyahIndex + 1 : "1"}`
+                    : "Surah Recitation"}
+                </h4>
+              </div>
+              <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                {reciterName || "Mishari Rashid al-`Afasy"}
               </p>
             </div>
           </button>
 
           {/* Mobile-only Close button */}
           <button
+            type="button"
             onClick={onClose}
-            className="md:hidden p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-all ml-auto"
+            className="md:hidden p-1.5 rounded-full text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all ml-auto cursor-pointer"
             aria-label="Close audio player"
           >
             <X size={18} />
           </button>
         </div>
 
-        {/* 2. Controls & Seek Bar */}
-        <div className="flex flex-col items-center flex-1 w-full gap-1.5 md:gap-0.5">
-          {/* Controls Buttons */}
-          <div className="flex items-center justify-center gap-4">
-            {/* Skip Previous */}
+        {/* ── 2. Playback Controls & Timeline (Center) ── */}
+        <div className="flex flex-col items-center flex-1 w-full gap-1.5 md:gap-0.5 z-10">
+          
+          {/* Main Playback Buttons */}
+          <div className="flex items-center justify-center gap-3 sm:gap-4">
             <button
+              type="button"
               onClick={playPrev}
-              className="p-1.5 rounded-full text-slate-300 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
+              className="p-2 rounded-full text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
               aria-label="Previous Ayah"
+              title="Previous Ayah"
             >
-              <SkipBack size={17} fill="currentColor" />
+              <SkipBack size={16} fill="currentColor" />
             </button>
 
-            {/* Main Play/Pause */}
+            {/* Glowing Tactical Play/Pause Button */}
             <button
+              type="button"
               onClick={togglePlay}
-              className="w-11 h-11 flex items-center justify-center rounded-full text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-500 shadow-lg shadow-emerald-500/30 hover:scale-105 transition-all duration-200 flex-shrink-0 cursor-pointer"
+              className="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full text-white bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 shadow-md shadow-emerald-500/30 ring-2 ring-emerald-500/20 hover:scale-105 active:scale-95 transition-all duration-200 shrink-0 cursor-pointer"
               aria-label={isPlaying ? "Pause" : "Play"}
             >
               {isLoading ? (
-                <Loader2 className="animate-spin text-white" size={19} />
+                <Loader2 className="animate-spin text-white" size={18} />
               ) : isPlaying ? (
-                <Pause size={19} fill="currentColor" />
+                <Pause size={18} fill="currentColor" />
               ) : (
-                <Play size={19} fill="currentColor" className="ml-0.5" />
+                <Play size={18} fill="currentColor" className="ml-0.5" />
               )}
             </button>
 
-            {/* Skip Next */}
             <button
+              type="button"
               onClick={playNext}
-              className="p-1.5 rounded-full text-slate-300 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
+              className="p-2 rounded-full text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
               aria-label="Next Ayah"
+              title="Next Ayah"
             >
-              <SkipForward size={17} fill="currentColor" />
+              <SkipForward size={16} fill="currentColor" />
             </button>
           </div>
 
-          {/* Progress Slider (current/total times + slider bar) */}
-          <div className="flex items-center w-full gap-2.5 text-[10px] md:text-xs font-mono text-slate-400">
-            <span className="w-9 text-right select-none">{formatTime(currentTime)}</span>
-            <div className="relative flex-1 flex items-center h-4 group">
+          {/* Precision Seek Bar */}
+          <div className="flex items-center w-full gap-2.5 text-[10.5px] md:text-xs font-mono text-slate-600 dark:text-slate-400">
+            <span className="w-9 text-right select-none font-bold">{formatTime(currentTime)}</span>
+            <div className="relative flex-1 flex items-center h-3.5 group">
               <input
                 type="range"
                 min={0}
@@ -470,25 +493,26 @@ function SurahAudioPlayer({
                 value={currentTime}
                 onChange={handleSeekChange}
                 style={progressBarStyle}
-                className="w-full h-1 group-hover:h-1.5 rounded-lg appearance-none cursor-pointer accent-emerald-500 audio-slider-input transition-all"
+                className="w-full h-1 group-hover:h-1.5 rounded-lg appearance-none cursor-pointer accent-emerald-500 dark:accent-emerald-400 audio-slider-input transition-all"
                 aria-label="Seek progress"
               />
             </div>
-            <span className="w-9 text-left select-none">{formatTime(duration)}</span>
+            <span className="w-9 text-left select-none font-bold">{formatTime(duration)}</span>
           </div>
         </div>
 
-        {/* 3. Right Controls: Loop, Speed, Word popup, Volume, Close */}
-        <div className="flex items-center justify-between md:justify-end gap-3 md:w-[30%]">
+        {/* ── 3. Action Tools: Repeat, Speed, Word Tooltips, Volume, Close (Right) ── */}
+        <div className="flex items-center justify-between md:justify-end gap-2 md:gap-3 md:w-[32%] z-10">
           
-          <div className="flex items-center gap-1.5 md:gap-2">
+          <div className="flex items-center gap-1 md:gap-1.5">
             {/* Repeat/Loop */}
             <button
+              type="button"
               onClick={() => setIsLooping(!isLooping)}
               className={`p-1.5 rounded-full transition-all cursor-pointer ${
                 isLooping
-                  ? "text-emerald-400 bg-emerald-500/20 border border-emerald-500/30 shadow-xs"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                  ? "text-emerald-700 dark:text-emerald-300 bg-emerald-500/15 dark:bg-emerald-500/25 border border-emerald-500/30 shadow-2xs"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
               }`}
               title={isLooping ? "Repeat: ON" : "Repeat: OFF"}
               aria-label="Toggle repeat"
@@ -498,26 +522,28 @@ function SurahAudioPlayer({
 
             {/* Word Meaning Tooltip Toggle */}
             <button
+              type="button"
               onClick={audioCtx?.toggleWordTooltip}
               className={`p-1.5 rounded-full transition-all cursor-pointer ${
                 showWordTooltip
-                  ? "text-emerald-400 bg-emerald-500/20 border border-emerald-500/30 shadow-xs"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800 opacity-60"
+                  ? "text-emerald-700 dark:text-emerald-300 bg-emerald-500/15 dark:bg-emerald-500/25 border border-emerald-500/30 shadow-2xs"
+                  : "text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 opacity-60"
               }`}
-              title={showWordTooltip ? "Word Tooltips: ON (Click to Disable)" : "Word Tooltips: OFF (Click to Enable)"}
+              title={showWordTooltip ? "Word Tooltips: ON" : "Word Tooltips: OFF"}
               aria-label="Toggle word meaning popup"
             >
               <Languages size={14} className={showWordTooltip ? "stroke-[2.5px]" : ""} />
             </button>
 
-            {/* Playback speed menu */}
+            {/* Speed Selector Menu */}
             <div className="relative">
               <button
+                type="button"
                 onClick={() => setShowSpeedMenu(!showSpeedMenu)}
-                className={`text-[10px] md:text-xs font-bold px-2 py-1 rounded-lg transition-all cursor-pointer ${
+                className={`text-[10px] md:text-xs font-black px-2 py-0.5 rounded-lg transition-all cursor-pointer ${
                   playbackRate !== 1
-                    ? "text-emerald-400 bg-emerald-500/20 border border-emerald-500/30"
-                    : "text-slate-300 hover:bg-slate-800 border border-slate-700/60"
+                    ? "text-emerald-700 dark:text-emerald-300 bg-emerald-500/15 dark:bg-emerald-500/25 border border-emerald-500/30"
+                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/80"
                 }`}
                 title="Playback speed"
                 aria-label="Speed controls"
@@ -531,18 +557,20 @@ function SurahAudioPlayer({
                     className="fixed inset-0 z-40"
                     onClick={() => setShowSpeedMenu(false)}
                   />
-                  <div className="absolute bottom-9 right-0 z-50 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl py-1 w-24 text-center">
+                  <div className="absolute bottom-9 right-0 z-50 bg-white/85 dark:bg-slate-900/85 backdrop-blur-2xl border border-slate-200/80 dark:border-slate-700/80 rounded-2xl shadow-2xl py-1.5 w-24 text-center">
                     {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
                       <button
                         key={rate}
+                        type="button"
                         onClick={() => changeSpeed(rate)}
-                        className={`block w-full py-1.5 px-3 text-xs hover:bg-slate-800 transition-colors cursor-pointer ${
+                        className={`w-full py-1.5 px-3 text-xs transition-colors cursor-pointer flex items-center justify-between font-bold ${
                           playbackRate === rate
-                            ? "font-bold text-emerald-400 bg-emerald-500/10"
-                            : "text-slate-300"
+                            ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10"
+                            : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                         }`}
                       >
-                        {rate}x
+                        <span>{rate}x</span>
+                        {playbackRate === rate && <Check size={12} />}
                       </button>
                     ))}
                   </div>
@@ -550,11 +578,12 @@ function SurahAudioPlayer({
               )}
             </div>
 
-            {/* Volume slider */}
-            <div className="flex items-center gap-1 group/volume">
+            {/* Volume Control */}
+            <div className="flex items-center gap-1">
               <button
+                type="button"
                 onClick={toggleMute}
-                className="p-1 rounded-full text-slate-400 hover:text-white transition-colors cursor-pointer"
+                className="p-1 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                 aria-label={isMuted ? "Unmute" : "Mute"}
               >
                 {isMuted || volume === 0 ? (
@@ -565,7 +594,7 @@ function SurahAudioPlayer({
                   <Volume2 size={15} />
                 )}
               </button>
-              
+
               <input
                 type="range"
                 min={0}
@@ -574,18 +603,19 @@ function SurahAudioPlayer({
                 value={isMuted ? 0 : volume}
                 onChange={handleVolumeChange}
                 style={volumeBarStyle}
-                className="w-12 md:w-16 h-1 rounded-lg appearance-none cursor-pointer accent-emerald-500 audio-slider-input"
+                className="w-12 md:w-16 h-1 rounded-lg appearance-none cursor-pointer accent-emerald-500 dark:accent-emerald-400 audio-slider-input"
                 aria-label="Volume slider"
               />
             </div>
           </div>
 
-          {/* Desktop-only Separator & Close button */}
+          {/* Desktop Close Button */}
           <div className="hidden md:flex items-center gap-1.5">
-            <div className="h-5 w-px bg-slate-800 mx-0.5" />
+            <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-0.5" />
             <button
+              type="button"
               onClick={onClose}
-              className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
+              className="p-1.5 rounded-full text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
               title="Close Player"
               aria-label="Close audio player"
             >

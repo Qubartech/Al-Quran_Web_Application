@@ -102,7 +102,7 @@ export default function SearchSurahModal({ isOpen, onClose, data }) {
                   {surah.number}
                 </div>
                 <div>
-                  <h4 className="text-xs font-extrabold text-slate-850 dark:text-slate-100 group-hover:text-primaryColor transition-colors">
+                  <h4 className="text-xs font-extrabold text-slate-900 dark:text-slate-100 group-hover:text-primaryColor transition-colors">
                     Surah {surah.englishName}
                   </h4>
                   <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 mt-0.5">

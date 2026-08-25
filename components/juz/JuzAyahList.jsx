@@ -467,16 +467,16 @@ export default function JuzAyahList({
         return (
           <div key={idx} className="w-full flex flex-col">
             {isNewSurah && (
-              <div className="my-8 p-6 rounded-2xl glass border border-primaryColor/10 dark:border-emerald-500/10 text-center relative overflow-hidden shadow-sm animate-fadeIn">
-                <div className="absolute inset-0 bg-gradient-to-r from-primaryColor/5 to-emerald-500/5 dark:from-primaryColor/10 dark:to-emerald-500/5"></div>
-                <div className="relative z-10 flex flex-col gap-1 items-center justify-center">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-primaryColor dark:text-primaryColor-light">
-                    Surah {surahNumber}
+              <div className="my-8 p-6 md:p-8 rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-emerald-500/20 dark:border-emerald-500/30 text-center relative overflow-hidden shadow-lg animate-fadeIn">
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-teal-500/5 to-emerald-500/5 dark:from-emerald-500/10 dark:to-teal-500/10 pointer-events-none" />
+                <div className="relative z-10 flex flex-col gap-2 items-center justify-center">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                    Surah #{surahNumber}
                   </span>
-                  <h3 className="text-2xl font-bold flex items-center gap-3 text-slate-800 dark:text-slate-100">
+                  <h3 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-slate-900 dark:text-slate-100 flex-wrap justify-center">
                     <span>{surahName}</span>
                     {surahNameArabic && (
-                      <span className="font-arabic text-2xl text-primaryColor dark:text-primaryColor-light ml-1 font-normal">
+                      <span className="font-arabic text-2xl sm:text-3xl bg-gradient-to-r from-emerald-600 to-teal-500 dark:from-emerald-400 dark:to-teal-300 bg-clip-text text-transparent ml-1 font-bold select-none">
                         {surahNameArabic}
                       </span>
                     )}
@@ -488,27 +488,42 @@ export default function JuzAyahList({
             <div
               id={`juz_${juzId}_ayah_${idx}`}
               tabIndex={-1}
-              className={`px-4 md:px-6 py-4 md:py-5 flex flex-col gap-3.5 w-full transition-all duration-300 rounded-2xl ${
+              className={`relative px-4 sm:px-6 py-5 md:py-6 flex flex-col gap-4 w-full transition-all duration-300 rounded-3xl verse-card outline-none focus:outline-none ${
                 isPlaying
-                  ? "bg-primaryColor/5 border border-primaryColor/20 shadow-sm dark:bg-emerald-500/10"
-                  : "bg-white/20 dark:bg-slate-900/10 border border-gray-200/20 dark:border-slate-800/20 hover:border-gray-300/30 dark:hover:border-slate-700/30"
+                  ? "bg-emerald-500/[0.08] dark:bg-emerald-950/30 border-2 border-emerald-500/60 dark:border-emerald-400/50 verse-active-glow shadow-xl shadow-emerald-500/10"
+                  : "bg-white/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80 hover:border-emerald-500/40 hover:bg-white dark:hover:bg-slate-900/85 shadow-sm hover:shadow-md"
               }`}
             >
+              {/* Left Neon Playing Indicator Line */}
+              {isPlaying && (
+                <div className="absolute left-0 top-4 bottom-4 w-1.5 bg-gradient-to-b from-emerald-400 to-teal-500 rounded-r-full shadow-[0_0_12px_rgba(16,185,129,0.8)]" />
+              )}
               
               {/* Top Action Header Bar */}
-              <div className="flex items-center justify-between w-full border-b border-gray-200/15 dark:border-slate-800/40 pb-3">
+              <div className="flex items-center justify-between w-full border-b border-gray-200/30 dark:border-slate-800/60 pb-3">
                 
                 {/* Left Controls: Ayah Badge, Play, Bookmark */}
                 <div className="flex items-center gap-2 md:gap-2.5">
-                  {/* Islamic Star Ayah Badge */}
-                  <div
-                    className={`ayah-badge w-8 h-8 md:w-9 md:h-9 shrink-0 transition-all flex items-center justify-center ${
-                      isPlaying
-                        ? "bg-primaryColor dark:bg-emerald-500 shadow-md shadow-emerald-500/20 text-white font-black"
-                        : "bg-primaryColor/10 dark:bg-emerald-500/10 text-primaryColor dark:text-primaryColor-light font-bold"
-                    }`}
-                  >
-                    <span className="text-[7.5px] md:text-[9px] font-black leading-none select-none">
+                  {/* SVG 8-Point Rub el Hizb Star Ayah Badge */}
+                  <div className="relative w-8 h-8 sm:w-9 sm:h-9 shrink-0 flex items-center justify-center">
+                    <svg viewBox="0 0 100 100" className="w-full h-full">
+                      {isPlaying ? (
+                        <>
+                          <rect x="18" y="18" width="64" height="64" rx="8" fill="#10b981" stroke="#34d399" strokeWidth="2.5" />
+                          <rect x="18" y="18" width="64" height="64" rx="8" transform="rotate(45 50 50)" fill="#10b981" stroke="#34d399" strokeWidth="2.5" />
+                        </>
+                      ) : (
+                        <>
+                          <rect x="18" y="18" width="64" height="64" rx="8" className="fill-emerald-500/10 dark:fill-emerald-500/20 stroke-emerald-500/30 dark:stroke-emerald-400/40" strokeWidth="2.5" />
+                          <rect x="18" y="18" width="64" height="64" rx="8" transform="rotate(45 50 50)" className="fill-emerald-500/10 dark:fill-emerald-500/20 stroke-emerald-500/30 dark:stroke-emerald-400/40" strokeWidth="2.5" />
+                        </>
+                      )}
+                    </svg>
+                    <span
+                      className={`absolute inset-0 flex items-center justify-center text-[8px] sm:text-[9.5px] font-black leading-none select-none font-mono ${
+                        isPlaying ? "text-white" : "text-emerald-700 dark:text-emerald-300"
+                      }`}
+                    >
                       {verseKey}
                     </span>
                   </div>
@@ -668,7 +683,7 @@ export default function JuzAyahList({
                           )}
 
                           {/* Tooltip on Hover OR when Word is Active (controlled by user setting) */}
-                          {isWord && (wordTrans || wordTranslit) && (
+                          {isWord && (audio?.showWordTooltip ?? true) && (wordTrans || wordTranslit) && (
                             <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2.5 flex-col items-center bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white text-[11px] p-2 rounded-xl shadow-2xl z-30 pointer-events-none whitespace-nowrap min-w-[65px] border border-emerald-500/30 transition-all duration-200 ${
                               shouldShowAutoTooltip ? "flex animate-fadeIn" : "hidden group-hover:flex"
                             }`}>

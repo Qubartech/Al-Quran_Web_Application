@@ -112,18 +112,24 @@ export default function PrayerCalendarTable({
                 <tr
                   key={greg.date || idx}
                   onClick={() => onSelectDay(d)}
-                  className={`group cursor-pointer transition-all hover:bg-emerald-500/10 ${isToday
+                  className={`group cursor-pointer transition-all hover:bg-emerald-500/10 ${
+                    isToday
                       ? "bg-emerald-500/10 dark:bg-emerald-500/20 font-bold border-l-4 border-l-emerald-500"
                       : isFriday
-                        ? "bg-slate-50 dark:bg-slate-850"
-                        : idx % 2 === 1
-                          ? "bg-slate-50/50 dark:bg-slate-950/40"
-                          : "bg-white dark:bg-slate-900"
-                    }`}
+                      ? "bg-emerald-50/50 dark:bg-emerald-950/20"
+                      : idx % 2 === 1
+                      ? "bg-slate-50/50 dark:bg-slate-950/40"
+                      : "bg-white dark:bg-slate-900"
+                  }`}
                 >
                   {/* Day Number (Sticky on Horizontal Scroll) */}
-                  <td className={`py-3.5 px-4 text-center font-black sticky left-0 z-10 shadow-sm ${isToday ? "bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-300" : isFriday ? "bg-slate-50 dark:bg-slate-850 text-slate-800 dark:text-white" : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200"
-                    }`}>
+                  <td className={`py-3.5 px-4 text-center font-black sticky left-0 z-10 shadow-sm ${
+                    isToday
+                      ? "bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-300"
+                      : isFriday
+                      ? "bg-emerald-50 dark:bg-slate-900 text-emerald-700 dark:text-emerald-300"
+                      : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200"
+                  }`}>
                     <div className="flex items-center justify-center gap-1">
                       {isToday && (
                         <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-ping" />

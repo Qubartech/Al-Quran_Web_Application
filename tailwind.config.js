@@ -18,6 +18,7 @@ module.exports = {
       },
 
       fontFamily: {
+        sans: ["'Plus Jakarta Sans'", "Inter", ...defaultTheme.fontFamily.sans],
         arabic: ["var(--font-arabic)", ...defaultTheme.fontFamily.sans],
       },
   		borderRadius: {

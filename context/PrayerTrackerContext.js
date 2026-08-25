@@ -385,11 +385,28 @@ export function PrayerTrackerProvider({ children }) {
         let savedManual = null;
         let savedMethod = 3;
         let savedSchool = 0;
+        let cityStr = "Dhaka";
+        let countryStr = "Bangladesh";
+
         try {
           savedMethod = parseInt(localStorage.getItem("quran_prayer_method") || "3", 10);
           savedSchool = parseInt(localStorage.getItem("quran_prayer_school") || "0", 10);
           const rawManual = localStorage.getItem("quran_manual_location");
-          if (rawManual) savedManual = JSON.parse(rawManual);
+          if (rawManual) {
+            savedManual = JSON.parse(rawManual);
+            if (typeof savedManual === "string") {
+              cityStr = savedManual;
+            } else if (typeof savedManual === "object" && savedManual !== null) {
+              if (typeof savedManual.city === "string") {
+                cityStr = savedManual.city;
+              } else if (typeof savedManual.city === "object" && savedManual.city?.city) {
+                cityStr = savedManual.city.city;
+              }
+              if (typeof savedManual.country === "string") {
+                countryStr = savedManual.country;
+              }
+            }
+          }
         } catch (e) {}
 
         const activeRemindersList = [];
@@ -422,8 +439,8 @@ export function PrayerTrackerProvider({ children }) {
             },
           },
           userId: user?.id || null,
-          city: savedManual?.city || "Dhaka",
-          country: savedManual?.country || "Bangladesh",
+          city: cityStr,
+          country: countryStr,
           method: savedMethod,
           school: savedSchool,
           voice: voice || azanVoice,
