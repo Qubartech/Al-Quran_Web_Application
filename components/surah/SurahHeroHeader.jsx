@@ -184,9 +184,52 @@ export default function SurahHeroHeader({
             className="relative group cursor-pointer"
             title="Click to play full Surah audio"
           >
-            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-300 opacity-40 blur-md group-hover:opacity-80 transition-all duration-300" />
-            <div className="ayah-badge w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-700 text-white shadow-xl shadow-emerald-500/25 flex items-center justify-center transition-transform group-hover:scale-105 border-2 border-emerald-300/30">
-              <span className="text-lg md:text-2xl font-black tracking-tight">{surahNumber}</span>
+            <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-300 opacity-20 dark:opacity-30 blur-lg group-hover:opacity-60 transition-all duration-300 pointer-events-none" />
+            <div className="relative w-14 h-14 md:w-16 md:h-16 flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
+              <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
+                <defs>
+                  <linearGradient id="heroStarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#10b981" />
+                    <stop offset="50%" stopColor="#059669" />
+                    <stop offset="100%" stopColor="#0f766e" />
+                  </linearGradient>
+                </defs>
+                {/* 8-Point Rub el Hizb Geometric Star with rounded stroke */}
+                <rect
+                  x="15"
+                  y="15"
+                  width="70"
+                  height="70"
+                  rx="10"
+                  fill="url(#heroStarGradient)"
+                  stroke="#34d399"
+                  strokeWidth="2.5"
+                  strokeOpacity="0.4"
+                />
+                <rect
+                  x="15"
+                  y="15"
+                  width="70"
+                  height="70"
+                  rx="10"
+                  transform="rotate(45 50 50)"
+                  fill="url(#heroStarGradient)"
+                  stroke="#34d399"
+                  strokeWidth="2.5"
+                  strokeOpacity="0.4"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="28"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.2)"
+                  strokeWidth="1.5"
+                />
+              </svg>
+              <span className="absolute inset-0 flex items-center justify-center text-white text-base md:text-xl font-black tracking-tight select-none">
+                {surahNumber}
+              </span>
             </div>
           </div>
 

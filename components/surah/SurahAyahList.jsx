@@ -775,14 +775,25 @@ export default function SurahAyahList({
                     {/* Left Controls: Ayah Star Badge & Play Button */}
                     <div className="flex items-center gap-2 sm:gap-2.5">
                       {/* Islamic Star Medallion */}
-                      <div
-                        className={`ayah-badge w-8 h-8 sm:w-9 sm:h-9 shrink-0 transition-all flex items-center justify-center ${
-                          isPlaying
-                            ? "bg-emerald-500 text-white font-black shadow-md shadow-emerald-500/30 ring-2 ring-emerald-400/40"
-                            : "bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20"
-                        }`}
-                      >
-                        <span className="text-[9px] sm:text-[10px] font-black leading-none select-none">
+                      <div className="relative w-8 h-8 sm:w-9 sm:h-9 shrink-0 flex items-center justify-center">
+                        <svg viewBox="0 0 100 100" className="w-full h-full">
+                          {isPlaying ? (
+                            <>
+                              <rect x="18" y="18" width="64" height="64" rx="8" fill="#10b981" stroke="#34d399" strokeWidth="2.5" />
+                              <rect x="18" y="18" width="64" height="64" rx="8" transform="rotate(45 50 50)" fill="#10b981" stroke="#34d399" strokeWidth="2.5" />
+                            </>
+                          ) : (
+                            <>
+                              <rect x="18" y="18" width="64" height="64" rx="8" className="fill-emerald-500/10 dark:fill-emerald-500/20 stroke-emerald-500/30 dark:stroke-emerald-400/40" strokeWidth="2.5" />
+                              <rect x="18" y="18" width="64" height="64" rx="8" transform="rotate(45 50 50)" className="fill-emerald-500/10 dark:fill-emerald-500/20 stroke-emerald-500/30 dark:stroke-emerald-400/40" strokeWidth="2.5" />
+                            </>
+                          )}
+                        </svg>
+                        <span
+                          className={`absolute inset-0 flex items-center justify-center text-[9px] sm:text-[10px] font-black leading-none select-none ${
+                            isPlaying ? "text-white" : "text-emerald-700 dark:text-emerald-300"
+                          }`}
+                        >
                           {pageId}:{idx + 1}
                         </span>
                       </div>

@@ -28,9 +28,9 @@ export default function SurahPrevNextNav({ surahList = [] }) {
         {prevId >= 1 ? (
           <Link
             href={`/surah/${prevId}`}
-            className="group relative p-5 rounded-3xl glass hover:border-emerald-500/50 dark:hover:border-emerald-500/50 shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-between border border-slate-200/80 dark:border-slate-800/80 overflow-hidden"
+            className="group relative p-5 rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl hover:border-emerald-500/50 dark:hover:border-emerald-500/50 shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-between border border-slate-200/80 dark:border-slate-800/80 overflow-hidden"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 dark:from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             <div className="flex items-center gap-3.5 min-w-0 z-10">
               <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-black text-sm shrink-0 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-sm">
                 <ChevronLeft size={18} />
@@ -61,9 +61,9 @@ export default function SurahPrevNextNav({ surahList = [] }) {
         {nextId <= 114 ? (
           <Link
             href={`/surah/${nextId}`}
-            className="group relative p-5 rounded-3xl glass hover:border-emerald-500/50 dark:hover:border-emerald-500/50 shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-between border border-slate-200/80 dark:border-slate-800/80 overflow-hidden text-right"
+            className="group relative p-5 rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl hover:border-emerald-500/50 dark:hover:border-emerald-500/50 shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-between border border-slate-200/80 dark:border-slate-800/80 overflow-hidden text-right"
           >
-            <div className="absolute inset-0 bg-gradient-to-l from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-l from-emerald-500/5 dark:from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             
             {nextSurah?.name && (
               <span className="font-arabic text-xl sm:text-2xl text-emerald-600/60 dark:text-emerald-400/60 font-semibold shrink-0 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors select-none z-10 pr-2">
@@ -97,7 +97,7 @@ export default function SurahPrevNextNav({ surahList = [] }) {
       {/* Center Jump to Index Pill */}
       <Link
         href="/page"
-        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl glass hover:border-emerald-500/50 text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all shadow-sm group cursor-pointer"
+        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl hover:border-emerald-500/50 text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border border-slate-200/80 dark:border-slate-800/80 transition-all shadow-sm group cursor-pointer"
       >
         <Compass size={15} className="text-emerald-500 group-hover:rotate-45 transition-transform" />
         <span>Browse All Surahs & Juz</span>
