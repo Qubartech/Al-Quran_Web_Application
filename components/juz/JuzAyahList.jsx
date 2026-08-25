@@ -683,7 +683,7 @@ export default function JuzAyahList({
                           )}
 
                           {/* Tooltip on Hover OR when Word is Active (controlled by user setting) */}
-                          {isWord && (wordTrans || wordTranslit) && (
+                          {isWord && (audio?.showWordTooltip ?? true) && (wordTrans || wordTranslit) && (
                             <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2.5 flex-col items-center bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white text-[11px] p-2 rounded-xl shadow-2xl z-30 pointer-events-none whitespace-nowrap min-w-[65px] border border-emerald-500/30 transition-all duration-200 ${
                               shouldShowAutoTooltip ? "flex animate-fadeIn" : "hidden group-hover:flex"
                             }`}>

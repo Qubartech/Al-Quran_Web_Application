@@ -563,7 +563,7 @@ export default function AudioPlayerPage() {
                                   </span>
 
                                   {/* Tooltip on Hover */}
-                                  {isWord && (wordTrans || wordTranslit) && (
+                                  {isWord && (audio?.showWordTooltip ?? true) && (wordTrans || wordTranslit) && (
                                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center bg-slate-900 dark:bg-slate-800 text-white text-[11px] p-2 rounded-xl shadow-xl z-30 pointer-events-none whitespace-nowrap min-w-[70px] border border-slate-700">
                                       {wordTranslit && (
                                         <span className="font-bold text-amber-300 font-sans tracking-wide mb-0.5" dir="ltr">

@@ -36,7 +36,7 @@ export default function SurahAyahList({
   const [playingWordAudio, setPlayingWordAudio] = useState(null);
   const wordAudioRef = useRef(null);
   const [arabicTextType, setArabicTextType] = useState("uthmani");
-  const [showWordTooltips, setShowWordTooltips] = useState(true);
+  const showWordTooltips = audio?.showWordTooltip ?? true;
   const [arabicFontSize, setArabicFontSize] = useState(24);
   const [transFontSize, setTransFontSize] = useState(17);
   const [showSettingsRibbon, setShowSettingsRibbon] = useState(false);
