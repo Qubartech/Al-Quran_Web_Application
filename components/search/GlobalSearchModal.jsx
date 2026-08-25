@@ -397,7 +397,7 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
                           {s.number}
                         </span>
                         <div className="min-w-0">
-                          <p className="text-xs font-extrabold text-slate-850 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
+                          <p className="text-xs font-extrabold text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
                             {s.name}
                           </p>
                           <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">

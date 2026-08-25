@@ -195,7 +195,14 @@ export default function PrayerDayDetailModal({
         <div className="shrink-0 p-4 border-t border-slate-800 bg-slate-900/90 text-[11px] text-slate-400 flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <MapPin size={13} className="text-emerald-400" />
-            <span className="truncate max-w-[200px]">{activeLocation?.city}{activeLocation?.country ? `, ${activeLocation.country}` : ""}</span>
+            <span className="truncate max-w-[200px]">
+              {typeof activeLocation?.city === "object"
+                ? activeLocation?.city?.city
+                : activeLocation?.city || "Location"}
+              {activeLocation?.country && typeof activeLocation.country === "string"
+                ? `, ${activeLocation.country}`
+                : ""}
+            </span>
           </div>
 
           <Button size="sm" variant="secondary" onClick={onClose} className="text-xs rounded-xl px-4">

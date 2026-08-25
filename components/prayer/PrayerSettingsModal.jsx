@@ -98,12 +98,6 @@ export default function PrayerSettingsModal({
     }
   };
 
-  const handleScheduleCustomTest = (e) => {
-    e.preventDefault();
-    if (!customTime) return;
-    tracker?.scheduleTestAlarm(customTime, "Custom Closed-Tab Test Azan");
-  };
-
   const azanVoiceOptions = [
     { id: "makkah", label: "Makkah Adhan", desc: "Masjid al-Haram" },
     { id: "madinah", label: "Madinah Adhan", desc: "Masjid an-Nabawi" },

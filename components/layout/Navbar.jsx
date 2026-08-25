@@ -288,7 +288,7 @@ function Navbar() {
                     setMobileMenuOpen(false);
                     setSearchModalOpen(true);
                   }}
-                  className="flex items-center gap-3 w-full p-3 rounded-2xl bg-slate-900 border border-emerald-500/30 text-slate-300 text-xs font-bold transition-all hover:bg-slate-850 cursor-pointer shadow-sm mb-2"
+                  className="flex items-center gap-3 w-full p-3 rounded-2xl bg-slate-900 border border-emerald-500/30 text-slate-300 text-xs font-bold transition-all hover:bg-slate-800 cursor-pointer shadow-sm mb-2"
                 >
                   <Search size={16} className="text-emerald-400 shrink-0" />
                   <span className="truncate">Search Surahs, Verses, Tools...</span>

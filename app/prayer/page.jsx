@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import useCity from "@/lib/getLocation";
+import useCity, { normalizeLocation } from "@/lib/getLocation";
 import { usePrayerTracker } from "@/context/PrayerTrackerContext";
 import { ALADHAN_API_BASE_URL } from "@/lib/api/config";
 import PrayerSettingsModal from "@/components/prayer/PrayerSettingsModal";
@@ -253,7 +253,7 @@ export default function PrayerPage() {
     if (savedManual) {
       try {
         const parsed = JSON.parse(savedManual);
-        setActiveLocation(parsed);
+        setActiveLocation(normalizeLocation(parsed));
         setIsManual(true);
       } catch (e) {
         console.error(e);
@@ -267,13 +267,13 @@ export default function PrayerPage() {
 
     if (gpsLocation && !gpsLocation.loading) {
       if (!gpsLocation.error && gpsLocation.latitude && gpsLocation.longitude) {
-        setActiveLocation({
+        setActiveLocation(normalizeLocation({
           city: gpsLocation.city || "Detected Location",
           country: gpsLocation.country || "",
           latitude: gpsLocation.latitude,
           longitude: gpsLocation.longitude,
           isGps: true
-        });
+        }));
       } else {
         setActiveLocation(defaultLocation);
       }

@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { toast } from "react-toastify";
-import useCity from "@/lib/getLocation";
+import useCity, { normalizeLocation } from "@/lib/getLocation";
 import { usePrayerTracker } from "@/context/PrayerTrackerContext";
 import { fetchMonthlyCalendar } from "@/lib/api/aladhanCalendar";
 import { exportCalendarToCSV, exportCalendarToICS, triggerCalendarPrint } from "@/lib/utils/calendarExport";
@@ -74,7 +74,7 @@ export default function PrayerCalendarPage() {
       const saved = localStorage.getItem("quran_manual_location");
       if (saved) {
         try {
-          return JSON.parse(saved);
+          return normalizeLocation(JSON.parse(saved));
         } catch (e) { }
       }
     }
@@ -97,13 +97,13 @@ export default function PrayerCalendarPage() {
   useEffect(() => {
     if (isManual) return;
     if (gpsLocation && !gpsLocation.loading && !gpsLocation.error && gpsLocation.latitude && gpsLocation.longitude) {
-      setActiveLocation({
+      setActiveLocation(normalizeLocation({
         city: gpsLocation.city || "Detected Location",
         country: gpsLocation.country || "",
         latitude: gpsLocation.latitude,
         longitude: gpsLocation.longitude,
         isGps: true
-      });
+      }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gpsLocation?.loading, gpsLocation?.city, gpsLocation?.country, gpsLocation?.latitude, gpsLocation?.longitude, isManual]);
@@ -163,10 +163,30 @@ export default function PrayerCalendarPage() {
   }, [calendarDays]);
 
   // Location Handlers
-  const handleSearchLocation = async (queryStr) => {
+  const handleSearchLocation = async (target) => {
     setLoading(true);
     setError(null);
     try {
+      // 1. If an object with predefined city & country was passed (e.g. Quick City)
+      if (typeof target === "object" && target !== null && target.city) {
+        const newLoc = {
+          city: target.city,
+          country: target.country || "",
+          latitude: target.latitude || null,
+          longitude: target.longitude || null,
+          isGps: false
+        };
+        setIsManual(true);
+        setActiveLocation(newLoc);
+        localStorage.setItem("quran_manual_location", JSON.stringify(newLoc));
+        toast.success(`Location switched to ${target.city}, ${target.country || ""}`);
+        return;
+      }
+
+      // 2. If a search query string was provided
+      const queryStr = typeof target === "string" ? target.trim() : "";
+      if (!queryStr) return;
+
       const response = await fetch(
         `https://api.aladhan.com/v1/timingsByAddress?address=${encodeURIComponent(queryStr)}`
       );
@@ -175,7 +195,7 @@ export default function PrayerCalendarPage() {
       if (json.code === 200 && json.data) {
         const newLoc = {
           city: queryStr,
-          country: json.data.meta?.timezone?.split("/")[1] || "",
+          country: json.data.meta?.timezone?.split("/")[1]?.replace(/_/g, " ") || "",
           latitude: json.data.meta?.latitude,
           longitude: json.data.meta?.longitude,
           isGps: false
