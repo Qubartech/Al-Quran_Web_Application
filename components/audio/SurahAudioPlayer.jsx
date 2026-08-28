@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useAudio } from "@/context/AudioProvider";
+import { ALL_SURAHS } from "@/lib/surahMetadata";
 import {
   Play,
   Pause,
@@ -381,10 +382,32 @@ function SurahAudioPlayer({
   // Determine playing surah number accurately
   const playingSurahNumber = (() => {
     if (activeSurahNumber) return activeSurahNumber;
-    if (!playlistId) return null;
-    const s = String(playlistId).replace("surah_", "").trim();
-    const num = parseInt(s, 10);
-    return !isNaN(num) && num > 0 && num <= 114 ? num : null;
+    if (playlistId) {
+      const s = String(playlistId).replace("surah_", "").trim();
+      const num = parseInt(s, 10);
+      if (!isNaN(num) && num > 0 && num <= 114) return num;
+    }
+    if (src) {
+      const match = src.match(/\/(\d+)\.mp3/i);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (!isNaN(num) && num > 0 && num <= 114) return num;
+      }
+    }
+    return null;
+  })();
+
+  const resolvedSurahName = (() => {
+    if (title && title !== "Surah Recitation" && title.trim() !== "") {
+      return title;
+    }
+    if (playingSurahNumber) {
+      const match = ALL_SURAHS.find((s) => s.number === playingSurahNumber);
+      if (match) {
+        return match.englishName;
+      }
+    }
+    return "Surah Recitation";
   })();
 
   // Navigate or scroll strictly to the playing Surah's active verse
@@ -469,11 +492,9 @@ function SurahAudioPlayer({
             <div className="min-w-0 flex flex-col">
               <div className="flex items-center gap-1.5 min-w-0">
                 <h4 className="text-xs md:text-sm font-black text-slate-900 dark:text-white group-hover/track:text-emerald-600 dark:group-hover/track:text-emerald-400 transition-colors truncate">
-                  {title
-                    ? title.includes("Ayah") || title.includes(":")
-                      ? title
-                      : `${title} • Ayah ${activeAyahIndex >= 0 ? activeAyahIndex + 1 : "1"}`
-                    : "Surah Recitation"}
+                  {resolvedSurahName.includes("Ayah") || resolvedSurahName.includes(":")
+                    ? resolvedSurahName
+                    : `${resolvedSurahName} • Ayah ${activeAyahIndex >= 0 ? activeAyahIndex + 1 : "1"}`}
                 </h4>
               </div>
               <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate mt-0.5">

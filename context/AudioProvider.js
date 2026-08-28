@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
 import { QURAN_API_BASE_URL, QURANICAUDIO_BASE_URL } from "@/lib/api/config";
 import getReciters, { FALLBACK_RECITERS } from "@/lib/api/getReciters";
+import { ALL_SURAHS } from "@/lib/surahMetadata";
 import SurahAudioPlayer from "@/components/audio/SurahAudioPlayer";
 
 const AudioContext = createContext(null);
@@ -179,6 +180,12 @@ export default function AudioProvider({ children }) {
     const num = parseInt(surahNumber, 10);
     if (isNaN(num)) return;
 
+    let resolvedTitle = surahName;
+    if (!resolvedTitle || resolvedTitle === "Surah Recitation" || resolvedTitle.trim() === "") {
+      const match = ALL_SURAHS.find((s) => s.number === num);
+      if (match) resolvedTitle = match.englishName;
+    }
+
     const currentReciter = String(
       targetReciterId ||
       reciterIdRef.current ||
@@ -194,7 +201,7 @@ export default function AudioProvider({ children }) {
     currentTimeRef.current = startSeekTime;
     
     // Immediately start playback in user click gesture context
-    playList([initialUrl], 0, `surah_${num}`, surahName);
+    playList([initialUrl], 0, `surah_${num}`, resolvedTitle);
   }, []);
 
   // Handle seamless reciter change with active playback instant hot-swapping
@@ -222,6 +229,11 @@ export default function AudioProvider({ children }) {
       const currentPos = currentTimeRef.current || 0;
       if (typeof window !== "undefined") {
         window.pendingQuranAudioSeekTime = currentPos;
+      }
+
+      const surahMatch = ALL_SURAHS.find((s) => s.number === surahNum);
+      if (surahMatch) {
+        setTitle(surahMatch.englishName);
       }
 
       // Instantly set the new CDN URL so audio switches immediately without interruption

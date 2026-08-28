@@ -511,25 +511,21 @@ export default function AudioPlayerPage() {
                 <label className="block text-[11px] font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
                   Surah Selection
                 </label>
-                <div className="relative flex items-center">
-                  <select
-                    value={activeSurahNum}
-                    onChange={(e) => selectSurah(parseInt(e.target.value, 10))}
-                    style={{ WebkitAppearance: "none", MozAppearance: "none", appearance: "none" }}
-                    className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-bold shadow-inner cursor-pointer [appearance:none] [-webkit-appearance:none] [-moz-appearance:none] bg-none pr-10"
-                  >
-                    {ALL_SURAHS.map((s) => (
-                      <option
-                        key={s.number}
-                        value={s.number}
-                        className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
-                      >
-                        {s.number}. {s.englishName} ({s.arabicName}) - {s.translatedName}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown size={16} className="absolute right-3.5 text-gray-400 pointer-events-none" />
-                </div>
+                <select
+                  value={activeSurahNum}
+                  onChange={(e) => selectSurah(parseInt(e.target.value, 10))}
+                  className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-bold shadow-inner cursor-pointer"
+                >
+                  {ALL_SURAHS.map((s) => (
+                    <option
+                      key={s.number}
+                      value={s.number}
+                      className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                    >
+                      {s.number}. {s.englishName} ({s.arabicName}) - {s.translatedName}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* ── Reciter Switcher ── */}
@@ -537,25 +533,21 @@ export default function AudioPlayerPage() {
                 <label className="block text-[11px] font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
                   Reciter Voice (Qari)
                 </label>
-                <div className="relative flex items-center">
-                  <select
-                    value={playerReciterId}
-                    onChange={(e) => handleReciterChangeOnPlayer(e.target.value)}
-                    style={{ WebkitAppearance: "none", MozAppearance: "none", appearance: "none" }}
-                    className="w-full px-4 py-3 rounded-2xl border border-emerald-500/30 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-950/20 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-bold shadow-inner cursor-pointer [appearance:none] [-webkit-appearance:none] [-moz-appearance:none] bg-none pr-10"
-                  >
-                    {reciterList.map((r) => (
-                      <option
-                        key={r.id}
-                        value={r.id}
-                        className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
-                      >
-                        {r.name}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown size={16} className="absolute right-3.5 text-gray-400 pointer-events-none" />
-                </div>
+                <select
+                  value={playerReciterId}
+                  onChange={(e) => handleReciterChangeOnPlayer(e.target.value)}
+                  className="w-full px-4 py-3 rounded-2xl border border-emerald-500/30 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-950/20 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-bold shadow-inner cursor-pointer"
+                >
+                  {reciterList.map((r) => (
+                    <option
+                      key={r.id}
+                      value={r.id}
+                      className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                    >
+                      {r.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
