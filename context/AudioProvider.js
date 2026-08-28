@@ -25,7 +25,7 @@ function getInitialReciterCdnUrl(reciterId, surahNumber) {
     "5": `${QURANICAUDIO_BASE_URL}/qdc/hani_ar_rifai/murattal/${num}.mp3`,
     "6": `${QURANICAUDIO_BASE_URL}/qdc/khalil_al_husary/murattal/${num}.mp3`,
     "7": `${QURANICAUDIO_BASE_URL}/qdc/mishari_al_afasy/murattal/${num}.mp3`,
-    "8": `${QURANICAUDIO_BASE_URL}/qdc/siddiq_al-minshawi/mujawwad/${numPad3}.mp3`,
+    "8": `${QURANICAUDIO_BASE_URL}/quran/muhammad_siddeeq_al-minshaawee/${numPad3}.mp3`,
     "9": `${QURANICAUDIO_BASE_URL}/qdc/siddiq_minshawi/murattal/${num}.mp3`,
     "10": `${QURANICAUDIO_BASE_URL}/qdc/saud_ash-shuraym/murattal/${numPad3}.mp3`,
     "11": `${QURANICAUDIO_BASE_URL}/quran/abdul_muhsin_alqasim/${numPad3}.mp3`,
@@ -33,6 +33,26 @@ function getInitialReciterCdnUrl(reciterId, surahNumber) {
   };
 
   return reciterCdnMap[rId] || `${QURANICAUDIO_BASE_URL}/qdc/mishari_al_afasy/murattal/${num}.mp3`;
+}
+
+function resolveSurahNumber(playlistId, src, optionalNum) {
+  if (optionalNum) {
+    const n = parseInt(optionalNum, 10);
+    if (!isNaN(n) && n >= 1 && n <= 114) return n;
+  }
+  if (playlistId) {
+    const s = String(playlistId).replace("surah_", "").trim();
+    const n = parseInt(s, 10);
+    if (!isNaN(n) && n >= 1 && n <= 114) return n;
+  }
+  if (src) {
+    const match = src.match(/\/(\d+)\.mp3/i);
+    if (match) {
+      const n = parseInt(match[1], 10);
+      if (!isNaN(n) && n >= 1 && n <= 114) return n;
+    }
+  }
+  return null;
 }
 
 export default function AudioProvider({ children }) {
@@ -46,12 +66,28 @@ export default function AudioProvider({ children }) {
   const [pauseTick, setPauseTick] = useState(0);
   const [playTick, setPlayTick] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+
+  const srcRef = useRef(src);
+  const playlistIdRef = useRef(playlistId);
   const currentTimeRef = useRef(0);
+  const reciterIdRef = useRef("7");
 
   // Dynamic reciter states
   const [reciters, setReciters] = useState(FALLBACK_RECITERS);
   const [reciterId, setReciterId] = useState("7");
   const [reciterName, setReciterName] = useState("Mishari Rashid al-`Afasy");
+
+  useEffect(() => {
+    srcRef.current = src;
+  }, [src]);
+
+  useEffect(() => {
+    playlistIdRef.current = playlistId;
+  }, [playlistId]);
+
+  useEffect(() => {
+    reciterIdRef.current = reciterId;
+  }, [reciterId]);
 
   // Track playback time
   useEffect(() => {
@@ -78,6 +114,7 @@ export default function AudioProvider({ children }) {
 
     const savedReciterId = typeof window !== "undefined" ? localStorage.getItem("app_reciter_id") || "7" : "7";
     setReciterId(savedReciterId);
+    reciterIdRef.current = savedReciterId;
 
     getReciters().then((list) => {
       if (Array.isArray(list) && list.length > 0) {
@@ -102,6 +139,7 @@ export default function AudioProvider({ children }) {
 
   const play = (newSrc) => {
     setSrc(newSrc);
+    srcRef.current = newSrc;
     setOpen(true);
     setPaused(false);
     setPlaylist([]);
@@ -119,10 +157,12 @@ export default function AudioProvider({ children }) {
     if (!Array.isArray(list) || list.length === 0) return;
     setPlaylist(list);
     setPlaylistId(listId);
+    playlistIdRef.current = listId;
     const idx = Math.max(0, Math.min(startIdx, list.length - 1));
     setCurrentIndex(idx);
     const nextSrc = list[idx];
     setSrc(nextSrc);
+    srcRef.current = nextSrc;
     setOpen(true);
     setPaused(false);
     setTitle(listTitle || "");
@@ -141,7 +181,7 @@ export default function AudioProvider({ children }) {
 
     const currentReciter = String(
       targetReciterId ||
-      reciterId ||
+      reciterIdRef.current ||
       (typeof window !== "undefined" ? localStorage.getItem("app_reciter_id") : null) ||
       "7"
     );
@@ -168,17 +208,24 @@ export default function AudioProvider({ children }) {
             window.pendingQuranAudioSeekTime = targetSeek;
           }
           setSrc(apiAudioUrl);
+          srcRef.current = apiAudioUrl;
+          if (typeof window !== "undefined") {
+            try {
+              localStorage.setItem("__audio_src__", apiAudioUrl);
+            } catch (e) {}
+          }
         }
       }
     } catch (e) {
       console.error("Failed to fetch recitation from API:", e);
     }
-  }, [reciterId]);
+  }, []);
 
-  // Handle seamless reciter change with active playback hot-swapping
-  const changeReciter = useCallback(async (newId) => {
+  // Handle seamless reciter change with active playback instant hot-swapping
+  const changeReciter = useCallback(async (newId, optionalSurahNumber = null) => {
     const stringId = String(newId);
     setReciterId(stringId);
+    reciterIdRef.current = stringId;
 
     if (typeof window !== "undefined") {
       try {
@@ -193,64 +240,70 @@ export default function AudioProvider({ children }) {
       setReciterName(match.name || match.reciter_name);
     }
 
-    // If a Surah is currently playing or open in the player, hot-swap the audio source
-    if (playlistId) {
-      let surahNum = null;
-      if (typeof playlistId === "string" && playlistId.startsWith("surah_")) {
-        surahNum = parseInt(playlistId.replace("surah_", ""), 10);
-      } else if (!isNaN(Number(playlistId))) {
-        surahNum = parseInt(playlistId, 10);
+    const surahNum = resolveSurahNumber(playlistIdRef.current, srcRef.current, optionalSurahNumber);
+
+    if (surahNum) {
+      const currentPos = currentTimeRef.current || 0;
+      if (typeof window !== "undefined") {
+        window.pendingQuranAudioSeekTime = currentPos;
       }
 
-      if (surahNum) {
-        const currentPos = currentTimeRef.current || currentTime || 0;
-        if (typeof window !== "undefined") {
-          window.pendingQuranAudioSeekTime = currentPos;
-        }
+      // 1. Instantly set the new CDN URL so audio switches immediately without pause
+      const initialUrl = getInitialReciterCdnUrl(stringId, surahNum);
+      setSrc(initialUrl);
+      srcRef.current = initialUrl;
+      setOpen(true);
+      setPaused(false);
+      setPlaylistId(`surah_${surahNum}`);
+      playlistIdRef.current = `surah_${surahNum}`;
+      setPlayTick((t) => t + 1);
 
-        // Fetch new audio URL for the new reciter
+      if (typeof window !== "undefined") {
         try {
-          const res = await fetch(`${QURAN_API_BASE_URL}/chapter_recitations/${stringId}/${surahNum}`);
-          if (res.ok) {
-            const data = await res.json();
-            const apiAudioUrl = data.audio_file?.audio_url;
-            if (apiAudioUrl) {
-              setSrc(apiAudioUrl);
-              setPaused(false);
-              setPlayTick((t) => t + 1);
-            } else {
-              const fallbackUrl = getInitialReciterCdnUrl(stringId, surahNum);
-              setSrc(fallbackUrl);
-              setPaused(false);
-              setPlayTick((t) => t + 1);
+          localStorage.setItem("__audio_src__", initialUrl);
+        } catch (e) {}
+      }
+
+      // 2. Fetch API asynchronously in background to ensure accurate URL sync
+      try {
+        const res = await fetch(`${QURAN_API_BASE_URL}/chapter_recitations/${stringId}/${surahNum}`);
+        if (res.ok) {
+          const data = await res.json();
+          const apiAudioUrl = data.audio_file?.audio_url;
+          if (apiAudioUrl && apiAudioUrl !== initialUrl) {
+            const targetSeek = currentTimeRef.current > 0 ? currentTimeRef.current : currentPos;
+            if (typeof window !== "undefined" && targetSeek > 0) {
+              window.pendingQuranAudioSeekTime = targetSeek;
             }
-          } else {
-            const fallbackUrl = getInitialReciterCdnUrl(stringId, surahNum);
-            setSrc(fallbackUrl);
-            setPaused(false);
-            setPlayTick((t) => t + 1);
+            setSrc(apiAudioUrl);
+            srcRef.current = apiAudioUrl;
+            if (typeof window !== "undefined") {
+              try {
+                localStorage.setItem("__audio_src__", apiAudioUrl);
+              } catch (e) {}
+            }
           }
-        } catch (e) {
-          const fallbackUrl = getInitialReciterCdnUrl(stringId, surahNum);
-          setSrc(fallbackUrl);
         }
+      } catch (e) {
+        console.error("Failed to fetch recitation from API:", e);
       }
     }
 
-    // Dispatch global event for other components to react
+    // Dispatch global event for other components (Ayah highlights, player page, etc.)
     if (typeof window !== "undefined") {
       window.dispatchEvent(
         new CustomEvent("quran-reciter-change", { detail: { reciterId: stringId } })
       );
     }
-  }, [playlistId, currentTime, reciters]);
+  }, [reciters]);
 
   // Listen to external quran-reciter-change events (e.g. from settings or storage)
   useEffect(() => {
     const handleExternalReciterChange = (e) => {
-      if (e.detail?.reciterId && String(e.detail.reciterId) !== String(reciterId)) {
+      if (e.detail?.reciterId && String(e.detail.reciterId) !== String(reciterIdRef.current)) {
         const newId = String(e.detail.reciterId);
         setReciterId(newId);
+        reciterIdRef.current = newId;
         const match = reciters.find((r) => String(r.id) === newId);
         if (match) {
           setReciterName(match.name || match.reciter_name);
@@ -261,13 +314,16 @@ export default function AudioProvider({ children }) {
     return () => {
       window.removeEventListener("quran-reciter-change", handleExternalReciterChange);
     };
-  }, [reciterId, reciters]);
+  }, [reciters]);
 
   const close = () => {
     setOpen(false);
     setPaused(false);
     setSrc("");
+    srcRef.current = "";
     setPlaylist([]);
+    setPlaylistId(null);
+    playlistIdRef.current = null;
     setCurrentIndex(-1);
     setTitle("");
     setCurrentTime(0);
@@ -286,6 +342,7 @@ export default function AudioProvider({ children }) {
         const nextSrc = playlist[nextIdx];
         setCurrentIndex(nextIdx);
         setSrc(nextSrc);
+        srcRef.current = nextSrc;
         if (typeof window !== "undefined") {
           try {
             localStorage.setItem("__audio_src__", nextSrc || "");
@@ -303,6 +360,7 @@ export default function AudioProvider({ children }) {
       const prevSrc = playlist[prevIdx];
       setCurrentIndex(prevIdx);
       setSrc(prevSrc);
+      srcRef.current = prevSrc;
       setOpen(true);
       setPaused(false);
       if (typeof window !== "undefined") {

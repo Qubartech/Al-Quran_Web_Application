@@ -126,6 +126,12 @@ function SurahAudioPlayer({
       setCurrentTime(0);
     }
     setDuration(0);
+
+    // Explicitly play new src when hot-swapping audio
+    if (audioRef.current && src) {
+      audioRef.current.load();
+      audioRef.current.play().catch(() => {});
+    }
   }, [src]);
 
   // Seek listeners
@@ -155,7 +161,7 @@ function SurahAudioPlayer({
     };
   }, [src]);
 
-  // Execute pending seeks when metadata loads or audio starts playing
+  // Execute pending seeks when metadata loads or audio starts playing and ensure non-stop play
   useEffect(() => {
     const audioEl = audioRef.current;
     if (!audioEl) return;
@@ -173,6 +179,7 @@ function SurahAudioPlayer({
           setCurrentTime(seekTime);
         } catch (e) {}
       }
+      audioEl.play().catch(() => {});
     };
 
     audioEl.addEventListener("loadedmetadata", handleLoadedMetadata);

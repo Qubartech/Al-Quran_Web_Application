@@ -280,7 +280,7 @@ export default function AudioPlayerPage() {
     const strId = String(newId);
     setPlayerReciterId(strId);
     if (audio?.changeReciter) {
-      audio.changeReciter(strId);
+      audio.changeReciter(strId, activeSurahNum);
     }
   };
 
@@ -489,7 +489,8 @@ export default function AudioPlayerPage() {
                   <select
                     value={activeSurahNum}
                     onChange={(e) => selectSurah(parseInt(e.target.value, 10))}
-                    className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-bold shadow-inner cursor-pointer appearance-none pr-10"
+                    style={{ WebkitAppearance: "none", MozAppearance: "none", appearance: "none" }}
+                    className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-bold shadow-inner cursor-pointer [appearance:none] [-webkit-appearance:none] [-moz-appearance:none] bg-none pr-10"
                   >
                     {ALL_SURAHS.map((s) => (
                       <option
@@ -514,7 +515,8 @@ export default function AudioPlayerPage() {
                   <select
                     value={playerReciterId}
                     onChange={(e) => handleReciterChangeOnPlayer(e.target.value)}
-                    className="w-full px-4 py-3 rounded-2xl border border-emerald-500/30 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-950/20 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-bold shadow-inner cursor-pointer appearance-none pr-10"
+                    style={{ WebkitAppearance: "none", MozAppearance: "none", appearance: "none" }}
+                    className="w-full px-4 py-3 rounded-2xl border border-emerald-500/30 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-950/20 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-bold shadow-inner cursor-pointer [appearance:none] [-webkit-appearance:none] [-moz-appearance:none] bg-none pr-10"
                   >
                     {reciterList.map((r) => (
                       <option
