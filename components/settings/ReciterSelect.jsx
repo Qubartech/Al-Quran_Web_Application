@@ -1,23 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { QURAN_API_BASE_URL } from "@/lib/api/config";
+import getReciters, { FALLBACK_RECITERS } from "@/lib/api/getReciters";
 import { Headphones, Search, Check, ChevronDown, Loader2 } from "lucide-react";
-
-export const DEFAULT_RECITERS = [
-  { id: "7", name: "Mishari Rashid al-`Afasy" },
-  { id: "2", name: "AbdulBaset AbdulSamad (Murattal)" },
-  { id: "1", name: "AbdulBaset AbdulSamad (Mujawwad)" },
-  { id: "3", name: "Abdur-Rahman as-Sudais" },
-  { id: "4", name: "Abu Bakr al-Shatri" },
-  { id: "5", name: "Hani ar-Rifai" },
-  { id: "6", name: "Mahmoud Khalil Al-Husary" },
-  { id: "12", name: "Mahmoud Khalil Al-Husary (Muallim)" },
-  { id: "9", name: "Mohamed Siddiq al-Minshawi (Murattal)" },
-  { id: "8", name: "Mohamed Siddiq al-Minshawi (Mujawwad)" },
-  { id: "11", name: "Mohamed al-Tablawi" },
-  { id: "10", name: "Sa`ud ash-Shuraym" },
-];
 
 export default function ReciterSelect({
   value = "7",
@@ -25,7 +10,7 @@ export default function ReciterSelect({
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [reciters, setReciters] = React.useState(DEFAULT_RECITERS);
+  const [reciters, setReciters] = React.useState(FALLBACK_RECITERS);
   const [loading, setLoading] = React.useState(false);
   const dropdownRef = React.useRef(null);
 
@@ -42,22 +27,13 @@ export default function ReciterSelect({
     }
   }, [isOpen]);
 
+  // Fetch reciters list dynamically from API
   React.useEffect(() => {
     setLoading(true);
-    fetch(`${QURAN_API_BASE_URL}/resources/recitations?language=en`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.recitations && data.recitations.length > 0) {
-          const mapped = data.recitations.map((r) => {
-            const name = r.translated_name?.name || r.reciter_name || "";
-            const style = r.style ? ` (${r.style})` : "";
-            return {
-              id: String(r.id),
-              name: `${name}${style}`,
-            };
-          });
-          mapped.sort((a, b) => a.name.localeCompare(b.name));
-          setReciters(mapped);
+    getReciters()
+      .then((list) => {
+        if (Array.isArray(list) && list.length > 0) {
+          setReciters(list);
         }
       })
       .catch((err) => console.error("Error fetching reciters list:", err))
@@ -68,13 +44,17 @@ export default function ReciterSelect({
 
   const selectedReciter = React.useMemo(() => {
     const match = reciters.find((r) => String(r.id) === currentValue);
-    return match?.name || "Mishari Rashid al-`Afasy";
+    return match?.name || match?.reciter_name || "Mishari Rashid al-`Afasy";
   }, [reciters, currentValue]);
 
   const filteredReciters = React.useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return reciters;
-    return reciters.filter((r) => r.name.toLowerCase().includes(q));
+    return reciters.filter(
+      (r) =>
+        r.name.toLowerCase().includes(q) ||
+        (r.style && r.style.toLowerCase().includes(q))
+    );
   }, [reciters, searchQuery]);
 
   return (
@@ -111,7 +91,7 @@ export default function ReciterSelect({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search Reciter (e.g. Mishary, Sudais)..."
+              placeholder="Search Reciter (e.g. Mishary, Sudais, AbdulBaset)..."
               className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 placeholder-slate-400 text-xs focus:outline-none focus:border-emerald-500"
               autoFocus
             />
@@ -140,7 +120,14 @@ export default function ReciterSelect({
                         : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60"
                     }`}
                   >
-                    <span className="truncate pr-2">{r.name}</span>
+                    <div className="flex items-center gap-2 truncate pr-2">
+                      <span className="truncate">{r.name}</span>
+                      {r.style && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold shrink-0">
+                          {r.style}
+                        </span>
+                      )}
+                    </div>
                     {isSelected && <Check size={14} className="text-emerald-500 shrink-0" />}
                   </button>
                 );
@@ -152,5 +139,3 @@ export default function ReciterSelect({
     </div>
   );
 }
-
-

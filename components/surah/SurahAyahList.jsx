@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import TafsirModal from "./TafsirModal";
 import SurahPlayBtn from "./SurahPlayBtn";
+import { formatTranslationBadge, getTranslatorName } from "@/lib/data/translationNames";
 
 export default function SurahAyahList({
   arabicAyah = [],
@@ -240,6 +241,51 @@ export default function SurahAyahList({
     }
   };
 
+  const [dynamicSegments, setDynamicSegments] = useState(null);
+
+  // Listen to reciter change and refresh timestamps for active surah
+  useEffect(() => {
+    const handleReciterChange = async (e) => {
+      const newReciterId = e.detail?.reciterId;
+      if (!newReciterId || !pageId) return;
+      try {
+        const res = await fetch(
+          `${QURAN_API_BASE_URL}/chapter_recitations/${newReciterId}/${pageId}?segments=true`
+        );
+        if (res.ok) {
+          const json = await res.json();
+          const timestamps = json.audio_file?.timestamps || [];
+          if (timestamps.length > 0) {
+            setDynamicSegments(timestamps);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch new reciter segments:", err);
+      }
+    };
+
+    window.addEventListener("quran-reciter-change", handleReciterChange);
+    return () => window.removeEventListener("quran-reciter-change", handleReciterChange);
+  }, [pageId]);
+
+  // Merge dynamic segments into ayah list if available
+  const resolvedArabicAyah = useMemo(() => {
+    if (!dynamicSegments || dynamicSegments.length === 0) return arabicAyah;
+    return arabicAyah.map((ayah, i) => {
+      const verseKey = `${pageId}:${i + 1}`;
+      const segMatch = dynamicSegments.find((s) => s.verse_key === verseKey);
+      if (segMatch) {
+        return {
+          ...ayah,
+          timestamp_from: segMatch.timestamp_from ?? ayah.timestamp_from,
+          timestamp_to: segMatch.timestamp_to ?? ayah.timestamp_to,
+          segments: segMatch.segments || ayah.segments,
+        };
+      }
+      return ayah;
+    });
+  }, [arabicAyah, dynamicSegments, pageId]);
+
   useEffect(() => {
     const onTimeUpdate = (e) => {
       setAudioCurrentTime(e.detail.currentTime);
@@ -276,10 +322,10 @@ export default function SurahAyahList({
   const activeAyahIndex = useMemo(() => {
     if (!isCurrentSurahPlaying) return -1;
     const timeMs = audioCurrentTime * 1000;
-    return arabicAyah.findIndex(
+    return resolvedArabicAyah.findIndex(
       (ayah) => timeMs >= ayah.timestamp_from && timeMs < ayah.timestamp_to
     );
-  }, [arabicAyah, audioCurrentTime, isCurrentSurahPlaying]);
+  }, [resolvedArabicAyah, audioCurrentTime, isCurrentSurahPlaying]);
 
   // Sync scroll on active ayah index change
   useEffect(() => {
@@ -297,7 +343,7 @@ export default function SurahAyahList({
 
   useEffect(() => {
     if (repeatAyahIndex === null || !isCurrentSurahPlaying) return;
-    const targetAyah = arabicAyah[repeatAyahIndex];
+    const targetAyah = resolvedArabicAyah[repeatAyahIndex];
     if (!targetAyah) return;
 
     const fromMs = typeof targetAyah.timestamp_from === "number" ? targetAyah.timestamp_from : 0;
@@ -323,7 +369,7 @@ export default function SurahAyahList({
     return () => {
       window.removeEventListener("quran-audio-timeupdate", onTimeUpdate);
     };
-  }, [repeatAyahIndex, isCurrentSurahPlaying, arabicAyah]);
+  }, [repeatAyahIndex, isCurrentSurahPlaying, resolvedArabicAyah]);
 
   const toggleRepeatSingleAyah = (idx) => {
     if (repeatAyahIndex === idx) {
@@ -406,7 +452,7 @@ export default function SurahAyahList({
   };
 
   function playControl(ayahIndex) {
-    const targetAyah = arabicAyah[ayahIndex];
+    const targetAyah = resolvedArabicAyah[ayahIndex] || arabicAyah[ayahIndex];
     if (!targetAyah) return;
     const seekTime = (targetAyah.timestamp_from || 0) / 1000;
 
@@ -485,14 +531,15 @@ export default function SurahAyahList({
 
         for (let i = 0; i < totalAyahs; i++) {
           const verseTransList = [];
-          validResults.forEach((resData) => {
+          validResults.forEach((resData, rIdx) => {
             const verse = resData?.verses?.[i];
             const transObj = verse?.translations?.[0];
             if (transObj && transObj.text) {
+              const resId = transObj.resource_id || identifiers[rIdx];
               verseTransList.push({
                 text: transObj.text || "",
-                name: transObj.resource_name || "",
-                id: transObj.resource_id,
+                name: getTranslatorName(resId, rIdx + 1),
+                id: resId,
               });
             }
           });
@@ -1027,8 +1074,8 @@ export default function SurahAyahList({
                         englishTrans[idx].map((transItem, tIdx) => (
                           <div key={tIdx} className="flex flex-col gap-1">
                             {englishTrans[idx].length > 1 && (
-                              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded-md w-max border border-emerald-500/20">
-                                {transItem.name || `Translation ${tIdx + 1}`}
+                              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 px-2.5 py-0.5 rounded-md w-max border border-emerald-500/20 shadow-2xs">
+                                {formatTranslationBadge(transItem, tIdx)}
                               </span>
                             )}
                             <p className="text-slate-800 dark:text-slate-200 ayah-text leading-relaxed font-normal">

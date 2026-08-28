@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useAudio } from "@/context/AudioProvider";
+import { ALL_SURAHS } from "@/lib/surahMetadata";
 import {
   Play,
   Pause,
@@ -34,6 +35,7 @@ function SurahAudioPlayer({
   reciterName,
 }) {
   const audioRef = useRef(null);
+  const audioCtx = useAudio();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -82,12 +84,29 @@ function SurahAudioPlayer({
         const savedSpeed = localStorage.getItem("__audio_speed__");
         if (savedSpeed !== null) {
           const s = parseFloat(savedSpeed);
-          setPlaybackRate(s);
+          if (!isNaN(s) && s > 0) setPlaybackRate(s);
         }
-      } catch (e) {
-        // ignore storage errors
-      }
+      } catch (e) {}
     }
+  }, []);
+
+  // Sync playback speed from global context and events
+  useEffect(() => {
+    if (audioCtx?.playbackRate) {
+      setPlaybackRate(audioCtx.playbackRate);
+    }
+  }, [audioCtx?.playbackRate]);
+
+  useEffect(() => {
+    const handleSpeedEvent = (e) => {
+      if (typeof e.detail?.speed === "number") {
+        setPlaybackRate(e.detail.speed);
+      }
+    };
+    window.addEventListener("quran-audio-speed-change", handleSpeedEvent);
+    return () => {
+      window.removeEventListener("quran-audio-speed-change", handleSpeedEvent);
+    };
   }, []);
 
   // Sync speed changes to native element
@@ -115,6 +134,42 @@ function SurahAudioPlayer({
       window.removeEventListener("quran-audio-ayah-change", handleAyahChange);
     };
   }, []);
+
+  const playPromiseRef = useRef(null);
+
+  const safePlay = () => {
+    const el = audioRef.current;
+    if (!el) return;
+    try {
+      const p = el.play();
+      if (p && typeof p.catch === "function") {
+        playPromiseRef.current = p;
+        p.catch((err) => {
+          if (err.name !== "AbortError" && err.name !== "NotAllowedError") {
+            // Ignore intentional abort/not-allowed errors during fast switching
+          }
+        });
+      }
+    } catch (e) {}
+  };
+
+  const safePause = () => {
+    const el = audioRef.current;
+    if (!el) return;
+    try {
+      if (playPromiseRef.current) {
+        playPromiseRef.current
+          .then(() => {
+            el.pause();
+          })
+          .catch(() => {
+            el.pause();
+          });
+      } else {
+        el.pause();
+      }
+    } catch (e) {}
+  };
 
   // Reset state on src change, preserving pending seek time if present
   useEffect(() => {
@@ -155,7 +210,7 @@ function SurahAudioPlayer({
     };
   }, [src]);
 
-  // Execute pending seeks when metadata loads or audio starts playing
+  // Execute pending seeks when metadata loads or audio can play
   useEffect(() => {
     const audioEl = audioRef.current;
     if (!audioEl) return;
@@ -173,36 +228,30 @@ function SurahAudioPlayer({
           setCurrentTime(seekTime);
         } catch (e) {}
       }
+      safePlay();
     };
 
     audioEl.addEventListener("loadedmetadata", handleLoadedMetadata);
     audioEl.addEventListener("canplay", handleLoadedMetadata);
-    audioEl.addEventListener("play", handleLoadedMetadata);
     return () => {
       audioEl.removeEventListener("loadedmetadata", handleLoadedMetadata);
       audioEl.removeEventListener("canplay", handleLoadedMetadata);
-      audioEl.removeEventListener("play", handleLoadedMetadata);
     };
   }, [src]);
 
   // Play/pause controls from tick states
   useEffect(() => {
     if (!pauseTick) return;
-    try {
-      audioRef.current?.pause?.();
-    } catch (e) {}
+    safePause();
   }, [pauseTick]);
 
   useEffect(() => {
     if (!playTick) return;
-    try {
-      audioRef.current?.play?.();
-    } catch (e) {}
+    safePlay();
   }, [playTick]);
 
   if (!src) return null;
 
-  const audioCtx = useAudio();
   const showWordTooltip = audioCtx?.showWordTooltip ?? true;
 
   // Audio HTML5 Events
@@ -293,9 +342,14 @@ function SurahAudioPlayer({
   const changeSpeed = (rate) => {
     setPlaybackRate(rate);
     setShowSpeedMenu(false);
-    try {
-      localStorage.setItem("__audio_speed__", rate.toString());
-    } catch (err) {}
+    if (audioCtx?.changeSpeed) {
+      audioCtx.changeSpeed(rate);
+    } else {
+      try {
+        localStorage.setItem("__audio_speed__", rate.toString());
+      } catch (err) {}
+      window.dispatchEvent(new CustomEvent("quran-audio-speed-change", { detail: { speed: rate } }));
+    }
   };
 
   // Helper: format duration in mm:ss
@@ -328,10 +382,32 @@ function SurahAudioPlayer({
   // Determine playing surah number accurately
   const playingSurahNumber = (() => {
     if (activeSurahNumber) return activeSurahNumber;
-    if (!playlistId) return null;
-    const s = String(playlistId).replace("surah_", "").trim();
-    const num = parseInt(s, 10);
-    return !isNaN(num) && num > 0 && num <= 114 ? num : null;
+    if (playlistId) {
+      const s = String(playlistId).replace("surah_", "").trim();
+      const num = parseInt(s, 10);
+      if (!isNaN(num) && num > 0 && num <= 114) return num;
+    }
+    if (src) {
+      const match = src.match(/\/(\d+)\.mp3/i);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (!isNaN(num) && num > 0 && num <= 114) return num;
+      }
+    }
+    return null;
+  })();
+
+  const resolvedSurahName = (() => {
+    if (title && title !== "Surah Recitation" && title.trim() !== "") {
+      return title;
+    }
+    if (playingSurahNumber) {
+      const match = ALL_SURAHS.find((s) => s.number === playingSurahNumber);
+      if (match) {
+        return match.englishName;
+      }
+    }
+    return "Surah Recitation";
   })();
 
   // Navigate or scroll strictly to the playing Surah's active verse
@@ -357,7 +433,7 @@ function SurahAudioPlayer({
   };
 
   return (
-    <div className="fixed bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl z-50 transition-all duration-300 animate-fadeIn">
+    <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl z-50 transition-all duration-300 animate-fadeIn">
       
       {/* Outer Ambient Glowing Blur Orbs */}
       <div className="absolute -inset-1.5 bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-emerald-600/20 rounded-3xl md:rounded-full blur-xl opacity-80 dark:opacity-60 pointer-events-none transition-all duration-500" />
@@ -380,14 +456,14 @@ function SurahAudioPlayer({
       />
 
       {/* Floating Glassmorphic Capsule */}
-      <div className="relative overflow-hidden bg-white/80 dark:bg-slate-950/80 text-slate-900 dark:text-slate-100 border border-white/60 dark:border-emerald-500/30 backdrop-blur-3xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.12)] dark:shadow-[0_25px_60px_-12px_rgba(0,0,0,0.85)] ring-1 ring-slate-900/5 dark:ring-white/10 rounded-3xl md:rounded-full px-4 py-3 md:py-2.5 md:px-6 flex flex-col gap-2.5 md:gap-0 md:flex-row md:items-center md:justify-between transition-all">
+      <div className="relative bg-white/85 dark:bg-slate-950/85 text-slate-900 dark:text-slate-100 border border-white/60 dark:border-emerald-500/30 backdrop-blur-3xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.12)] dark:shadow-[0_25px_60px_-12px_rgba(0,0,0,0.85)] ring-1 ring-slate-900/5 dark:ring-white/10 rounded-3xl md:rounded-full px-4 py-3 md:py-2.5 md:px-6 flex flex-col gap-2.5 md:gap-0 md:flex-row md:items-center md:justify-between transition-all">
         
         {/* Subtle Ambient Backlight Glow inside Capsule */}
         <div className="absolute -top-12 left-1/4 w-72 h-24 bg-emerald-500/20 dark:bg-emerald-400/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-10 right-1/4 w-72 h-20 bg-teal-500/15 dark:bg-teal-400/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* ── 1. Track Info (Left) ── */}
-        <div className="flex items-center justify-between md:justify-start min-w-0 md:w-[32%] gap-3 z-10">
+        <div className="flex items-center justify-between md:justify-start min-w-0 md:max-w-[32%] md:flex-1 gap-3 z-10">
           <button
             type="button"
             onClick={handleJumpToActiveVerse}
@@ -416,11 +492,9 @@ function SurahAudioPlayer({
             <div className="min-w-0 flex flex-col">
               <div className="flex items-center gap-1.5 min-w-0">
                 <h4 className="text-xs md:text-sm font-black text-slate-900 dark:text-white group-hover/track:text-emerald-600 dark:group-hover/track:text-emerald-400 transition-colors truncate">
-                  {title
-                    ? title.includes("Ayah") || title.includes(":")
-                      ? title
-                      : `${title} • Ayah ${activeAyahIndex >= 0 ? activeAyahIndex + 1 : "1"}`
-                    : "Surah Recitation"}
+                  {resolvedSurahName.includes("Ayah") || resolvedSurahName.includes(":")
+                    ? resolvedSurahName
+                    : `${resolvedSurahName} • Ayah ${activeAyahIndex >= 0 ? activeAyahIndex + 1 : "1"}`}
                 </h4>
               </div>
               <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate mt-0.5">
@@ -502,7 +576,7 @@ function SurahAudioPlayer({
         </div>
 
         {/* ── 3. Action Tools: Repeat, Speed, Word Tooltips, Volume, Close (Right) ── */}
-        <div className="flex items-center justify-between md:justify-end gap-2 md:gap-3 md:w-[32%] z-10">
+        <div className="flex items-center justify-between md:justify-end gap-1.5 sm:gap-2 md:gap-3 shrink-0 z-10">
           
           <div className="flex items-center gap-1 md:gap-1.5">
             {/* Repeat/Loop */}
