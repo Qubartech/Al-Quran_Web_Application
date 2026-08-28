@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef } from "react";
 import { QURAN_API_BASE_URL } from "@/lib/api/config";
+import getReciters, { FALLBACK_RECITERS } from "@/lib/api/getReciters";
 import { useAudio } from "@/context/AudioProvider";
 import { useUser } from "@/context/UserProvider";
 import { ALL_SURAHS } from "@/lib/surahMetadata";
@@ -37,7 +38,7 @@ const formatTime = (secs) => {
 
 const getSurahNumFromSrc = (src) => {
   if (!src) return null;
-  const match = src.match(/murattal\/(\d+)\.mp3/);
+  const match = src.match(/\/(\d+)\.mp3/i);
   if (match) {
     return parseInt(match[1], 10);
   }
@@ -65,6 +66,8 @@ export default function AudioPlayerPage() {
   const [activeSurahNum, setActiveSurahNum] = useState(1);
   const [activeSurahInfo, setActiveSurahInfo] = useState(ALL_SURAHS[0]);
   const [searchFilter, setSearchFilter] = useState("");
+  const [reciterList, setReciterList] = useState(FALLBACK_RECITERS);
+  const [playerReciterId, setPlayerReciterId] = useState("7");
 
   // Quran data states for active playback
   const [arabicAyahs, setArabicAyahs] = useState([]);
@@ -91,6 +94,29 @@ export default function AudioPlayerPage() {
         String(s.number).includes(q)
     );
   }, [searchFilter]);
+
+  // Load reciters list from API on mount
+  useEffect(() => {
+    getReciters().then((list) => {
+      if (Array.isArray(list) && list.length > 0) {
+        setReciterList(list);
+      }
+    });
+
+    const savedReciter = typeof window !== "undefined" ? localStorage.getItem("app_reciter_id") || "7" : "7";
+    setPlayerReciterId(savedReciter);
+  }, []);
+
+  // Listen to reciter change event from Settings or Audio Provider
+  useEffect(() => {
+    const handleReciterChange = (e) => {
+      if (e.detail?.reciterId) {
+        setPlayerReciterId(String(e.detail.reciterId));
+      }
+    };
+    window.addEventListener("quran-reciter-change", handleReciterChange);
+    return () => window.removeEventListener("quran-reciter-change", handleReciterChange);
+  }, []);
 
   // Update activeSurahNum based on global playlist context
   useEffect(() => {
@@ -126,13 +152,13 @@ export default function AudioPlayerPage() {
     };
   }, []);
 
-  // Fetch verse content & segments for the active Surah
+  // Fetch verse content & segments for the active Surah & active reciter
   useEffect(() => {
     if (!activeSurahNum) return;
     setLoadingDetails(true);
 
     let translationId = "161"; // English Sahih International
-    let reciterId = "7"; // Mishari Rashid Alafasy
+    let currentReciterId = playerReciterId || "7";
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("app_translation_identifier");
       if (saved && !isNaN(Number(saved))) {
@@ -140,16 +166,16 @@ export default function AudioPlayerPage() {
       }
       const savedReciter = localStorage.getItem("app_reciter_id");
       if (savedReciter) {
-        reciterId = savedReciter;
+        currentReciterId = savedReciter;
       }
     }
 
     const textUrl = `${QURAN_API_BASE_URL}/verses/by_chapter/${activeSurahNum}?per_page=300&translations=${translationId}&words=true&word_fields=location,text_qpc_hafs,text_indopak,text_uthmani,code_v1,code_v2`;
-    const segmentsUrl = `${QURAN_API_BASE_URL}/chapter_recitations/${reciterId}/${activeSurahNum}?segments=true`;
+    const segmentsUrl = `${QURAN_API_BASE_URL}/chapter_recitations/${currentReciterId}/${activeSurahNum}?segments=true`;
 
     Promise.all([
-      fetch(textUrl).then((r) => r.json()),
-      fetch(segmentsUrl).then((r) => r.json()),
+      fetch(textUrl).then((r) => (r.ok ? r.json() : { verses: [] })),
+      fetch(segmentsUrl).then((r) => (r.ok ? r.json() : { audio_file: {} })),
     ])
       .then(([textJson, segJson]) => {
         const verses = textJson.verses || [];
@@ -175,7 +201,7 @@ export default function AudioPlayerPage() {
       })
       .catch((e) => console.error("Error fetching recitation details:", e))
       .finally(() => setLoadingDetails(false));
-  }, [activeSurahNum]);
+  }, [activeSurahNum, playerReciterId]);
 
   // Compute active ayah based on audioTime (milliseconds check)
   const activeAyah = useMemo(() => {
@@ -215,11 +241,11 @@ export default function AudioPlayerPage() {
     }
   }, [activeAyah?.number]);
 
-  // Sync page activeSurahNum with the loaded audio player source URL
+  // Sync page activeSurahNum with loaded audio source URL
   useEffect(() => {
     if (audio?.src) {
       const num = getSurahNumFromSrc(audio.src);
-      if (num && num !== activeSurahNum) {
+      if (num && num !== activeSurahNum && num >= 1 && num <= 114) {
         setActiveSurahNum(num);
         const match = ALL_SURAHS.find((s) => s.number === num);
         if (match) setActiveSurahInfo(match);
@@ -231,7 +257,7 @@ export default function AudioPlayerPage() {
     setActiveSurahNum(num);
     const selected = ALL_SURAHS.find((s) => s.number === num) || ALL_SURAHS[0];
     setActiveSurahInfo(selected);
-    audio?.playSurah(num, selected?.englishName || "Surah");
+    audio?.playSurah(num, selected?.englishName || "Surah", 0, playerReciterId);
 
     // Log to recents
     if (user && session?.access_token) {
@@ -247,6 +273,14 @@ export default function AudioPlayerPage() {
           englishName: selected?.englishName || "",
         }),
       }).catch((e) => console.error(e));
+    }
+  };
+
+  const handleReciterChangeOnPlayer = (newId) => {
+    const strId = String(newId);
+    setPlayerReciterId(strId);
+    if (audio?.changeReciter) {
+      audio.changeReciter(strId);
     }
   };
 
@@ -353,8 +387,8 @@ export default function AudioPlayerPage() {
             </div>
             <div className="h-10 w-px bg-emerald-100 dark:bg-slate-800" />
             <div className="text-center px-3">
-              <span className="text-2xl font-black text-slate-800 dark:text-slate-100 block font-mono">128</span>
-              <span className="text-[10px] font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Kbps HQ</span>
+              <span className="text-2xl font-black text-slate-800 dark:text-slate-100 block font-mono">{reciterList.length}</span>
+              <span className="text-[10px] font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Reciters</span>
             </div>
           </div>
         </div>
@@ -363,7 +397,7 @@ export default function AudioPlayerPage() {
       {/* ── 2. Core Player Workspace ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
         
-        {/* ── LEFT COLUMN (5 Cols): Vinyl Turntable & Surah Selector ── */}
+        {/* ── LEFT COLUMN (5 Cols): Vinyl Turntable & Selectors ── */}
         <div className="lg:col-span-5 flex flex-col gap-6">
           <div className="w-full p-6 sm:p-8 rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-xl flex flex-col items-center text-center relative overflow-hidden">
             
@@ -438,36 +472,62 @@ export default function AudioPlayerPage() {
               </p>
 
               <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2">
-                <Radio size={14} className="text-emerald-500 animate-pulse" />
-                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                <Radio size={14} className="text-emerald-500 animate-pulse shrink-0" />
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">
                   {audio?.reciterName || "Mishari Rashid al-`Afasy"}
                 </span>
               </div>
             </div>
 
             {/* ── Searchable Surah Quick Selector ── */}
-            <div className="w-full mt-6 text-left">
-              <label className="block text-[11px] font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-                Quick Surah Switcher
-              </label>
+            <div className="w-full mt-6 text-left space-y-4">
+              <div>
+                <label className="block text-[11px] font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                  Surah Selection
+                </label>
+                <div className="relative flex items-center">
+                  <select
+                    value={activeSurahNum}
+                    onChange={(e) => selectSurah(parseInt(e.target.value, 10))}
+                    className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-bold shadow-inner cursor-pointer appearance-none pr-10"
+                  >
+                    {ALL_SURAHS.map((s) => (
+                      <option
+                        key={s.number}
+                        value={s.number}
+                        className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                      >
+                        {s.number}. {s.englishName} ({s.arabicName}) - {s.translatedName}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={16} className="absolute right-3.5 text-gray-400 pointer-events-none" />
+                </div>
+              </div>
 
-              <div className="relative flex items-center">
-                <select
-                  value={activeSurahNum}
-                  onChange={(e) => selectSurah(parseInt(e.target.value, 10))}
-                  className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-bold shadow-inner cursor-pointer appearance-none pr-10"
-                >
-                  {ALL_SURAHS.map((s) => (
-                    <option
-                      key={s.number}
-                      value={s.number}
-                      className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
-                    >
-                      {s.number}. {s.englishName} ({s.arabicName}) - {s.translatedName}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown size={16} className="absolute right-3.5 text-gray-400 pointer-events-none" />
+              {/* ── Reciter Switcher ── */}
+              <div>
+                <label className="block text-[11px] font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                  Reciter Voice (Qari)
+                </label>
+                <div className="relative flex items-center">
+                  <select
+                    value={playerReciterId}
+                    onChange={(e) => handleReciterChangeOnPlayer(e.target.value)}
+                    className="w-full px-4 py-3 rounded-2xl border border-emerald-500/30 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-950/20 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-bold shadow-inner cursor-pointer appearance-none pr-10"
+                  >
+                    {reciterList.map((r) => (
+                      <option
+                        key={r.id}
+                        value={r.id}
+                        className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                      >
+                        {r.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={16} className="absolute right-3.5 text-gray-400 pointer-events-none" />
+                </div>
               </div>
             </div>
 

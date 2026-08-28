@@ -85,6 +85,15 @@ export default function JuzAyahList({
     }
   }, []);
 
+  // Listen to reciter change and reset cached segments
+  useEffect(() => {
+    const handleReciterChange = () => {
+      setSegmentsMap({});
+    };
+    window.addEventListener("quran-reciter-change", handleReciterChange);
+    return () => window.removeEventListener("quran-reciter-change", handleReciterChange);
+  }, []);
+
   // Listen to time updates from global audio player
   useEffect(() => {
     const onTimeUpdate = (e) => {

@@ -5,6 +5,7 @@ import { setCookie } from "cookies-next";
 import { useTheme } from "next-themes";
 import getLanguages from "@/lib/api/getLanguages";
 import getTranslationEditions from "@/lib/api/getTranslationEditions";
+import getReciters from "@/lib/api/getReciters";
 import { useRouter } from "next/navigation";
 import { useAudio } from "@/context/AudioProvider";
 import { useUser } from "@/context/UserProvider";
@@ -125,6 +126,17 @@ export default function useSettings() {
         if (savedId) setIdentifier(savedId);
       } catch {}
     })();
+  }, []);
+
+  // Listen to reciter change from audio context or external events
+  React.useEffect(() => {
+    const onReciterChange = (e) => {
+      if (e.detail?.reciterId) {
+        setReciterId(String(e.detail.reciterId));
+      }
+    };
+    window.addEventListener("quran-reciter-change", onReciterChange);
+    return () => window.removeEventListener("quran-reciter-change", onReciterChange);
   }, []);
 
   // Sync reciter from user profile if logged in
@@ -283,13 +295,23 @@ export default function useSettings() {
   const handleReciterIdChange = (val) => {
     const stringVal = String(val);
     setReciterId(stringVal);
-    try {
-      localStorage.setItem("app_reciter_id", stringVal);
-      setCookie("__reciter_id__", stringVal, {
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
-        path: "/",
-      });
-    } catch {}
+    
+    // Use audio provider's centralized changeReciter helper if available
+    if (audio?.changeReciter) {
+      audio.changeReciter(stringVal);
+    } else {
+      try {
+        localStorage.setItem("app_reciter_id", stringVal);
+        setCookie("__reciter_id__", stringVal, {
+          expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+          path: "/",
+        });
+      } catch {}
+
+      window.dispatchEvent(
+        new CustomEvent("quran-reciter-change", { detail: { reciterId: stringVal } })
+      );
+    }
 
     // Sync to user profile if logged in
     if (session?.access_token) {
@@ -303,29 +325,12 @@ export default function useSettings() {
       }).catch((err) => console.error("Error syncing reciter change:", err));
     }
 
-    // Hot-swap playing audio if any Surah is currently playing
-    if (audio?.playlistId) {
-      let num = null;
-      if (typeof audio.playlistId === "string" && audio.playlistId.startsWith("surah_")) {
-        num = parseInt(audio.playlistId.replace("surah_", ""), 10);
-      } else if (!isNaN(Number(audio.playlistId))) {
-        num = parseInt(audio.playlistId, 10);
-      }
-      if (num) {
-        const currentPos = audio?.currentTime || 0;
-        audio.playSurah(num, audio.title || "", currentPos);
-      }
-    }
-
-    window.dispatchEvent(new CustomEvent("quran-reciter-change", { detail: { reciterId: stringVal } }));
-
+    // Soft refresh server components for page headers/metadata
     setTimeout(() => {
       try {
         router.refresh();
-      } catch {
-        if (typeof window !== "undefined") window.location.reload();
-      }
-    }, 150);
+      } catch {}
+    }, 100);
   };
 
   const resetAll = () => {
@@ -358,6 +363,9 @@ export default function useSettings() {
     setArabicFontSize(defaultArabic);
     setArabicTextType("uthmani");
     setReciterId("7");
+    if (audio?.changeReciter) {
+      audio.changeReciter("7");
+    }
     setTimeout(() => {
       try {
         router.refresh();
