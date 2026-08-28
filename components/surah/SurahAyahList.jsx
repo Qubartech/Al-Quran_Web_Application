@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import TafsirModal from "./TafsirModal";
 import SurahPlayBtn from "./SurahPlayBtn";
+import { formatTranslationBadge, getTranslatorName } from "@/lib/data/translationNames";
 
 export default function SurahAyahList({
   arabicAyah = [],
@@ -530,14 +531,15 @@ export default function SurahAyahList({
 
         for (let i = 0; i < totalAyahs; i++) {
           const verseTransList = [];
-          validResults.forEach((resData) => {
+          validResults.forEach((resData, rIdx) => {
             const verse = resData?.verses?.[i];
             const transObj = verse?.translations?.[0];
             if (transObj && transObj.text) {
+              const resId = transObj.resource_id || identifiers[rIdx];
               verseTransList.push({
                 text: transObj.text || "",
-                name: transObj.resource_name || "",
-                id: transObj.resource_id,
+                name: getTranslatorName(resId, rIdx + 1),
+                id: resId,
               });
             }
           });
@@ -1072,8 +1074,8 @@ export default function SurahAyahList({
                         englishTrans[idx].map((transItem, tIdx) => (
                           <div key={tIdx} className="flex flex-col gap-1">
                             {englishTrans[idx].length > 1 && (
-                              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded-md w-max border border-emerald-500/20">
-                                {transItem.name || `Translation ${tIdx + 1}`}
+                              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 px-2.5 py-0.5 rounded-md w-max border border-emerald-500/20 shadow-2xs">
+                                {formatTranslationBadge(transItem, tIdx)}
                               </span>
                             )}
                             <p className="text-slate-800 dark:text-slate-200 ayah-text leading-relaxed font-normal">
