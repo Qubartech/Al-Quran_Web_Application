@@ -195,30 +195,6 @@ export default function AudioProvider({ children }) {
     
     // Immediately start playback in user click gesture context
     playList([initialUrl], 0, `surah_${num}`, surahName);
-
-    // Fetch API asynchronously in background to sync official CDN URL if different
-    try {
-      const res = await fetch(`${QURAN_API_BASE_URL}/chapter_recitations/${currentReciter}/${num}`);
-      if (res.ok) {
-        const data = await res.json();
-        const apiAudioUrl = data.audio_file?.audio_url;
-        if (apiAudioUrl && apiAudioUrl !== initialUrl) {
-          const targetSeek = currentTimeRef.current > 0 ? currentTimeRef.current : startSeekTime;
-          if (typeof window !== "undefined" && targetSeek > 0) {
-            window.pendingQuranAudioSeekTime = targetSeek;
-          }
-          setSrc(apiAudioUrl);
-          srcRef.current = apiAudioUrl;
-          if (typeof window !== "undefined") {
-            try {
-              localStorage.setItem("__audio_src__", apiAudioUrl);
-            } catch (e) {}
-          }
-        }
-      }
-    } catch (e) {
-      console.error("Failed to fetch recitation from API:", e);
-    }
   }, []);
 
   // Handle seamless reciter change with active playback instant hot-swapping
@@ -248,7 +224,7 @@ export default function AudioProvider({ children }) {
         window.pendingQuranAudioSeekTime = currentPos;
       }
 
-      // 1. Instantly set the new CDN URL so audio switches immediately without pause
+      // Instantly set the new CDN URL so audio switches immediately without interruption
       const initialUrl = getInitialReciterCdnUrl(stringId, surahNum);
       setSrc(initialUrl);
       srcRef.current = initialUrl;
@@ -262,30 +238,6 @@ export default function AudioProvider({ children }) {
         try {
           localStorage.setItem("__audio_src__", initialUrl);
         } catch (e) {}
-      }
-
-      // 2. Fetch API asynchronously in background to ensure accurate URL sync
-      try {
-        const res = await fetch(`${QURAN_API_BASE_URL}/chapter_recitations/${stringId}/${surahNum}`);
-        if (res.ok) {
-          const data = await res.json();
-          const apiAudioUrl = data.audio_file?.audio_url;
-          if (apiAudioUrl && apiAudioUrl !== initialUrl) {
-            const targetSeek = currentTimeRef.current > 0 ? currentTimeRef.current : currentPos;
-            if (typeof window !== "undefined" && targetSeek > 0) {
-              window.pendingQuranAudioSeekTime = targetSeek;
-            }
-            setSrc(apiAudioUrl);
-            srcRef.current = apiAudioUrl;
-            if (typeof window !== "undefined") {
-              try {
-                localStorage.setItem("__audio_src__", apiAudioUrl);
-              } catch (e) {}
-            }
-          }
-        }
-      } catch (e) {
-        console.error("Failed to fetch recitation from API:", e);
       }
     }
 
@@ -388,6 +340,46 @@ export default function AudioProvider({ children }) {
   // Word tooltip toggle state
   const [showWordTooltip, setShowWordTooltip] = useState(true);
 
+  // Synchronized playback rate state
+  const [playbackRate, setPlaybackRate] = useState(1);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("__audio_speed__");
+        if (saved !== null) {
+          const s = parseFloat(saved);
+          if (!isNaN(s) && s > 0) setPlaybackRate(s);
+        }
+      } catch (e) {}
+    }
+  }, []);
+
+  const changeSpeed = useCallback((rate) => {
+    const r = parseFloat(rate) || 1;
+    setPlaybackRate(r);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("__audio_speed__", String(r));
+      } catch (e) {}
+      window.dispatchEvent(new CustomEvent("quran-audio-speed-change", { detail: { speed: r } }));
+    }
+    const audioEl = document.querySelector("audio");
+    if (audioEl) audioEl.playbackRate = r;
+  }, []);
+
+  useEffect(() => {
+    const handleSpeedEvent = (e) => {
+      if (typeof e.detail?.speed === "number") {
+        setPlaybackRate(e.detail.speed);
+      }
+    };
+    window.addEventListener("quran-audio-speed-change", handleSpeedEvent);
+    return () => {
+      window.removeEventListener("quran-audio-speed-change", handleSpeedEvent);
+    };
+  }, []);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
@@ -418,6 +410,9 @@ export default function AudioProvider({ children }) {
     currentTime,
     showWordTooltip,
     toggleWordTooltip,
+    playbackRate,
+    setPlaybackRate,
+    changeSpeed,
     play,
     playList,
     playSurah,

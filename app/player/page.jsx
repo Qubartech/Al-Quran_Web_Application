@@ -152,6 +152,25 @@ export default function AudioPlayerPage() {
     };
   }, []);
 
+  // Listen to playback speed changes from global context or audio player
+  useEffect(() => {
+    if (audio?.playbackRate) {
+      setPlaybackSpeed(audio.playbackRate);
+    }
+  }, [audio?.playbackRate]);
+
+  useEffect(() => {
+    const handleSpeedEvent = (e) => {
+      if (typeof e.detail?.speed === "number") {
+        setPlaybackSpeed(e.detail.speed);
+      }
+    };
+    window.addEventListener("quran-audio-speed-change", handleSpeedEvent);
+    return () => {
+      window.removeEventListener("quran-audio-speed-change", handleSpeedEvent);
+    };
+  }, []);
+
   // Fetch verse content & segments for the active Surah & active reciter
   useEffect(() => {
     if (!activeSurahNum) return;
@@ -319,19 +338,26 @@ export default function AudioPlayerPage() {
   const handleSpeedChange = (rate) => {
     setPlaybackSpeed(rate);
     setShowSpeedMenu(false);
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem("__audio_speed__", String(rate));
-      } catch (e) {}
+    if (audio?.changeSpeed) {
+      audio.changeSpeed(rate);
+    } else {
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("__audio_speed__", String(rate));
+        } catch (e) {}
+        window.dispatchEvent(
+          new CustomEvent("quran-audio-speed-change", { detail: { speed: rate } })
+        );
+      }
+      const audioEl = document.querySelector("audio");
+      if (audioEl) audioEl.playbackRate = rate;
     }
-    const audioEl = document.querySelector("audio");
-    if (audioEl) audioEl.playbackRate = rate;
   };
 
   const progressPercent = audioDuration > 0 ? (audioTime / audioDuration) * 100 : 0;
 
   return (
-    <main className="text-gray-900 dark:text-gray-100 min-h-screen transition-colors py-6 sm:py-8 px-4 md:px-6 max-w-screen-2xl mx-auto flex flex-col gap-6 sm:gap-8">
+    <main className="text-gray-900 dark:text-gray-100 min-h-screen transition-colors pt-6 sm:pt-8 pb-36 sm:pb-40 px-4 md:px-6 max-w-screen-2xl mx-auto flex flex-col gap-6 sm:gap-8">
       
       {/* ── 1. Luxury Header Banner ── */}
       <div className="relative overflow-hidden p-6 sm:p-8 md:p-10 rounded-3xl glass border border-emerald-500/20 dark:border-emerald-500/30 shadow-xl transition-all duration-300 animate-fadeIn">
